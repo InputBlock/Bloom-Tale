@@ -1,1 +1,1 @@
-export const DB_NAME = "STMS"
+export const DB_NAME = "BloomTale"
