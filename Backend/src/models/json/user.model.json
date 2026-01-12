@@ -1,11 +1,6 @@
 {
   "table": "users",
   "columns": {
-    "id": {
-      "type": "INTEGER",
-      "primary_key": true,
-      "nullable": false
-    },
     "username": {
       "type": "VARCHAR",
       "length": 30,
@@ -30,29 +25,11 @@
       "type": "BOOLEAN",
       "default": false
     },
-    "is_admin": {
-      "type": "BOOLEAN",
-      "default": false,
-      "indexed": true
-    },
     "created_at": {
       "type": "TIMESTAMP",
       "default": "utcnow"
     },
-    "updated_at": {
-      "type": "TIMESTAMP",
-      "default": "utcnow",
-      "on_update": "utcnow"
-    },
-    "last_login_at": {
-      "type": "TIMESTAMP",
-      "nullable": true
-    },
-    "password_changed_at": {
-      "type": "TIMESTAMP",
-      "nullable": true
-    },
-    "user_metadata": {
+    "metadata": {
       "type": "JSON",
       "default": {}
     }
