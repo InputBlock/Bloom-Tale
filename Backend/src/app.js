@@ -22,7 +22,10 @@ app.get("/", (req, res) => {
 });
 
 import authRoutes from "./route/auth.route.js"
+import adminRoutes from "./route/admin.route.js"
+
 app.use("/api/v1", authRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 
 export {app}

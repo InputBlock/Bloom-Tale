@@ -5,12 +5,14 @@ import AddItems from './pages/AddItems'
 import ListItems from './pages/ListItems'
 import Orders from './pages/Orders'
 import Users from './pages/Users'
+import Login from './pages/Login'
 import './App.css'
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Layout title="Dashboard" subtitle="Manage your business with ease" />}>
           <Route index element={<Dashboard />} />
         </Route>

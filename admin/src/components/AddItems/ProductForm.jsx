@@ -53,7 +53,7 @@ export default function ProductForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-gray-900 font-medium mb-2">Flower Type</label>
+          <label className="block text-gray-900 font-medium mb-2">Category</label>
           <select
             value={formData.type}
             onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -68,7 +68,7 @@ export default function ProductForm() {
         </div>
 
         <div>
-          <label className="block text-gray-900 font-medium mb-2">Color</label>
+          <label className="block text-gray-900 font-medium mb-2">sub category</label>
           <select
             value={formData.color}
             onChange={(e) => setFormData({ ...formData, color: e.target.value })}

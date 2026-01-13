@@ -1,6 +1,7 @@
 import StatCard from "../components/Dashboard/StatCard"
 import SalesChart from "../components/Dashboard/SalesChart"
 import OrdersChart from "../components/Dashboard/OrdersChart"
+import RecentOrders from "../components/Dashboard/RecentOrders"
 import { DollarSign, ShoppingCart, Users, TrendingUp } from "lucide-react"
 
 export default function Dashboard() {
@@ -39,6 +40,9 @@ export default function Dashboard() {
         <SalesChart />
         <OrdersChart />
       </div>
+
+      {/* Recent Orders Table */}
+      <RecentOrders />
     </div>
   )
 }

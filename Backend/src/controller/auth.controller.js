@@ -1,5 +1,10 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import {ApiError} from "../utils/ApiError.js"
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { generateOtp } from "../utils/generateOtp.js";
+import sendOtpEmail from "../utils/sendOtp.js";
 
 const createAccessToken = (userId) => {
   return jwt.sign({ sub: userId }, process.env.JWT_SECRET, { 
@@ -107,21 +112,6 @@ export const googleCallback = async (req, res) => {
     });
   }
 };
-
-
-
-import { asyncHandler } from "../utils/asyncHandler.js";
-import {ApiError} from "../utils/ApiError.js"
-
-import { ApiResponse } from "../utils/ApiResponse.js";
-
-import mongoose from "mongoose";
-
-
-
-
-import { generateOtp } from "../utils/generateOtp.js";
-import sendOtpEmail from "../utils/sendOtp.js";
 
 
 const registerUser = asyncHandler(async (req, res) => {
