@@ -10,7 +10,6 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      index: true,
       lowercase: true,
     },
     password: { type: String, required: true },
@@ -19,24 +18,34 @@ const userSchema = new Schema(
     },
     firstName: {
       type: String,
-      required: true,
+      // required: true,
     },
     lastName: {
       type: String,
-      required: true,
+      // required: true,
     },
     mobileNumber: {
       type: String,
-      required: true,
+      // required: true,
       match: [/^[6-9]\d{9}$/, "Invalid mobile number"],
     },
     address: {
       type: String,
-      required: true,
+      // required: true,
     },
     metadata: {
       type: Schema.Types.Mixed,
       default: {},
+    },
+    emailOtp: {
+      type: String,
+    },
+    emailOtpExpiry: {
+      type: Date,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -45,11 +54,10 @@ const userSchema = new Schema(
 );
 
 //mongoose hook (middleware)
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 //mongoose custom methods

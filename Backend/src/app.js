@@ -21,8 +21,8 @@ app.get("/", (req, res) => {
   res.send("Server is running 🚀");
 });
 
-
-
+import authRoutes from "./route/auth.route.js"
+app.use("/api/v1", authRoutes);
 
 
 export {app}
