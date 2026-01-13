@@ -23,8 +23,3 @@ connectDB()  //ye async use kiye hai to promise bhi return karega isliye
     
 })
 
-console.log("ENV CHECK:", {
-  DB: process.env.MONGODB_URI,
-  SMTP_USER: process.env.SMTP_USER,
-  SMTP_PASS_EXISTS: !!process.env.SMTP_PASS,
-});
