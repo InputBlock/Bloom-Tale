@@ -14,7 +14,7 @@ export default function Header() {
     "Condolences & Fragrances",
     "Potted Plants",
     "Gift Combos",
-    "Same Day Gifting",
+    "Services",
   ]
 
   return (
