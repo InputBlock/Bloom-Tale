@@ -3,16 +3,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Import flower images
-import flowersCouples from "@/assets/flowers-couples.jpg";
-import flowersCorporate from "@/assets/flowers-corporate.jpg";
-import flowersCelebration from "@/assets/flowers-celebration.jpg";
-import flowersGifting from "@/assets/flowers-gifting.jpg";
+import flowersCouples from "../../assets/flowers-couples.jpg";
+import flowersCorporate from "../../assets/flowers-corporate.jpg";
+import flowersCelebration from "../../assets/flowers-celebration.jpg";
+import flowersGifting from "../../assets/flowers-gifting.jpg";
 
 // Import scene images
-import sceneCouples from "@/assets/scene-couples.jpg";
-import sceneCorporate from "@/assets/scene-corporate.jpg";
-import sceneCelebration from "@/assets/scene-celebration.jpg";
-import sceneGifting from "@/assets/scene-gifting.jpg";
+import sceneCouples from "../../assets/scene-couples.jpg";
+import sceneCorporate from "../../assets/scene-corporate.jpg";
+import sceneCelebration from "../../assets/scene-celebration.jpg";
+import sceneGifting from "../../assets/scene-gifting.jpg";
+
 
 const categories = [
   {
@@ -75,14 +76,14 @@ const FlowerCarousel = () => {
   const getCardPosition = (index) => {
     const diff = (index - activeIndex + categories.length) % categories.length;
     const positions = [
-      { x: 0, y: 0, scale: 0.75, opacity: 0.6, rotate: -15, zIndex: 1 },
-      { x: -280, y: 20, scale: 0.85, opacity: 0.8, rotate: -8, zIndex: 2 },
-      { x: 280, y: 20, scale: 0.85, opacity: 0.8, rotate: 8, zIndex: 2 },
-      { x: 0, y: 0, scale: 0.75, opacity: 0.6, rotate: 15, zIndex: 1 },
+      { x: 0, y: 0, scale: 0.75, opacity: 0.6, rotate: -15, zIndex: 1 }, // Far left
+      { x: -280, y: 20, scale: 0.85, opacity: 0.8, rotate: -8, zIndex: 2 }, // Left
+      { x: 280, y: 20, scale: 0.85, opacity: 0.8, rotate: 8, zIndex: 2 }, // Right
+      { x: 0, y: 0, scale: 0.75, opacity: 0.6, rotate: 15, zIndex: 1 }, // Far right
     ];
 
     if (categories.length === 4) {
-      if (diff === 0) return { x: 0, y: -30, scale: 1, opacity: 1, rotate: 0, zIndex: 10 };
+      if (diff === 0) return { x: 0, y: -30, scale: 1, opacity: 1, rotate: 0, zIndex: 10 }; // Active behind glass
       if (diff === 1) return { x: 320, y: 40, scale: 0.75, opacity: 0.85, rotate: 12, zIndex: 3 };
       if (diff === 2) return { x: 0, y: 80, scale: 0.65, opacity: 0.5, rotate: 0, zIndex: 1 };
       if (diff === 3) return { x: -320, y: 40, scale: 0.75, opacity: 0.85, rotate: -12, zIndex: 3 };
@@ -95,8 +96,8 @@ const FlowerCarousel = () => {
 
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-8">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background" />
+      {/* Background linear */}
+      <div className="absolute inset-0 bg-linear-to-b from-secondary/50 via-background to-background" />
       
       {/* Decorative circles */}
       <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-accent/10 blur-3xl" />
@@ -105,7 +106,7 @@ const FlowerCarousel = () => {
       {/* Carousel Container */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4">
         {/* Flower Cards Circle */}
-        <div className="relative h-[420px] flex items-center justify-center carousel-container">
+        <div className="relative h-105 flex items-center justify-center carousel-container">
           {/* Background Flower Cards */}
           {categories.map((category, index) => (
             <motion.div
@@ -134,21 +135,21 @@ const FlowerCarousel = () => {
                   alt={category.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/60 to-transparent p-3">
+                <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-foreground/60 to-transparent p-3">
                   <p className="text-card text-sm font-medium">{category.name}</p>
                 </div>
               </div>
             </motion.div>
           ))}
 
-          {/* Central Glass Showcase Card */}
+          {/* Central Showcase Card */}
           <motion.div
-            className="absolute z-20 w-72 h-96 md:w-80 md:h-[420px]"
+            className="absolute z-20 w-72 h-96 md:w-80 md:h-[450px]"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="glass-card rounded-3xl overflow-hidden h-full pulse-glow">
+            <div className="bg-[#FBF8F3] rounded-3xl overflow-hidden h-full shadow-xl">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeCategory.id}
@@ -159,22 +160,22 @@ const FlowerCarousel = () => {
                   className="h-full flex flex-col"
                 >
                   {/* Scene Image */}
-                  <div className="relative h-56 md:h-64 overflow-hidden">
+                  <div className="relative h-56 md:h-64 overflow-hidden rounded-t-3xl">
                     <img
                       src={activeCategory.sceneImage}
                       alt={activeCategory.tagline}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FBF8F3]/80" />
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 p-5 flex flex-col justify-center text-center">
+                  <div className="flex-1 p-6 flex flex-col justify-center text-center bg-[#FBF8F3]">
                     <motion.span
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
-                      className="text-xs uppercase tracking-widest text-muted-foreground mb-1"
+                      className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 font-medium"
                     >
                       {activeCategory.name}
                     </motion.span>
@@ -182,7 +183,7 @@ const FlowerCarousel = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="text-2xl md:text-3xl font-display text-foreground mb-2"
+                      className="text-3xl md:text-4xl font-serif text-gray-800 mb-3 leading-tight"
                     >
                       {activeCategory.tagline}
                     </motion.h3>
@@ -190,7 +191,7 @@ const FlowerCarousel = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
-                      className="text-sm text-muted-foreground leading-relaxed"
+                      className="text-sm text-gray-600 leading-relaxed px-2"
                     >
                       {activeCategory.description}
                     </motion.p>
