@@ -1,7 +1,6 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
 
-export default function L_email({ onNext }) {
+export default function R_credentials({ onNext }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -15,9 +14,9 @@ export default function L_email({ onNext }) {
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
       <h1 className="text-3xl font-serif text-gray-800 mb-2 text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
-        Welcome Back
+        Create Account
       </h1>
-      <p className="text-sm text-gray-500 text-center mb-8">Login to your account</p>
+      <p className="text-sm text-gray-500 text-center mb-8">Join BloomTale today</p>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -29,7 +28,7 @@ export default function L_email({ onNext }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition"
             required
           />
         </div>
@@ -43,31 +42,22 @@ export default function L_email({ onNext }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition"
             required
           />
-        </div>
-
-        <div className="text-right">
-          <Link 
-            to="/forgot-password" 
-            className="text-sm text-[#6B7C59] hover:underline font-medium"
-          >
-            Forgot Password?
-          </Link>
         </div>
 
         <button
           type="submit"
           className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200"
         >
-          LOGIN
+          SEND OTP
         </button>
       </form>
 
       <div className="flex items-center my-6">
         <div className="flex-1 border-t border-gray-300"></div>
-        <span className="px-4 text-gray-400 text-sm">or login with</span>
+        <span className="px-4 text-gray-400 text-sm">or sign up</span>
         <div className="flex-1 border-t border-gray-300"></div>
       </div>
 
@@ -90,21 +80,25 @@ export default function L_email({ onNext }) {
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
           />
         </svg>
-        LOGIN WITH GOOGLE
+        SIGN UP WITH GOOGLE
       </button>
 
       <p className="text-center text-xs text-gray-500 mt-6">
-        Don't have an account?{" "}
-        <Link to="/register" className="text-[#6B7C59] hover:underline font-medium">
-          Sign up
-        </Link>
+        Already have an account?{" "}
+        <a href="/login" className="text-[#6B7C59] hover:underline font-medium">
+          Log in
+        </a>
       </p>
 
       <p className="text-center text-xs text-gray-500 mt-4">
         By continuing, you agree to our{" "}
-        <a href="#" className="underline hover:text-gray-700">Terms of Service</a>
+        <a href="#" className="underline hover:text-gray-700">
+          Terms of Service
+        </a>
         {" "}and{" "}
-        <a href="#" className="underline hover:text-gray-700">Privacy Policy</a>
+        <a href="#" className="underline hover:text-gray-700">
+          Privacy Policy
+        </a>
       </p>
     </div>
   )

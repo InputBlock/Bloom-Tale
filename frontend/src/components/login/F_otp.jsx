@@ -1,6 +1,6 @@
 import { useState, useRef } from "react"
 
-export default function L_otp({ email, onSubmit, onResend }) {
+export default function F_otp({ email, onNext, onResend }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const inputRefs = useRef([])
 
@@ -11,7 +11,6 @@ export default function L_otp({ email, onSubmit, onResend }) {
     newOtp[index] = value
     setOtp(newOtp)
 
-    // Move to next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus()
     }
@@ -27,17 +26,18 @@ export default function L_otp({ email, onSubmit, onResend }) {
     e.preventDefault()
     const otpValue = otp.join("")
     if (otpValue.length === 6) {
-      onSubmit(otpValue)
+      onNext(otpValue)
     }
   }
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-      <h1 className="text-2xl font-serif text-gray-900 mb-2 text-center">
-        Enter OTP to verify Email
+    <div className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
+      <h1 className="text-2xl font-serif text-gray-800 mb-2 text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
+        Verify OTP
       </h1>
       <p className="text-gray-600 text-sm text-center mb-8">
-        We've sent a verification code to <span className="font-medium">{email}</span>
+        We've sent a verification code to<br />
+        <span className="font-medium text-gray-800">{email}</span>
       </p>
 
       <form onSubmit={handleSubmit}>
@@ -51,17 +51,17 @@ export default function L_otp({ email, onSubmit, onResend }) {
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-14 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+              className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
             />
           ))}
         </div>
 
         <div className="text-center mb-6">
-          <span className="text-gray-500 text-sm">Didn't receive OTP? </span>
+          <span className="text-gray-500 text-sm">Didn't receive the code? </span>
           <button
             type="button"
             onClick={onResend}
-            className="text-gray-900 font-semibold text-sm hover:underline"
+            className="text-[#6B7C59] font-semibold text-sm hover:underline"
           >
             Resend OTP
           </button>
@@ -69,9 +69,9 @@ export default function L_otp({ email, onSubmit, onResend }) {
 
         <button
           type="submit"
-          className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 rounded-md transition duration-200"
+          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200"
         >
-          SUBMIT
+          VERIFY OTP
         </button>
       </form>
     </div>
