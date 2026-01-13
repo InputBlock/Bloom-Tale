@@ -1,4 +1,4 @@
-import { addItem ,listItem } from "../../admin/product.js";
+import { addItem, listItem, unlistItem } from "../../admin/product.js";
 
 const add_item = async (req, res) => {
     try {
@@ -21,14 +21,24 @@ const add_item = async (req, res) => {
         return res.status(500).json({ error: err.message });
     }
 };
-const list_item=async(req, res)=>{
-    try{
-        const {name}= req.body.name;
-        const p=await listItem(name);
+const list_item = async (req, res) => {
+    try {
+        const { name } = req.body;
+        const p = await listItem(name);
         return res.status(200).json(p);
-    }catch(err){
+    } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 }
 
-export default list_item ; add_item;
+const unlist_item = async (req, res) => {
+    try {
+        const { name } = req.body;
+        const p = await unlistItem(name);
+        return res.status(200).json(p);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+export { add_item, list_item, unlist_item };

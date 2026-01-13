@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
-import { LayoutDashboard, Plus, List, Package, Users, LogOut, X } from "lucide-react"
+import { LayoutDashboard, Plus, List, Package, Users, LogOut, X, Menu } from "lucide-react"
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation()
@@ -24,49 +24,71 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Expanded Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen bg-black text-white w-64 z-50 transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 left-0 h-screen bg-black text-white z-50 transition-all duration-300 ${
+          isOpen ? "w-64" : "w-16"
         } lg:translate-x-0`}
       >
-        <div className="p-6 flex items-center justify-between border-b border-gray-800">
-          <div>
-            <h1 className="text-2xl font-bold">FOREVER</h1>
-            <p className="text-gray-400 text-sm">Admin Panel</p>
-          </div>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-white"
-          >
-            <X size={24} />
-          </button>
+        {/* Header */}
+        <div className={`p-4 flex items-center border-b border-gray-800 ${isOpen ? "justify-between" : "justify-center"}`}>
+          {isOpen ? (
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-white">FOREVER</h1>
+                <p className="text-gray-400 text-sm">Admin Panel</p>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setIsOpen(true)}
+              className="text-gray-400 hover:text-white transition-colors p-2"
+            >
+              <Menu size={20} />
+            </button>
+          )}
         </div>
 
-        <nav className="p-4 flex-1">
+        {/* Navigation */}
+        <nav className="p-2 flex-1">
           {menuItems.map((item) => {
             const Icon = item.icon
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition ${
+                className={`flex items-center gap-3 px-3 py-3 rounded-lg mb-1 transition-all duration-200 ${
+                  isOpen ? "" : "justify-center"
+                } ${
                   isActive(item.path)
                     ? "bg-gray-800 text-white"
                     : "text-gray-400 hover:bg-gray-900 hover:text-white"
                 }`}
+                title={!isOpen ? item.label : ""}
               >
                 <Icon size={20} />
-                <span>{item.label}</span>
+                {isOpen && <span className="text-sm">{item.label}</span>}
               </Link>
             )
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-800">
-          <button className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-900 rounded-lg w-full transition">
+        {/* Logout */}
+        <div className="p-2 border-t border-gray-800 absolute bottom-0 left-0 right-0">
+          <button 
+            className={`flex items-center gap-3 px-3 py-3 text-gray-400 hover:text-white hover:bg-gray-900 rounded-lg w-full transition-all duration-200 ${
+              isOpen ? "" : "justify-center"
+            }`}
+            title={!isOpen ? "Logout" : ""}
+          >
             <LogOut size={20} />
-            <span>Logout</span>
+            {isOpen && <span className="text-sm">Logout</span>}
           </button>
         </div>
       </aside>

@@ -17,7 +17,15 @@ export async function listItem(name) {
     }
     existing.is_active=true;
     return await existing.save();
+}
 
+export async function unlistItem(name) {
+    const existing = await productSchema.findOne({ name: name })
+    if (!existing) {
+        throw new Error("Product is not available");
+    }
+    existing.is_active = false;
+    return await existing.save();
 }
 
 

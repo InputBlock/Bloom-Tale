@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { Search, Edit2, Trash2, Plus, X } from "lucide-react"
+import { Search, Edit2, Trash2, Plus } from "lucide-react"
+import EditProductModal from "../components/ListItems/EditProductModal"
 
 export default function ListItems() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -34,24 +35,35 @@ export default function ListItems() {
     }
   }
 
+  const toggleListing = (id) => {
+    setProducts(products.map((p) => {
+      if (p.id === id) {
+        if (p.stock === 0) {
+          alert("Cannot activate product with 0 stock. Please add stock first.")
+          return p
+        }
+        return { ...p, isListed: !p.isListed }
+      }
+      return p
+    }))
+  }
+
   const handleEdit = (product) => {
     setEditProduct({ ...product })
     setEditModal(true)
   }
 
-  const handleSaveEdit = () => {
-    if (editProduct) {
-      // If stock is 0, automatically unlist
-      const updatedProduct = {
-        ...editProduct,
-        isListed: editProduct.stock > 0 ? editProduct.isListed : false
-      }
-      setProducts(products.map((p) => 
-        p.id === updatedProduct.id ? updatedProduct : p
-      ))
-      setEditModal(false)
-      setEditProduct(null)
-    }
+  const handleSaveEdit = (updatedProduct) => {
+    setProducts(products.map((p) => 
+      p.id === updatedProduct.id ? updatedProduct : p
+    ))
+    setEditModal(false)
+    setEditProduct(null)
+  }
+
+  const handleCloseModal = () => {
+    setEditModal(false)
+    setEditProduct(null)
   }
 
   return (
@@ -93,7 +105,7 @@ export default function ListItems() {
                   <td className="py-4 px-6 text-gray-600 text-sm">{product.category}</td>
                   <td className="py-4 px-6 text-gray-900 font-semibold">${product.price}</td>
                   <td className="py-4 px-6">
-                    {product.stock > 0 ? (
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleUpdateStock(product.id)}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 transition-colors duration-200"
@@ -101,15 +113,17 @@ export default function ListItems() {
                         {product.stock} items
                         <Plus size={12} />
                       </button>
-                    ) : (
                       <button
-                        onClick={() => handleUpdateStock(product.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-red-100 text-red-600 border border-red-200 hover:bg-red-200 transition-colors duration-200"
+                        onClick={() => toggleListing(product.id)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${
+                          product.isListed
+                            ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
+                            : "bg-red-100 text-red-600 border-red-200 hover:bg-red-200"
+                        }`}
                       >
-                        Out of Stock
-                        <Plus size={12} />
+                        {product.isListed ? "Active" : "Inactive"}
                       </button>
-                    )}
+                    </div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center justify-center gap-3">
@@ -142,120 +156,12 @@ export default function ListItems() {
       )}
 
       {/* Edit Modal */}
-      {editModal && editProduct && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 m-4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Edit Product</h2>
-              <button
-                onClick={() => { setEditModal(false); setEditProduct(null); }}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Product Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                <input
-                  type="text"
-                  value={editProduct.name}
-                  onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <input
-                  type="text"
-                  value={editProduct.category}
-                  onChange={(e) => setEditProduct({ ...editProduct, category: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                />
-              </div>
-
-              {/* Price */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
-                <input
-                  type="text"
-                  value={editProduct.price}
-                  onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                />
-              </div>
-
-              {/* Stock */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-                <input
-                  type="number"
-                  value={editProduct.stock}
-                  onChange={(e) => setEditProduct({ ...editProduct, stock: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                />
-              </div>
-
-              {/* List Toggle */}
-              <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">List this product</p>
-                  <p className="text-sm text-gray-500">
-                    {editProduct.stock === 0 
-                      ? "Cannot list - Out of stock" 
-                      : "Show this product to customers"}
-                  </p>
-                </div>
-                <button
-                  onClick={() => editProduct.stock > 0 && setEditProduct({ ...editProduct, isListed: !editProduct.isListed })}
-                  disabled={editProduct.stock === 0}
-                  className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
-                    editProduct.stock === 0 
-                      ? "bg-gray-200 cursor-not-allowed" 
-                      : editProduct.isListed 
-                        ? "bg-green-500" 
-                        : "bg-gray-300"
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
-                      editProduct.isListed && editProduct.stock > 0 ? "translate-x-6" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Status Badge */}
-              {editProduct.stock === 0 && (
-                <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <p className="text-sm text-red-600 font-medium">This product is out of stock and will not be listed</p>
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => { setEditModal(false); setEditProduct(null); }}
-                className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditProductModal
+        product={editProduct}
+        isOpen={editModal}
+        onClose={handleCloseModal}
+        onSave={handleSaveEdit}
+      />
     </div>
   )
 }
