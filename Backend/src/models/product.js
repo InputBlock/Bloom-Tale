@@ -20,7 +20,10 @@ const productSchema = new mongoose.Schema(
     images: {type:String , default:null},
     stock: {
       type: Number,
-      default: 100,
+      default: null,
+      description:"Out of Stock"
+    },
+    is_active: { type: Boolean, default: false,
     },
   },
   { timestamps: true },

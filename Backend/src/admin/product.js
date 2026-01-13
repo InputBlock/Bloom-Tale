@@ -9,3 +9,24 @@ export async function addItem(details) {
     const p = new productSchema(details);
     return await p.save();
 }
+
+export async function listItem(name) {
+    const existing=await productSchema.findOne({name:name})
+    if(!existing){
+        throw new Error("Prouct is not available");
+    }
+    existing.is_active=true;
+    return await existing.save();
+
+}
+
+
+
+
+
+
+
+
+
+
+
