@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {
   registerUser,
-//   loginUser,
-//   logoutUser,
-//   refreshAccessToken,
+  verifyOtp,
+  loginUser,
+  logoutUser,
+  forgotPassword,
+  resetPassword
 } from "../controller/auth.controller.js";
 // import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -11,11 +13,12 @@ const router = Router();
 
 // Public routes
 router.post("/register", registerUser);
-// router.post("/login", loginUser);
-// router.post("/refresh-token", refreshAccessToken);
+router.post("/verifyOtp", verifyOtp);
+router.post("/login", loginUser);
+router.post("/logout", logoutUser);
+router.post("/forgotPassword", forgotPassword);
+router.post("/resetPassword", resetPassword);
 
-// Protected routes
-// router.post("/logout", verifyJWT, logoutUser);
 // router.get("/me", verifyJWT, (req, res) => {
 //   res.status(200).json({
 //     success: true,
