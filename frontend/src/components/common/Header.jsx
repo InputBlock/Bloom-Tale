@@ -2,9 +2,13 @@
 
 import { useState } from "react"
 import { Search, User, ShoppingCart, Menu, X } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { useCart } from "../../context/CartContext"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const navigate = useNavigate()
+  const { getCartCount } = useCart()
 
   const categories = [
     "Same Day Delivery",
@@ -32,10 +36,13 @@ export default function Header() {
           </div>
         </div>
         <div className="flex items-center gap-2 ml-4">
-          <button className="relative p-2 hover:bg-gray-800 rounded-full">
+          <button 
+            onClick={() => navigate("/cart")}
+            className="relative p-2 hover:bg-gray-800 rounded-full"
+          >
             <ShoppingCart size={20} />
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              0
+              {getCartCount()}
             </span>
           </button>
           <button className="p-2 hover:bg-gray-800 rounded-full">

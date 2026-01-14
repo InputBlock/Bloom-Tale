@@ -3,11 +3,20 @@ import { useState } from "react"
 export default function R_credentials({ onNext }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (email && password) {
-      onNext(email, password)
+      setLoading(true)
+      setError("")
+      const result = await onNext(email, password)
+      setLoading(false)
+      
+      if (!result.success) {
+        setError(result.message)
+      }
     }
   }
 
@@ -19,6 +28,12 @@ export default function R_credentials({ onNext }) {
       <p className="text-sm text-gray-500 text-center mb-8">Join BloomTale today</p>
       
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
+        
         <div>
           <label className="block text-gray-700 text-sm font-medium mb-2">
             Email
@@ -30,6 +45,7 @@ export default function R_credentials({ onNext }) {
             placeholder="Enter your email"
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition"
             required
+            disabled={loading}
           />
         </div>
 
@@ -44,14 +60,16 @@ export default function R_credentials({ onNext }) {
             placeholder="Enter your password"
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition"
             required
+            disabled={loading}
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200"
+          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading}
         >
-          SEND OTP
+          {loading ? "SENDING..." : "SEND OTP"}
         </button>
       </form>
 
