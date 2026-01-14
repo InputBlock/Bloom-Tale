@@ -3,8 +3,8 @@ dotenv.config({ path: './.env' })
 
 import mongoose from "mongoose"
 import bcrypt from "bcrypt"
-import Admin from "./models/admin.model.js"
-import { DB_NAME } from "./constants.js"
+import Admin from "../models/admin.model.js"
+import { DB_NAME } from "../constants.js"
 
 const seedAdmin = async () => {
     try {
@@ -12,7 +12,7 @@ const seedAdmin = async () => {
         console.log("MongoDB connected")
 
         // Check if admin already exists
-        const existingAdmin = await Admin.findOne({ email: "admin@sample.com" })
+        const existingAdmin = await Admin.findOne({ email: "sample@gmail.com" })
         
         if (existingAdmin) {
             console.log("Admin already exists!")
@@ -21,18 +21,18 @@ const seedAdmin = async () => {
         }
 
         // Hash password
-        const password_hash = await bcrypt.hash("admin123", 10)
+        const password_hash = await bcrypt.hash("password", 10)
 
         // Create admin
         const admin = await Admin.create({
-            email: "admin@sample.com",
+            email: "sample@gmail.com",
             password_hash: password_hash,
             is_admin: true
         })
 
-        console.log("Admin created successfully!")
-        console.log("Email: admin@sample.com")
-        console.log("Password: admin123")
+        console.log("Sample admin created successfully!")
+        console.log("Email: sample@gmail.com")
+        console.log("Password: password")
         
         await mongoose.disconnect()
         console.log("MongoDB disconnected")
