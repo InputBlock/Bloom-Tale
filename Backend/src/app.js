@@ -28,4 +28,10 @@ app.use("/api/v1", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 
 
+import productRoutes from "./route/product.route.js"
+app.use("/api/v1/getProduct",productRoutes)
+
+import cartRoutes from "./route/cart.route.js"
+app.use("/api/v1/cart",cartRoutes)
+
 export {app}
