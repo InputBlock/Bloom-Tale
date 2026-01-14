@@ -3,6 +3,30 @@ const { Schema } = mongoose;
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const addressSchema = {
+  title: String, // Mr / Ms
+  fullName: String,
+ 
+
+  country: {
+    type: String,
+    default: "India",
+  },
+
+  streetAddress: String,
+  house: String,
+
+  pincode: String,
+  city: String,
+  state: String,
+
+  mobile: String,
+  alternateMobile: String,
+  email: String,
+
+  addressTag: String, // Home / Office
+};
+
 const userSchema = new Schema(
   {
     username: { type: String, trim: true },
@@ -15,23 +39,6 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     rereshToken: {
       type: String,
-    },
-    firstName: {
-      type: String,
-      // required: true,
-    },
-    lastName: {
-      type: String,
-      // required: true,
-    },
-    mobileNumber: {
-      type: String,
-      // required: true,
-      match: [/^[6-9]\d{9}$/, "Invalid mobile number"],
-    },
-    address: {
-      type: String,
-      // required: true,
     },
     metadata: {
       type: Schema.Types.Mixed,
@@ -47,6 +54,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    addresses: [addressSchema],
   },
   {
     timestamps: true,
