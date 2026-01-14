@@ -1,13 +1,25 @@
 import { useState } from "react"
 import { Minus, Plus } from "lucide-react"
+import { useCart } from "../../context/CartContext"
+import { useNavigate } from "react-router-dom"
 
 export default function ProductInfo() {
   const [quantity, setQuantity] = useState(1)
   const [selectedVariant, setSelectedVariant] = useState(0)
   const [pincode, setPincode] = useState("")
+  const { addToCart } = useCart()
+  const navigate = useNavigate()
+  
   const description = `This exquisite handcrafted rose gold crochet flower set brings timeless elegance to any space. 
   Each piece is carefully crafted with premium metal thread, showcasing intricate details and superior craftsmanship. 
   Perfect for home decor, these flowers add a touch of sophistication and charm to your living space.`
+
+  const product = {
+    id: 1,
+    name: "rose gold crochet flower- set of 3",
+    price: 1990,
+    image: "/white-flowers-arrangement.jpg",
+  }
 
   const variants = [
     { id: 0, image: "/white-flowers-arrangement.jpg", name: "White Arrangement" },
@@ -20,6 +32,20 @@ export default function ProductInfo() {
     } else if (type === "decrement" && quantity > 1) {
       setQuantity((prev) => prev - 1)
     }
+  }
+
+  const handleAddToCart = () => {
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: variants[selectedVariant].image,
+      variantId: selectedVariant,
+      variantName: variants[selectedVariant].name,
+      quantity: quantity,
+    }
+    addToCart(cartItem)
+    navigate("/cart")
   }
 
   return (
@@ -88,10 +114,15 @@ export default function ProductInfo() {
 
       {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-3">
-        <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-md transition">
-          ADD TO BAG
+        <button 
+          onClick={handleAddToCart}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-md transition"
+        >
+          ADD TO CART
         </button>
-        <button className="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 rounded-md transition">
+        <button 
+          className="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 rounded-md transition"
+        >
           BUY IT NOW
         </button>
       </div>
