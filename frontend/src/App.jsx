@@ -6,6 +6,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ProductDetailsPage from './pages/productDetails'
 import Landing from './pages/Landing'
 import ProductCart from './pages/ProductCart/productCart'
+import Checkout from './pages/Checkout'
 import { CartProvider } from './context/CartContext'
 import ToastContainer from './components/common/ToastContainer'
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/productDetails" element={<ProductDetailsPage />} />
           <Route path="/cart" element={<ProductCart />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </Router>
     </CartProvider>

@@ -17,7 +17,8 @@ const productSchema = new mongoose.Schema(
     sizes: [String],
     bestSeller: { type: Boolean,default: false,
     },
-    images: {type:String , default:null},
+    images_uri: [String],
+    image_public:[String],
     stock: {
       type: Number,
       default: null,

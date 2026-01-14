@@ -2,15 +2,23 @@ import { addItem, listItem, unlistItem ,updateItem } from "../../admin/product.j
 
 const add_item = async (req, res) => {
     try {
-        //cloudinary image upload logic can be added here
+        let images_uri = [];
+        let image_public = [];
+        
+        if (req.file) {
+            images_uri.push(req.file.path);       
+            image_public.push(req.file.filename); 
+        }
+
         const details = {
             name: req.body.name,
             description: req.body.description,
             category: req.body.category,
             subcategory: req.body.subcategory,
             price: req.body.price,
-            sizes: req.body.sizes,
-            //images: IMAGE_URI,
+            sizes: req.body.sizes ? JSON.parse(req.body.sizes) : [],
+            images_uri: images_uri,
+            image_public: image_public,
             stock: req.body.stock
         };
 
