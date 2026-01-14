@@ -1,4 +1,5 @@
-import { addItem, listItem, unlistItem ,updateItem } from "../../admin/product.js";
+import { addItem, listItem, unlistItem, updateItem, deleteItem } from "../../admin/product.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../service/cloudinary.service.js";
 
 const add_item = async (req, res) => {
     try {
@@ -6,8 +7,9 @@ const add_item = async (req, res) => {
         let image_public = [];
         
         if (req.file) {
-            images_uri.push(req.file.path);       
-            image_public.push(req.file.filename); 
+            const result = await uploadToCloudinary(req.file.buffer);
+            images_uri.push(result.url);
+            image_public.push(result.public_id);
         }
 
         const details = {
@@ -15,11 +17,12 @@ const add_item = async (req, res) => {
             description: req.body.description,
             category: req.body.category,
             subcategory: req.body.subcategory,
-            price: req.body.price,
+            price: parseFloat(req.body.price) || 0,
             sizes: req.body.sizes ? JSON.parse(req.body.sizes) : [],
             images_uri: images_uri,
             image_public: image_public,
-            stock: req.body.stock
+            stock: parseInt(req.body.stock) || 0,
+            bestSeller: req.body.bestSeller === 'true' || req.body.bestSeller === true
         };
 
         const p = await addItem(details);
@@ -73,4 +76,26 @@ const update_item = async (req, res) => {
     }
 };
 
-export { add_item, list_item, unlist_item , update_item};
+const delete_item = async (req, res) => {
+    try {
+        const { id } = req.body;
+        if (!id) {
+            return res.status(400).json({ error: "Product ID is required" });
+        }
+        const result = await deleteItem(id);
+        
+        // Delete images from cloudinary
+        if (result.image_public && result.image_public.length > 0) {
+            for (const publicId of result.image_public) {
+                await deleteFromCloudinary(publicId);
+            }
+        }
+        
+        return res.status(200).json({ message: "Product deleted", product_id: id });
+    } catch (err) {
+        const statusCode = err.message.includes("not found") ? 404 : 500;
+        return res.status(statusCode).json({ error: err.message });
+    }
+};
+
+export { add_item, list_item, unlist_item, update_item, delete_item };

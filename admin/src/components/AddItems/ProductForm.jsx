@@ -3,7 +3,7 @@ import axios from "axios"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
 
-export default function ProductForm() {
+export default function ProductForm({ images, setImages }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -44,20 +44,28 @@ export default function ProductForm() {
     try {
       const token = localStorage.getItem("adminToken")
       
+      // Create FormData for multipart/form-data
+      const formDataToSend = new FormData()
+      formDataToSend.append("name", formData.name)
+      formDataToSend.append("description", formData.description)
+      formDataToSend.append("category", formData.type)
+      formDataToSend.append("subcategory", formData.color)
+      formDataToSend.append("price", formData.price)
+      formDataToSend.append("sizes", JSON.stringify(formData.quantities))
+      formDataToSend.append("stock", formData.inStock ? 100 : 0)
+      
+      // Append image file if exists
+      if (images.length > 0 && images[0].file) {
+        formDataToSend.append("image", images[0].file)
+      }
+
       const response = await axios.post(
         "http://localhost:8000/api/v1/admin/add",
-        {
-          name: formData.name,
-          description: formData.description,
-          category: formData.type,
-          subcategory: formData.color,
-          price: parseFloat(formData.price),
-          sizes: formData.quantities,
-          stock: formData.inStock ? 100 : 0
-        },
+        formDataToSend,
         {
           headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
           }
         }
       )
@@ -73,6 +81,8 @@ export default function ProductForm() {
         quantities: [],
         inStock: true,
       })
+      // Clear images
+      setImages([])
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to connect to server. Please try again."
       setMessage({ type: "error", text: errorMessage })
