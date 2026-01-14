@@ -1,4 +1,4 @@
-import { addItem, listItem, unlistItem, updateItem, deleteItem } from "../../admin/product.js";
+import { addItem, listItem, unlistItem, updateItem, deleteItem ,getList} from "../../admin/product.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../../service/cloudinary.service.js";
 
 const add_item = async (req, res) => {
@@ -98,4 +98,13 @@ const delete_item = async (req, res) => {
     }
 };
 
-export { add_item, list_item, unlist_item, update_item, delete_item };
+const get_list = async (req, res) => {
+    try {
+        const data = await getList();
+        return res.status(200).json(data);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+export { add_item, list_item, unlist_item, update_item, delete_item  , get_list};
