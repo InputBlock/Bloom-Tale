@@ -2,6 +2,7 @@ import { useState } from "react"
 import Header from "../components/common/Header"
 import R_credentials from "../components/register/R_credentials"
 import R_otp from "../components/register/R_otp"
+import { showToast } from "../components/common/ToastContainer"
 
 export default function Register() {
   const [step, setStep] = useState("credentials") // "credentials" or "otp"
@@ -29,6 +30,7 @@ export default function Register() {
       setUserEmail(email)
       setUserPassword(password)
       setStep("otp")
+      showToast("A secret bloomed in your inbox! 🌷", "success")
       return { success: true, message: data.message }
     } catch (error) {
       console.error("Registration error:", error)
@@ -54,8 +56,10 @@ export default function Register() {
       }
 
       // Success - account created
-      alert("Account created successfully! Please login.")
-      window.location.href = "/login"
+      showToast("Your garden account is blooming! 🌺", "success")
+      setTimeout(() => {
+        window.location.href = "/login"
+      }, 1500)
       return { success: true, message: data.message }
     } catch (error) {
       console.error("OTP verification error:", error)
@@ -80,6 +84,7 @@ export default function Register() {
         throw new Error(data.message || "Failed to resend OTP")
       }
 
+      showToast("Fresh petals sent to your inbox! 🌺", "success")
       return { success: true, message: "OTP resent successfully" }
     } catch (error) {
       console.error("Resend OTP error:", error)

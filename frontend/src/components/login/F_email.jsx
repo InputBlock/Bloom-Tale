@@ -1,10 +1,15 @@
+import { useState } from "react"
+
 export default function F_email({ onNext }) {
   const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (email) {
-      onNext(email)
+      setLoading(true)
+      await onNext(email)
+      setLoading(false)
     }
   }
 
@@ -29,14 +34,16 @@ export default function F_email({ onNext }) {
             placeholder="Enter your email"
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
             required
+            disabled={loading}
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200"
+          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading}
         >
-          SEND OTP
+          {loading ? "🌱 SENDING..." : "SEND OTP"}
         </button>
       </form>
 
@@ -50,4 +57,3 @@ export default function F_email({ onNext }) {
   )
 }
 
-import { useState } from "react"
