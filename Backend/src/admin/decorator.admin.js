@@ -3,7 +3,11 @@ import { createAccessToken } from "../utils/jwtHelper.js";
 import bcrypt from "bcrypt";
 
 export async function AdminDecorator(ctx) {
-    const admin = await adminSchema.findOne({ email: ctx.email });
+    if (!ctx.email || !ctx.password) {
+        throw new Error("Invalid credentials");
+    }
+    
+    const admin = await adminSchema.findOne({ email: ctx.email.toLowerCase() });
 
     if (!admin) {
         throw new Error("Invalid credentials");
