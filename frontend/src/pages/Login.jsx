@@ -1,11 +1,12 @@
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import Header from "../components/common/Header"
 import L_email from "../components/login/L_email"
 import { showToast } from "../components/common/ToastContainer"
 
 export default function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from || "/home"
 
   const handleLogin = async (email, password) => {
     try {
@@ -29,8 +30,8 @@ export default function Login() {
       
       showToast("Welcome back, bloom lover! 🌸", "success")
       
-      // Redirect to home page
-      navigate("/home")
+      // Redirect to the page user came from or home page
+      navigate(from)
       return { success: true, message: data.message }
     } catch (error) {
       console.error("Login error:", error)

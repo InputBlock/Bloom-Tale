@@ -20,7 +20,7 @@ export default function ProductForm({ images, setImages }) {
     if (message.text) {
       const timer = setTimeout(() => {
         setMessage({ type: "", text: "" })
-      }, 5000)
+      }, 2000)
       return () => clearTimeout(timer)
     }
   }, [message])
@@ -102,21 +102,19 @@ export default function ProductForm({ images, setImages }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/50 z-50"
               onClick={() => setMessage({ type: "", text: "" })}
             />
             
             {/* Modal */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               transition={{ type: "spring", duration: 0.5 }}
               className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md mx-4"
             >
-              <div className={`relative bg-white rounded-2xl shadow-2xl p-8 ${
-                message.type === "success" ? "border-2 border-green-500" : "border-2 border-red-500"
-              }`}>
+              <div className="relative bg-white rounded-xl shadow-2xl p-8">
                 {/* Close Button */}
                 <button
                   onClick={() => setMessage({ type: "", text: "" })}
@@ -131,40 +129,42 @@ export default function ProductForm({ images, setImages }) {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                      className="text-green-500"
                     >
-                      <CheckCircle2 size={64} className="text-green-500" />
+                      <CheckCircle2 size={80} />
                     </motion.div>
                   ) : (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                      className="text-red-500"
                     >
-                      <XCircle size={64} className="text-red-500" />
+                      <XCircle size={80} />
                     </motion.div>
                   )}
                 </div>
 
                 {/* Message */}
-                <h3 className={`text-2xl font-bold text-center mb-2 ${
-                  message.type === "success" ? "text-green-700" : "text-red-700"
-                }`}>
-                  {message.type === "success" ? "Success!" : "Error"}
-                </h3>
-                <p className="text-gray-600 text-center text-lg">
-                  {message.text}
-                </p>
-
-                {/* Auto-dismiss progress bar */}
-                <motion.div
-                  initial={{ scaleX: 1 }}
-                  animate={{ scaleX: 0 }}
-                  transition={{ duration: 5, ease: "linear" }}
-                  className={`h-1 mt-6 rounded-full origin-left ${
-                    message.type === "success" ? "bg-green-500" : "bg-red-500"
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className={`text-2xl font-bold text-center mb-2 ${
+                    message.type === "success" ? "text-green-700" : "text-red-700"
                   }`}
-                />
+                >
+                  {message.type === "success" ? "Success!" : "Error"}
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-gray-600 text-center text-lg"
+                >
+                  {message.text}
+                </motion.p>
               </div>
             </motion.div>
           </>
@@ -263,15 +263,15 @@ export default function ProductForm({ images, setImages }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <input
           type="checkbox"
           id="inStock"
           checked={formData.inStock}
           onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
-          className="w-5 h-5 accent-black"
+          className="w-5 h-5 accent-black cursor-pointer"
         />
-        <label htmlFor="inStock" className="text-gray-900 font-medium cursor-pointer">
+        <label htmlFor="inStock" className="text-gray-900 font-medium cursor-pointer select-none">
           In Stock
         </label>
       </div>
@@ -279,7 +279,7 @@ export default function ProductForm({ images, setImages }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-black text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+        className="w-full bg-black text-white py-4 rounded-lg font-semibold text-lg hover:bg-gray-800 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm"
       >
         {loading ? "Adding Product..." : "Add Flower Product"}
       </button>
