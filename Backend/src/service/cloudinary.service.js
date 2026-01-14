@@ -1,58 +1,33 @@
 import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
-dotenv.config()
+dotenv.config();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: "bloom-tale/products",  
-        allowed_formats: ["jpg", "jpeg", "png", "webp"],
-        transformation: [{ width: 800, height: 800, crop: "limit", quality: "auto" }]
-    }
-});
+// Simple memory storage
+export const upload = multer({ storage: multer.memoryStorage() });
 
-
-export const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 10 * 1024 * 1024 
-    },
-    fileFilter: (req, file, cb) => {
-        
-        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error("Invalid file type. Only JPG, PNG, and WebP are allowed."), false);
-        }
-    }
-});
-
-export async function uploadItem(imagePath) {
-    const result = await cloudinary.uploader.upload(imagePath, {
-        folder: "bloom-tale/products",
-        transformation: [{ width: 800, height: 800, crop: "limit", quality: "auto" }]
+// Upload buffer to cloudinary
+export async function uploadToCloudinary(buffer) {
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+            { folder: "bloom-tale" },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve({ url: result.secure_url, public_id: result.public_id });
+            }
+        ).end(buffer);
     });
-    return {
-        url: result.secure_url,
-        public_id: result.public_id
-    };
 }
 
-export async function deleteImage(publicId) {
+// Delete from cloudinary
+export async function deleteFromCloudinary(publicId) {
     if (!publicId) return null;
-    const result = await cloudinary.uploader.destroy(publicId);
-    return result;
+    return await cloudinary.uploader.destroy(publicId);
 }
-
-export default cloudinary;
 

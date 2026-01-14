@@ -3,7 +3,7 @@ import axios from "axios"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
 
-export default function ProductForm() {
+export default function ProductForm({ images, setImages }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -20,7 +20,7 @@ export default function ProductForm() {
     if (message.text) {
       const timer = setTimeout(() => {
         setMessage({ type: "", text: "" })
-      }, 5000)
+      }, 2000)
       return () => clearTimeout(timer)
     }
   }, [message])
@@ -44,20 +44,28 @@ export default function ProductForm() {
     try {
       const token = localStorage.getItem("adminToken")
       
+      // Create FormData for multipart/form-data
+      const formDataToSend = new FormData()
+      formDataToSend.append("name", formData.name)
+      formDataToSend.append("description", formData.description)
+      formDataToSend.append("category", formData.type)
+      formDataToSend.append("subcategory", formData.color)
+      formDataToSend.append("price", formData.price)
+      formDataToSend.append("sizes", JSON.stringify(formData.quantities))
+      formDataToSend.append("stock", formData.inStock ? 100 : 0)
+      
+      // Append image file if exists
+      if (images.length > 0 && images[0].file) {
+        formDataToSend.append("image", images[0].file)
+      }
+
       const response = await axios.post(
         "http://localhost:8000/api/v1/admin/add",
-        {
-          name: formData.name,
-          description: formData.description,
-          category: formData.type,
-          subcategory: formData.color,
-          price: parseFloat(formData.price),
-          sizes: formData.quantities,
-          stock: formData.inStock ? 100 : 0
-        },
+        formDataToSend,
         {
           headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
           }
         }
       )
@@ -73,6 +81,8 @@ export default function ProductForm() {
         quantities: [],
         inStock: true,
       })
+      // Clear images
+      setImages([])
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to connect to server. Please try again."
       setMessage({ type: "error", text: errorMessage })
@@ -92,21 +102,19 @@ export default function ProductForm() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/50 z-50"
               onClick={() => setMessage({ type: "", text: "" })}
             />
             
             {/* Modal */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               transition={{ type: "spring", duration: 0.5 }}
               className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md mx-4"
             >
-              <div className={`relative bg-white rounded-2xl shadow-2xl p-8 ${
-                message.type === "success" ? "border-2 border-green-500" : "border-2 border-red-500"
-              }`}>
+              <div className="relative bg-white rounded-xl shadow-2xl p-8">
                 {/* Close Button */}
                 <button
                   onClick={() => setMessage({ type: "", text: "" })}
@@ -121,40 +129,42 @@ export default function ProductForm() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                      className="text-green-500"
                     >
-                      <CheckCircle2 size={64} className="text-green-500" />
+                      <CheckCircle2 size={80} />
                     </motion.div>
                   ) : (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                      className="text-red-500"
                     >
-                      <XCircle size={64} className="text-red-500" />
+                      <XCircle size={80} />
                     </motion.div>
                   )}
                 </div>
 
                 {/* Message */}
-                <h3 className={`text-2xl font-bold text-center mb-2 ${
-                  message.type === "success" ? "text-green-700" : "text-red-700"
-                }`}>
-                  {message.type === "success" ? "Success!" : "Error"}
-                </h3>
-                <p className="text-gray-600 text-center text-lg">
-                  {message.text}
-                </p>
-
-                {/* Auto-dismiss progress bar */}
-                <motion.div
-                  initial={{ scaleX: 1 }}
-                  animate={{ scaleX: 0 }}
-                  transition={{ duration: 5, ease: "linear" }}
-                  className={`h-1 mt-6 rounded-full origin-left ${
-                    message.type === "success" ? "bg-green-500" : "bg-red-500"
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className={`text-2xl font-bold text-center mb-2 ${
+                    message.type === "success" ? "text-green-700" : "text-red-700"
                   }`}
-                />
+                >
+                  {message.type === "success" ? "Success!" : "Error"}
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-gray-600 text-center text-lg"
+                >
+                  {message.text}
+                </motion.p>
               </div>
             </motion.div>
           </>
@@ -253,15 +263,15 @@ export default function ProductForm() {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <input
           type="checkbox"
           id="inStock"
           checked={formData.inStock}
           onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
-          className="w-5 h-5 accent-black"
+          className="w-5 h-5 accent-black cursor-pointer"
         />
-        <label htmlFor="inStock" className="text-gray-900 font-medium cursor-pointer">
+        <label htmlFor="inStock" className="text-gray-900 font-medium cursor-pointer select-none">
           In Stock
         </label>
       </div>
@@ -269,7 +279,7 @@ export default function ProductForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-black text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+        className="w-full bg-black text-white py-4 rounded-lg font-semibold text-lg hover:bg-gray-800 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm"
       >
         {loading ? "Adding Product..." : "Add Flower Product"}
       </button>
