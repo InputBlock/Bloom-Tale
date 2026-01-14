@@ -1,4 +1,4 @@
-import { addItem, listItem, unlistItem } from "../../admin/product.js";
+import { addItem, listItem, unlistItem ,updateItem } from "../../admin/product.js";
 
 const add_item = async (req, res) => {
     try {
@@ -23,22 +23,46 @@ const add_item = async (req, res) => {
 };
 const list_item = async (req, res) => {
     try {
-        const { name } = req.body;
-        const p = await listItem(name);
+        const { id } = req.body;
+        if (!id) {
+            return res.status(400).json({ error: "Product ID is required" });
+        }
+        const p = await listItem(id);
         return res.status(200).json(p);
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        const statusCode = err.message.includes("not available") ? 404 : 500;
+        return res.status(statusCode).json({ error: err.message });
     }
 }
 
 const unlist_item = async (req, res) => {
     try {
-        const { name } = req.body;
-        const p = await unlistItem(name);
+        const { id } = req.body;
+        if (!id) {
+            return res.status(400).json({ error: "Product ID is required" });
+        }
+        const p = await unlistItem(id);
         return res.status(200).json(p);
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        const statusCode = err.message.includes("not available") ? 404 : 500;
+        return res.status(statusCode).json({ error: err.message });
     }
 }
 
-export { add_item, list_item, unlist_item };
+const update_item = async (req, res) => {
+    try {
+        const { id, ...updateData } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ error: "id is required" });
+        }
+
+        const updated = await updateItem(id, updateData);
+
+        return res.status(200).json(updated);
+    } catch (err) {
+        return res.status(404).json({ error: err.message });
+    }
+};
+
+export { add_item, list_item, unlist_item , update_item};

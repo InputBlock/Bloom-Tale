@@ -19,7 +19,7 @@ router.post("/logout", logoutUser);
 router.post("/forgotPassword", forgotPassword);
 router.post("/resetPassword", resetPassword);
 
-// router.get("/me", verifyJWT, (req, res) => {
+// router.get("/me", verifyJWT, (req, res) => { 
 //   res.status(200).json({
 //     success: true,
 //     user: req.user,
