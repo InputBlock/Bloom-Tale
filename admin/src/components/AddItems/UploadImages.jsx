@@ -1,8 +1,6 @@
 import { Upload, X } from "lucide-react"
-import { useState } from "react"
 
-export default function UploadImages() {
-  const [images, setImages] = useState([])
+export default function UploadImages({ images, setImages }) {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files)

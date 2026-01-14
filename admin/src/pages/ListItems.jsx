@@ -1,18 +1,22 @@
 import { useState } from "react"
 import { Search, Edit2, Trash2, Plus } from "lucide-react"
 import EditProductModal from "../components/ListItems/EditProductModal"
+import StatusToggleModal from "../components/ListItems/StatusToggleModal"
+import axios from "axios"
 
 export default function ListItems() {
   const [searchTerm, setSearchTerm] = useState("")
   const [products, setProducts] = useState([
-    { id: "10001", name: "Red Rose Bouquet", category: "Roses", price: "25", stock: 142, isListed: true },
-    { id: "10002", name: "Sunflower Delight", category: "Sunflowers", price: "45", stock: 87, isListed: true },
-    { id: "10003", name: "Tulip Garden", category: "Tulips", price: "65", stock: 0, isListed: false },
-    { id: "10004", name: "Lily Elegance", category: "Lilies", price: "89", stock: 23, isListed: true },
-    { id: "10005", name: "Mixed Bouquet", category: "Mixed", price: "120", stock: 45, isListed: true },
+    { id: "PRO1", name: "Red Rose Bouquet", category: "Roses", price: "25", stock: 142, isListed: true },
+    { id: "PRO2", name: "Sunflower Delight", category: "Sunflowers", price: "45", stock: 87, isListed: true },
+    { id: "PRO3", name: "Tulip Garden", category: "Tulips", price: "65", stock: 0, isListed: false },
+    { id: "PRO4", name: "Lily Elegance", category: "Lilies", price: "89", stock: 23, isListed: true },
+    { id: "PRO5", name: "Mixed Bouquet", category: "Mixed", price: "120", stock: 45, isListed: true },
   ])
   const [editModal, setEditModal] = useState(false)
   const [editProduct, setEditProduct] = useState(null)
+  const [statusModal, setStatusModal] = useState(false)
+  const [statusProduct, setStatusProduct] = useState(null)
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -25,27 +29,75 @@ export default function ListItems() {
     }
   }
 
-  const handleUpdateStock = (id) => {
+  const handleUpdateStock = async (id) => {
     const newStock = prompt("Enter new stock quantity:")
     if (newStock !== null && !isNaN(newStock)) {
       const stockValue = parseInt(newStock)
-      setProducts(products.map((p) => 
-        p.id === id ? { ...p, stock: stockValue, isListed: stockValue > 0 ? p.isListed : false } : p
-      ))
+      try {
+        const token = localStorage.getItem("adminToken")
+        await axios.post(
+          "http://localhost:8000/api/v1/admin/update",
+          { 
+            id: id,
+            stock: stockValue
+          },
+          {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }
+        )
+        setProducts(products.map((p) => 
+          p.id === id ? { ...p, stock: stockValue, isListed: stockValue > 0 ? p.isListed : false } : p
+        ))
+      } catch (error) {
+        console.error("Error updating stock:", error)
+      }
     }
   }
 
-  const toggleListing = (id) => {
-    setProducts(products.map((p) => {
-      if (p.id === id) {
-        if (p.stock === 0) {
-          alert("Cannot activate product with 0 stock. Please add stock first.")
-          return p
+  const openStatusModal = (id) => {
+    const product = products.find(p => p.id === id)
+    setStatusProduct(product)
+    setStatusModal(true)
+  }
+
+  const closeStatusModal = () => {
+    setStatusModal(false)
+    setStatusProduct(null)
+  }
+
+  const confirmToggleListing = async () => {
+    if (!statusProduct) return
+
+    if (!statusProduct.isListed && statusProduct.stock === 0) {
+      return
+    }
+
+    try {
+      const token = localStorage.getItem("adminToken")
+      const endpoint = statusProduct.isListed 
+        ? "http://localhost:8000/api/v1/admin/unlist"
+        : "http://localhost:8000/api/v1/admin/list"
+      
+      await axios.post(
+        endpoint,
+        { id: statusProduct.id },
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
         }
-        return { ...p, isListed: !p.isListed }
-      }
-      return p
-    }))
+      )
+      
+      setProducts(products.map((p) => 
+        p.id === statusProduct.id ? { ...p, isListed: !p.isListed } : p
+      ))
+    } catch (error) {
+      console.error("Error toggling listing:", error)
+    }
   }
 
   const handleEdit = (product) => {
@@ -53,10 +105,34 @@ export default function ListItems() {
     setEditModal(true)
   }
 
-  const handleSaveEdit = (updatedProduct) => {
-    setProducts(products.map((p) => 
-      p.id === updatedProduct.id ? updatedProduct : p
-    ))
+  const handleSaveEdit = async (updatedProduct) => {
+    try {
+      const token = localStorage.getItem("adminToken")
+      await axios.post(
+        "http://localhost:8000/api/v1/admin/update",
+        {
+          id: updatedProduct.id,
+          name: updatedProduct.name,
+          category: updatedProduct.category,
+          price: updatedProduct.price,
+          stock: updatedProduct.stock
+        },
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      )
+      
+      setProducts(products.map((p) => 
+        p.id === updatedProduct.id ? updatedProduct : p
+      ))
+      setEditModal(false)
+      setEditProduct(null)
+    } catch (error) {
+      console.error("Error updating product:", error)
+    }
     setEditModal(false)
     setEditProduct(null)
   }
@@ -90,6 +166,7 @@ export default function ListItems() {
                 <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Category</th>
                 <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Price</th>
                 <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Stock</th>
+                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Status</th>
                 <th className="text-center py-4 px-6 font-semibold text-gray-900 text-sm">Actions</th>
               </tr>
             </thead>
@@ -105,25 +182,25 @@ export default function ListItems() {
                   <td className="py-4 px-6 text-gray-600 text-sm">{product.category}</td>
                   <td className="py-4 px-6 text-gray-900 font-semibold">${product.price}</td>
                   <td className="py-4 px-6">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleUpdateStock(product.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 transition-colors duration-200"
-                      >
-                        {product.stock} items
-                        <Plus size={12} />
-                      </button>
-                      <button
-                        onClick={() => toggleListing(product.id)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${
-                          product.isListed
-                            ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
-                            : "bg-red-100 text-red-600 border-red-200 hover:bg-red-200"
-                        }`}
-                      >
-                        {product.isListed ? "Active" : "Inactive"}
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleUpdateStock(product.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 transition-colors duration-200"
+                    >
+                      {product.stock} items
+                      <Plus size={12} />
+                    </button>
+                  </td>
+                  <td className="py-4 px-6">
+                    <button
+                      onClick={() => openStatusModal(product.id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${
+                        product.isListed
+                          ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
+                          : "bg-red-100 text-red-600 border-red-200 hover:bg-red-200"
+                      }`}
+                    >
+                      {product.isListed ? "Active" : "Inactive"}
+                    </button>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center justify-center gap-3">
@@ -161,6 +238,14 @@ export default function ListItems() {
         isOpen={editModal}
         onClose={handleCloseModal}
         onSave={handleSaveEdit}
+      />
+
+      {/* Status Toggle Modal */}
+      <StatusToggleModal
+        product={statusProduct}
+        isOpen={statusModal}
+        onClose={closeStatusModal}
+        onConfirm={confirmToggleListing}
       />
     </div>
   )
