@@ -17,8 +17,15 @@ export const getCart = asyncHandler(async (req, res) => {
       new ApiResponse(200, { items: [] }, "Cart is empty")
     );
   }
+    let totalAmount = 0;
+
+  cart.items.forEach((item) => {
+    totalAmount += item.price * item.quantity;
+  });
+
+  
 
   return res.status(200).json(
-    new ApiResponse(200, cart, "Cart fetched successfully")
+    new ApiResponse(200, {cart,totalAmount}, "Cart fetched successfully")
   );
 });
