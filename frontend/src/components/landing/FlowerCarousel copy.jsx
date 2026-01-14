@@ -95,16 +95,13 @@ const FlowerCarousel = () => {
   const activeCategory = categories[activeIndex];
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-8">
+    <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden">
       {/* Background linear */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#efefef,#ede0c0)]" />
-      
-      {/* Decorative circles */}
-      <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-accent/10 blur-3xl" />
-      <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
-
+      {/* Top part */}
+      <div className="bg-black w-1000 text-black h-50 z-50"> faraaaz</div>
       {/* Carousel Container */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-4">
+      <div className="relative z-10 w-full max-w-6xl mx-auto mt-20 px-4">
         {/* Flower Cards Circle */}
         <div className="relative h-105 flex items-center justify-center carousel-container">
           {/* Background Flower Cards */}
@@ -133,7 +130,7 @@ const FlowerCarousel = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <p className="text-gray-800 text-sm font-serif text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <p className="text-gray-800 text-medium font-sans text-center">
                   {category.name}
                 </p>
               </div>
@@ -181,7 +178,7 @@ const FlowerCarousel = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="text-3xl md:text-4xl font-serif text-gray-800 mb-3 leading-tight"
+                      className="text-3xl md:text-[28px] font-serif text-[#5e6043] mb-3 leading-tight"
                     >
                       {activeCategory.tagline}
                     </motion.h3>
@@ -189,7 +186,7 @@ const FlowerCarousel = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
-                      className="text-sm text-gray-600 leading-relaxed px-2"
+                      className="text-sm text-[#5e6043ac] leading-relaxed px-2"
                     >
                       {activeCategory.description}
                     </motion.p>

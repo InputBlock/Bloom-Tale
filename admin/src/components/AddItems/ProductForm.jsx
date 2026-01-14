@@ -1,4 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import axios from "axios"
+import { motion, AnimatePresence } from "framer-motion"
+import { CheckCircle2, XCircle, X } from "lucide-react"
 
 export default function ProductForm() {
   const [formData, setFormData] = useState({
@@ -10,6 +13,17 @@ export default function ProductForm() {
     quantities: [],
     inStock: true,
   })
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState({ type: "", text: "" })
+
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => {
+        setMessage({ type: "", text: "" })
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [message])
 
   const quantities = [6, 12, 24, 36, 50]
 
@@ -22,13 +36,133 @@ export default function ProductForm() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
+    setMessage({ type: "", text: "" })
+    setLoading(true)
+
+    try {
+      const token = localStorage.getItem("adminToken")
+      
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/admin/add",
+        {
+          name: formData.name,
+          description: formData.description,
+          category: formData.type,
+          subcategory: formData.color,
+          price: parseFloat(formData.price),
+          sizes: formData.quantities,
+          stock: formData.inStock ? 100 : 0
+        },
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
+      )
+
+      setMessage({ type: "success", text: "Product added successfully!" })
+      // Reset form
+      setFormData({
+        name: "",
+        description: "",
+        type: "Rose",
+        color: "Red",
+        price: "",
+        quantities: [],
+        inStock: true,
+      })
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to connect to server. Please try again."
+      setMessage({ type: "error", text: errorMessage })
+      console.error("Error adding product:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <>
+      <AnimatePresence>
+        {message.text && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+              onClick={() => setMessage({ type: "", text: "" })}
+            />
+            
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md mx-4"
+            >
+              <div className={`relative bg-white rounded-2xl shadow-2xl p-8 ${
+                message.type === "success" ? "border-2 border-green-500" : "border-2 border-red-500"
+              }`}>
+                {/* Close Button */}
+                <button
+                  onClick={() => setMessage({ type: "", text: "" })}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+
+                {/* Icon */}
+                <div className="flex justify-center mb-4">
+                  {message.type === "success" ? (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                    >
+                      <CheckCircle2 size={64} className="text-green-500" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                    >
+                      <XCircle size={64} className="text-red-500" />
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Message */}
+                <h3 className={`text-2xl font-bold text-center mb-2 ${
+                  message.type === "success" ? "text-green-700" : "text-red-700"
+                }`}>
+                  {message.type === "success" ? "Success!" : "Error"}
+                </h3>
+                <p className="text-gray-600 text-center text-lg">
+                  {message.text}
+                </p>
+
+                {/* Auto-dismiss progress bar */}
+                <motion.div
+                  initial={{ scaleX: 1 }}
+                  animate={{ scaleX: 0 }}
+                  transition={{ duration: 5, ease: "linear" }}
+                  className={`h-1 mt-6 rounded-full origin-left ${
+                    message.type === "success" ? "bg-green-500" : "bg-red-500"
+                  }`}
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+
       <div>
         <label className="block text-gray-900 font-medium mb-2">Flower Name</label>
         <input
@@ -134,10 +268,12 @@ export default function ProductForm() {
 
       <button
         type="submit"
-        className="w-full bg-black text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition"
+        disabled={loading}
+        className="w-full bg-black text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
-        Add Flower Product
+        {loading ? "Adding Product..." : "Add Flower Product"}
       </button>
     </form>
+    </>
   )
 }

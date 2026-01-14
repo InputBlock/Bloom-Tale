@@ -1,8 +1,9 @@
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { LayoutDashboard, Plus, List, Package, Users, LogOut, X, Menu } from "lucide-react"
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation()
+  const navigate = useNavigate()
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -13,6 +14,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   ]
 
   const isActive = (path) => location.pathname === path
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken")
+    localStorage.removeItem("adminEmail")
+    navigate("/login")
+  }
 
   return (
     <>
@@ -82,6 +89,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         {/* Logout */}
         <div className="p-2 border-t border-gray-800 absolute bottom-0 left-0 right-0">
           <button 
+            onClick={handleLogout}
             className={`flex items-center gap-3 px-3 py-3 text-gray-400 hover:text-white hover:bg-gray-900 rounded-lg w-full transition-all duration-200 ${
               isOpen ? "" : "justify-center"
             }`}

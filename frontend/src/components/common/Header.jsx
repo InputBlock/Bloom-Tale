@@ -1,13 +1,26 @@
 "use client"
 
 import { useState } from "react"
-import { Search, User, ShoppingCart } from "lucide-react"
+import { Search, User, ShoppingCart, Menu, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../../context/CartContext"
+import { showToast } from "./ToastContainer"
 
 export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate()
   const { getCartCount } = useCart()
+
+  const categories = [
+    "Same Day Delivery",
+    "Birthday Flowers",
+    "Anniversary Flowers",
+    "Grand Openings",
+    "Condolences & Fragrances",
+    "Potted Plants",
+    "Gift Combos",
+    "Services",
+  ]
 
   return (
     <header className="sticky top-0 z-50">
@@ -33,7 +46,7 @@ export default function Header() {
               {getCartCount()}
             </span>
           </button>
-          <button className="p-2 hover:bg-[#5e6043] rounded-full transition-colors duration-300">
+          <button className="p-2 hover:bg-gray-800 rounded-full">
             <User size={20} />
           </button>
         </div>

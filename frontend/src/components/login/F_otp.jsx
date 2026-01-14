@@ -2,6 +2,8 @@ import { useState, useRef } from "react"
 
 export default function F_otp({ email, onNext, onResend }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
+  const [loading, setLoading] = useState(false)
+  const [resending, setResending] = useState(false)
   const inputRefs = useRef([])
 
   const handleChange = (index, value) => {
@@ -26,8 +28,18 @@ export default function F_otp({ email, onNext, onResend }) {
     e.preventDefault()
     const otpValue = otp.join("")
     if (otpValue.length === 6) {
+      setLoading(true)
       onNext(otpValue)
+      setLoading(false)
     }
+  }
+
+  const handleResend = async () => {
+    setResending(true)
+    await onResend()
+    setResending(false)
+    setOtp(["", "", "", "", "", ""])
+    inputRefs.current[0]?.focus()
   }
 
   return (
@@ -52,6 +64,7 @@ export default function F_otp({ email, onNext, onResend }) {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
+              disabled={loading}
             />
           ))}
         </div>
@@ -60,18 +73,20 @@ export default function F_otp({ email, onNext, onResend }) {
           <span className="text-gray-500 text-sm">Didn't receive the code? </span>
           <button
             type="button"
-            onClick={onResend}
-            className="text-[#6B7C59] font-semibold text-sm hover:underline"
+            onClick={handleResend}
+            className="text-[#6B7C59] font-semibold text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={resending || loading}
           >
-            Resend OTP
+            {resending ? "🌱 Sending..." : "Resend OTP"}
           </button>
         </div>
 
         <button
           type="submit"
-          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200"
+          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading || otp.join("").length !== 6}
         >
-          VERIFY OTP
+          {loading ? "🔍 VERIFYING..." : "VERIFY OTP"}
         </button>
       </form>
     </div>
