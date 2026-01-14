@@ -8,24 +8,83 @@ export default function Register() {
   const [userEmail, setUserEmail] = useState("")
   const [userPassword, setUserPassword] = useState("")
 
-  const handleCredentialsNext = (email, password) => {
-    setUserEmail(email)
-    setUserPassword(password)
-    setStep("otp")
-    // Here you would normally send OTP to email
-    console.log("Sending OTP to:", email)
+  const handleCredentialsNext = async (email, password) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important for cookies
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed")
+      }
+
+      // Success - OTP sent
+      setUserEmail(email)
+      setUserPassword(password)
+      setStep("otp")
+      return { success: true, message: data.message }
+    } catch (error) {
+      console.error("Registration error:", error)
+      return { success: false, message: error.message }
+    }
   }
 
-  const handleOtpSubmit = (otpValue) => {
-    // Here you would verify the OTP and create the account
-    console.log("Verifying OTP:", otpValue, "for email:", userEmail)
-    console.log("Password:", userPassword)
-    // On success, redirect to home or dashboard
+  const handleOtpSubmit = async (otpValue) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/verifyOtp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important for cookies
+        body: JSON.stringify({ otp: otpValue }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "OTP verification failed")
+      }
+
+      // Success - account created
+      alert("Account created successfully! Please login.")
+      window.location.href = "/login"
+      return { success: true, message: data.message }
+    } catch (error) {
+      console.error("OTP verification error:", error)
+      return { success: false, message: error.message }
+    }
   }
 
-  const handleResendOtp = () => {
-    // Here you would resend OTP
-    console.log("Resending OTP to:", userEmail)
+  const handleResendOtp = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email: userEmail, password: userPassword }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to resend OTP")
+      }
+
+      return { success: true, message: "OTP resent successfully" }
+    } catch (error) {
+      console.error("Resend OTP error:", error)
+      return { success: false, message: error.message }
+    }
   }
 
   return (

@@ -2,6 +2,10 @@ import { useState, useRef } from "react"
 
 export default function R_otp({ email, onSubmit, onResend }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
+  const [loading, setLoading] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [error, setError] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
   const inputRefs = useRef([])
 
   const handleChange = (index, value) => {
@@ -23,11 +27,34 @@ export default function R_otp({ email, onSubmit, onResend }) {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const otpValue = otp.join("")
     if (otpValue.length === 6) {
-      onSubmit(otpValue)
+      setLoading(true)
+      setError("")
+      const result = await onSubmit(otpValue)
+      setLoading(false)
+      
+      if (!result.success) {
+        setError(result.message)
+      }
+    }
+  }
+
+  const handleResend = async () => {
+    setResending(true)
+    setError("")
+    setSuccessMessage("")
+    const result = await onResend()
+    setResending(false)
+    
+    if (result.success) {
+      setSuccessMessage(result.message)
+      setOtp(["", "", "", "", "", ""])
+      inputRefs.current[0]?.focus()
+    } else {
+      setError(result.message)
     }
   }
 
@@ -42,6 +69,18 @@ export default function R_otp({ email, onSubmit, onResend }) {
       </p>
 
       <form onSubmit={handleSubmit}>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-4">
+            {error}
+          </div>
+        )}
+        
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-xl text-sm mb-4">
+            {successMessage}
+          </div>
+        )}
+        
         <div className="flex gap-2 justify-center mb-6">
           {otp.map((digit, index) => (
             <input
@@ -53,6 +92,7 @@ export default function R_otp({ email, onSubmit, onResend }) {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
+              disabled={loading}
             />
           ))}
         </div>
@@ -61,18 +101,20 @@ export default function R_otp({ email, onSubmit, onResend }) {
           <span className="text-gray-500 text-sm">Didn't receive the code? </span>
           <button
             type="button"
-            onClick={onResend}
-            className="text-[#6B7C59] font-semibold text-sm hover:underline"
+            onClick={handleResend}
+            className="text-[#6B7C59] font-semibold text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={resending || loading}
           >
-            Resend OTP
+            {resending ? "Sending..." : "Resend OTP"}
           </button>
         </div>
 
         <button
           type="submit"
-          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200"
+          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading || otp.join("").length !== 6}
         >
-          VERIFY & CREATE ACCOUNT
+          {loading ? "VERIFYING..." : "VERIFY & CREATE ACCOUNT"}
         </button>
       </form>
     </div>
