@@ -7,7 +7,7 @@ const app = express()
 
 //Configurations set
 app.use(cors({
-    origin:process.env.CORS_ORIGIN,
+    origin:[process.env.CORS_ORIGIN, process.env.ADMIN_CORS_ORIGIN],
     credentials:true
 }))
 

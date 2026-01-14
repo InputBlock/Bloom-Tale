@@ -8,7 +8,7 @@ const heroSlides = [
     title: "Anniversary Special",
     description: "Fresh blooms for milestones, yours or someone special's",
     buttonText: "ORDER NOW",
-    image: "/placeholder.svg?height=500&width=1280&query=anniversary-special-flowers-arrangement",
+    image: "/annivarsary-carousel.jpg",
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const heroSlides = [
     title: "Seasonal Collection",
     description: "Discover the beauty of fresh seasonal flowers",
     buttonText: "SHOP NOW",
-    image: "/placeholder.svg?height=500&width=1280&query=seasonal-flowers-collection",
+    image: "/seasonal-carousel.jpg",
   },
 ]
 
@@ -70,12 +70,12 @@ export default function Hero() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
 
           {/* Content */}
-          <div className="relative h-full flex flex-col justify-center items-start px-6 md:px-12 max-w-2xl">
+          <div className="relative h-full flex flex-col justify-center items-start px-6 md:px-20 lg:px-24 max-w-3xl pt-8 pb-16">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-4xl md:text-5xl font-serif text-white mb-3"
+              className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-4 leading-tight"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               {heroSlides[currentSlide].title}
@@ -84,7 +84,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-base md:text-lg text-gray-100 mb-6 leading-relaxed"
+              className="text-lg md:text-xl lg:text-2xl text-gray-50 mb-8 leading-relaxed max-w-xl"
             >
               {heroSlides[currentSlide].description}
             </motion.p>
@@ -94,7 +94,7 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 0.4 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-[#3e4026] text-white px-8 py-3 text-sm font-semibold hover:bg-[#5e6043] transition-all duration-300 rounded-sm shadow-lg"
+              className="bg-[#3e4026] text-white px-10 py-4 text-base font-semibold hover:bg-[#5e6043] transition-all duration-300 rounded-sm shadow-lg"
             >
               {heroSlides[currentSlide].buttonText}
             </motion.button>

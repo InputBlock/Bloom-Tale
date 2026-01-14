@@ -1,20 +1,42 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
+import axios from "axios"
 
 export default function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Add your login logic here
-    console.log("Login:", formData)
-    navigate("/")
+    setError("")
+    setLoading(true)
+
+    try {
+      const response = await axios.post("http://localhost:8000/api/v1/admin/login", {
+        email: formData.email,
+        password: formData.password,
+      })
+
+      // Store token in localStorage
+      localStorage.setItem("adminToken", response.data.token || "admin-authenticated")
+      localStorage.setItem("adminEmail", formData.email)
+      
+      // Redirect to dashboard
+      navigate("/")
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to connect to server. Please try again."
+      setError(errorMessage)
+      console.error("Login error:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -33,6 +55,12 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -82,9 +110,10 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition"
+              disabled={loading}
+              className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
         </div>
