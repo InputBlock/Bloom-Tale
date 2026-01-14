@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 const CartContext = createContext()
 
@@ -11,53 +12,130 @@ export const useCart = () => {
 }
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem("bloomtale-cart")
-    return savedCart ? JSON.parse(savedCart) : []
-  })
+  const [cartItems, setCartItems] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [totalAmount, setTotalAmount] = useState(0)
 
-  useEffect(() => {
-    localStorage.setItem("bloomtale-cart", JSON.stringify(cartItems))
-  }, [cartItems])
+  // Check if user is logged in
+  const isLoggedIn = () => {
+    const user = localStorage.getItem("user")
+    return !!user
+  }
 
-  const addToCart = (product) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (item) => item.id === product.id && item.variantId === product.variantId
-      )
+  // Fetch cart from backend
+  const fetchCart = async () => {
+    if (!isLoggedIn()) {
+      setCartItems([])
+      setTotalAmount(0)
+      return
+    }
 
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id && item.variantId === product.variantId
-            ? { ...item, quantity: item.quantity + product.quantity }
-            : item
-        )
+    try {
+      setLoading(true)
+      const response = await fetch("http://localhost:8000/api/v1/cart/getCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important for cookies
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.data.cart) {
+        setCartItems(data.data.cart.items || [])
+        setTotalAmount(data.data.totalAmount || 0)
+      } else {
+        setCartItems([])
+        setTotalAmount(0)
       }
-
-      return [...prevItems, { ...product, cartId: Date.now() }]
-    })
+    } catch (error) {
+      console.error("Error fetching cart:", error)
+      setCartItems([])
+      setTotalAmount(0)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const removeFromCart = (cartId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.cartId !== cartId))
+  // Don't load cart automatically on mount - only when user accesses cart page or adds to cart
+
+  const addToCart = async (product) => {
+    if (!isLoggedIn()) {
+      // Redirect to login if not logged in
+      window.location.href = "/login"
+      return { success: false, message: "Please login to add items to cart" }
+    }
+
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/cart/addToCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          product_id: product.product_id,
+          quantity: product.quantity || 1,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Refresh cart after adding
+        await fetchCart()
+        return { success: true, message: data.message }
+      } else {
+        return { success: false, message: data.message }
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error)
+      return { success: false, message: "Failed to add to cart" }
+    }
   }
 
-  const updateQuantity = (cartId, newQuantity) => {
-    if (newQuantity < 1) return
+  const removeFromCart = async (product_id) => {
+    if (!isLoggedIn()) {
+      return
+    }
 
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.cartId === cartId ? { ...item, quantity: newQuantity } : item
+    try {
+      // Note: You'll need to implement removeFromCart endpoint in backend
+      // For now, we'll handle it on the frontend
+      setCartItems((prevItems) => 
+        prevItems.filter((item) => item.product_id !== product_id)
       )
-    )
+    } catch (error) {
+      console.error("Error removing from cart:", error)
+    }
+  }
+
+  const updateQuantity = async (product_id, newQuantity) => {
+    if (newQuantity < 1 || !isLoggedIn()) return
+
+    try {
+      // Update locally first for immediate feedback
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.product_id === product_id ? { ...item, quantity: newQuantity } : item
+        )
+      )
+      
+      // Then sync with backend
+      // Note: You'll need to implement updateQuantity endpoint in backend
+    } catch (error) {
+      console.error("Error updating quantity:", error)
+    }
   }
 
   const clearCart = () => {
     setCartItems([])
+    setTotalAmount(0)
   }
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
+    return totalAmount
   }
 
   const getCartCount = () => {
@@ -74,6 +152,9 @@ export const CartProvider = ({ children }) => {
         clearCart,
         getCartTotal,
         getCartCount,
+        fetchCart,
+        loading,
+        isLoggedIn,
       }}
     >
       {children}
