@@ -44,30 +44,35 @@ export default function SubHeader() {
         
         <div className="relative w-full px-4 py-3">
           {/* Desktop View */}
-          <div className="hidden md:flex items-center justify-between gap-3 lg:gap-4 max-w-7xl mx-auto">
+          <div className="hidden md:flex items-center justify-evenly gap-2 max-w-7xl mx-auto">
             {categories.map((category, index) => {
               const Icon = category.icon
               return (
-                <motion.button
-                  key={index}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.3 }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="group flex flex-col items-center gap-2 min-w-fit px-1 py-1 transition-all duration-300"
-                >
-                  <div className="w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center rounded-full bg-[#EDE8E0]/50 group-hover:bg-[#5e6043]/10 transition-all duration-300 border border-[#5e6043]/20">
-                    <Icon 
-                      size={16} 
-                      className="text-[#5e6043] group-hover:text-[#3e4026] transition-colors duration-300 lg:w-[18px] lg:h-[18px]" 
-                      strokeWidth={1.5}
-                    />
-                  </div>
-                  <span className="text-[9px] lg:text-[10px] text-[#3e4026] font-medium text-center leading-tight whitespace-nowrap group-hover:text-[#5e6043] transition-colors duration-300">
-                    {category.name}
-                  </span>
-                </motion.button>
+                <>
+                  <motion.button
+                    key={index}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="group flex flex-col items-center gap-2 flex-1 px-1 py-1 transition-all duration-300"
+                  >
+                    <div className="w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center rounded-full bg-[#EDE8E0]/50 group-hover:bg-[#5e6043]/10 transition-all duration-300 border border-[#5e6043]/20">
+                      <Icon 
+                        size={16} 
+                        className="text-[#5e6043] group-hover:text-[#3e4026] transition-colors duration-300 lg:w-[18px] lg:h-[18px]" 
+                        strokeWidth={1.5}
+                      />
+                    </div>
+                    <span className="text-[9px] lg:text-[10px] text-[#3e4026] font-medium text-center leading-tight whitespace-nowrap group-hover:text-[#5e6043] transition-colors duration-300">
+                      {category.name}
+                    </span>
+                  </motion.button>
+                  {index < categories.length - 1 && (
+                    <div className="h-12 w-px bg-[#5e6043]/20"></div>
+                  )}
+                </>
               )
             })}
           </div>
