@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
+import axios from "axios"
+
+const API_URL = "http://localhost:8000/api/v1/admin"
 
 export default function EditProductModal({ product, isOpen, onClose, onSave }) {
   const [editProduct, setEditProduct] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (product) {
@@ -12,13 +16,31 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
 
   if (!isOpen || !editProduct) return null
 
-  const handleSave = () => {
-    // If stock is 0, automatically unlist
-    const updatedProduct = {
-      ...editProduct,
-      isListed: editProduct.stock > 0 ? editProduct.isListed : false
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+      
+      // If stock is 0, automatically unlist
+      const updatedProduct = {
+        ...editProduct,
+        isListed: editProduct.stock > 0 ? editProduct.isListed : false
+      }
+
+      await axios.post(`${API_URL}/update`, {
+        id: updatedProduct.id,
+        name: updatedProduct.name,
+        category: updatedProduct.category,
+        price: updatedProduct.price,
+        stock: updatedProduct.stock
+      })
+
+      onSave(updatedProduct)
+    } catch (error) {
+      console.error("Error updating product:", error)
+      alert("Failed to update product")
+    } finally {
+      setLoading(false)
     }
-    onSave(updatedProduct)
   }
 
   return (
@@ -121,15 +143,17 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
-            Save Changes
+            {loading ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>

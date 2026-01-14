@@ -7,6 +7,7 @@ import ProductDetailsPage from './pages/productDetails'
 import Landing from './pages/Landing'
 import ProductCart from './pages/ProductCart/productCart'
 import Checkout from './pages/Checkout'
+import AuthCallback from './pages/AuthCallback'
 import { CartProvider } from './context/CartContext'
 import ToastContainer from './components/common/ToastContainer'
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/product/:productId" element={<ProductDetailsPage />} />
           <Route path="/cart" element={<ProductCart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
         </Routes>
       </Router>
     </CartProvider>

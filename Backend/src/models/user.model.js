@@ -36,7 +36,8 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
     },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
+    authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
     rereshToken: {
       type: String,
     },

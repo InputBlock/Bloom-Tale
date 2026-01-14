@@ -21,7 +21,6 @@ export async function AdminDecorator(ctx) {
     if (!password_ok) {
         throw new Error("Invalid credentials");
     }
-    
     return {
         token: createAccessToken(admin._id, "admin"),
         admin: {

@@ -47,7 +47,7 @@ export default function Login() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600">
           <Link to="/" className="hover:text-gray-900">Home</Link>
-          <span>›</span>
+          <span></span>
           <span className="text-gray-900">Login</span>
         </nav>
       </div>

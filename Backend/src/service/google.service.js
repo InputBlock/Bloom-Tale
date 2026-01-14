@@ -18,12 +18,19 @@ const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 
-// Initialize Google OAuth client
-const oauth2Client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
+// Lazy initialization of OAuth client
+let oauth2Client = null;
+
+function getOAuth2Client() {
+  if (!oauth2Client) {
+    oauth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    );
+  }
+  return oauth2Client;
+}
 
 /**
  * Build Google OAuth authorization URL for user login.
@@ -81,7 +88,7 @@ export async function exchangeCodeForTokens(code) {
  */
 export async function verifyIdToken(idToken) {
   try {
-    const ticket = await oauth2Client.verifyIdToken({
+    const ticket = await getOAuth2Client().verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID
     });
