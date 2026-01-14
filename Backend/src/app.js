@@ -29,9 +29,12 @@ app.use("/api/v1/admin", adminRoutes);
 
 
 import productRoutes from "./route/product.route.js"
-app.use("/api/v1/getProduct",productRoutes)
+app.use("/api/v1/getProductDetail",productRoutes)
 
 import cartRoutes from "./route/cart.route.js"
 app.use("/api/v1/cart",cartRoutes)
+
+import getProductRoutes from "./route/getProduct.route.js"
+app.use("/api/v1/getProduct",getProductRoutes)
 
 export {app}
