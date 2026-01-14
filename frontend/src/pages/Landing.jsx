@@ -5,8 +5,6 @@ import FlowerCarousel1 from '../components/landing/FlowerCarousel copy'
 function Landing() {
   return (
     <>
-    <HeroSection/>
-    <FlowerCarousel/>
     <FlowerCarousel1/>
     </>
   )

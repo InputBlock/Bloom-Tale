@@ -1,18 +1,41 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Header from "../components/common/Header"
 import L_email from "../components/login/L_email"
+import { showToast } from "../components/common/ToastContainer"
 
 export default function Login() {
-  const [userEmail, setUserEmail] = useState("")
-  const [userPassword, setUserPassword] = useState("")
+  const navigate = useNavigate()
 
-  const handleLogin = (email, password) => {
-    setUserEmail(email)
-    setUserPassword(password)
-    // Here you would normally authenticate the user
-    console.log("Logging in with:", email, password)
-    // On success, redirect to home or dashboard
+  const handleLogin = async (email, password) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important for cookies
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed")
+      }
+
+      // Store user data in localStorage
+      localStorage.setItem("user", JSON.stringify(data.data.user))
+      
+      showToast("Welcome back, bloom lover! 🌸", "success")
+      
+      // Redirect to home page
+      navigate("/home")
+      return { success: true, message: data.message }
+    } catch (error) {
+      console.error("Login error:", error)
+      return { success: false, message: error.message }
+    }
   }
 
   return (

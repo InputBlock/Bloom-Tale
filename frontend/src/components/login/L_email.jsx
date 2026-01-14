@@ -1,14 +1,25 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { Eye, EyeOff } from "lucide-react"
 
 export default function L_email({ onNext }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (email && password) {
-      onNext(email, password)
+      setLoading(true)
+      setError("")
+      const result = await onNext(email, password)
+      setLoading(false)
+      
+      if (!result.success) {
+        setError(result.message)
+      }
     }
   }
 
@@ -20,6 +31,12 @@ export default function L_email({ onNext }) {
       <p className="text-sm text-gray-500 text-center mb-8">Login to your account</p>
       
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
+        
         <div>
           <label className="block text-gray-700 text-sm font-medium mb-2">
             Email
@@ -31,6 +48,7 @@ export default function L_email({ onNext }) {
             placeholder="Enter your email"
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
             required
+            disabled={loading}
           />
         </div>
 
@@ -38,14 +56,24 @@ export default function L_email({ onNext }) {
           <label className="block text-gray-700 text-sm font-medium mb-2">
             Password
           </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59] focus:border-transparent transition"
+              required
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
 
         <div className="text-right">
@@ -59,9 +87,10 @@ export default function L_email({ onNext }) {
 
         <button
           type="submit"
-          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200"
+          className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading}
         >
-          LOGIN
+          {loading ? "LOGGING IN..." : "LOGIN"}
         </button>
       </form>
 

@@ -4,33 +4,93 @@ import Header from "../components/common/Header"
 import F_email from "../components/login/F_email"
 import F_otp from "../components/login/F_otp"
 import F_newPassword from "../components/login/F_newPassword"
+import { showToast } from "../components/common/ToastContainer"
 
 export default function ForgotPassword() {
   const [step, setStep] = useState("email") // "email" | "otp" | "newPassword" | "done"
   const [userEmail, setUserEmail] = useState("")
+  const [otpValue, setOtpValue] = useState("")
   const navigate = useNavigate()
 
-  const handleEmailNext = (email) => {
-    setUserEmail(email)
-    setStep("otp")
-    console.log("Sending OTP to:", email)
+  const handleEmailNext = async (email) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/forgotPassword", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send OTP")
+      }
+
+      setUserEmail(email)
+      setStep("otp")
+      showToast("A secret bloomed in your inbox! 🌷", "success")
+      return { success: true }
+    } catch (error) {
+      showToast(error.message || "Our garden is taking a nap! 💤", "error")
+      return { success: false }
+    }
   }
 
-  const handleOtpNext = (otpValue) => {
-    console.log("Verifying OTP:", otpValue)
+  const handleOtpNext = (otp) => {
+    setOtpValue(otp)
     setStep("newPassword")
+    showToast("Perfect! Your garden gate is open! 🌻", "success")
   }
 
-  const handlePasswordSubmit = (password) => {
-    console.log("Setting new password:", password)
-    setStep("done")
-    setTimeout(() => {
-      navigate("/login")
-    }, 2000)
+  const handlePasswordSubmit = async (password) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/resetPassword", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ otp: otpValue, newPassword: password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to reset password")
+      }
+
+      showToast("Your password is fresh as morning dew! 💐", "success")
+      setStep("done")
+      setTimeout(() => {
+        navigate("/login")
+      }, 2000)
+      return { success: true }
+    } catch (error) {
+      showToast(error.message || "This key doesn't fit our garden! 🔑", "error")
+      return { success: false }
+    }
   }
 
-  const handleResendOtp = () => {
-    console.log("Resending OTP to:", userEmail)
+  const handleResendOtp = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/forgotPassword", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: userEmail }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to resend OTP")
+      }
+
+      showToast("Fresh petals sent to your inbox! 🌺", "success")
+      return { success: true }
+    } catch (error) {
+      showToast(error.message || "Couldn't resend the bloom! 🥀", "error")
+      return { success: false }
+    }
   }
 
   return (

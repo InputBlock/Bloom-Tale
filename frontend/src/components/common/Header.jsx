@@ -1,14 +1,60 @@
 "use client"
 
-import { useState } from "react"
-import { Search, User, ShoppingCart, Menu, X } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Search, User, ShoppingCart, Menu, X, LogOut, UserCircle } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../../context/CartContext"
+import { showToast } from "./ToastContainer"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const { getCartCount } = useCart()
+
+  // Load user from localStorage
+  useEffect(() => {
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      setUser(JSON.parse(userData))
+    }
+  }, [])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsUserDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:8000/api/v1/logout", {
+        method: "POST",
+        credentials: "include", // Important for cookies
+      })
+    } catch (error) {
+      console.error("Logout error:", error)
+    } finally {
+      // Clear local data and redirect even if API fails
+      localStorage.removeItem("user")
+      setUser(null)
+      setIsUserDropdownOpen(false)
+      showToast("See you soon, petal friend! 🌼", "info")
+      navigate("/")
+    }
+  }
+
+  const getUserInitial = () => {
+    if (!user || !user.email) return "U"
+    return user.email.charAt(0).toUpperCase()
+  }
 
   const categories = [
     "Same Day Delivery",
@@ -45,9 +91,60 @@ export default function Header() {
               {getCartCount()}
             </span>
           </button>
-          <button className="p-2 hover:bg-gray-800 rounded-full">
-            <User size={20} />
-          </button>
+          
+          {/* User Profile Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            {user ? (
+              <>
+                <button 
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6B7C59] to-[#5A6B4A] flex items-center justify-center text-white font-semibold text-sm hover:shadow-lg transition-shadow"
+                >
+                  {getUserInitial()}
+                </button>
+                
+                {/* Dropdown Menu */}
+                {isUserDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {user.email}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {user.username || "User"}
+                      </p>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        setIsUserDropdownOpen(false)
+                        navigate("/profile")
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    >
+                      <UserCircle size={16} />
+                      My Profile
+                    </button>
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <button 
+                onClick={() => navigate("/login")}
+                className="p-2 hover:bg-gray-800 rounded-full"
+              >
+                <User size={20} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
