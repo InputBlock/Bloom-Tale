@@ -161,7 +161,10 @@ export default function ProductCart() {
             <p className="text-base sm:text-lg lg:text-xl font-medium text-gray-900 text-center sm:text-left">
               Total Amount : <span className="font-bold">₹ {totalAmount.toLocaleString()}</span>
             </p>
-            <button className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 sm:py-3 px-6 sm:px-12 lg:px-16 text-sm sm:text-base transition whitespace-nowrap rounded">
+            <button 
+              onClick={() => navigate("/checkout")}
+              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 sm:py-3 px-6 sm:px-12 lg:px-16 text-sm sm:text-base transition whitespace-nowrap rounded"
+            >
               PROCEED TO CHECKOUT
             </button>
           </div>
