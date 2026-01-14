@@ -97,7 +97,7 @@ const FlowerCarousel = () => {
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-8">
       {/* Background linear */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#fffdf8,#e9e5d7)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#efefef,#ede0c0)]" />
       
       {/* Decorative circles */}
       <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-accent/10 blur-3xl" />

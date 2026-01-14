@@ -1,15 +1,15 @@
-
-import { DB_NAME } from "./constants.js";
+import dotenv from "dotenv"
+dotenv.config({
+    path:'./.env'
+})
 import {app} from './app.js'
 
 
 //require('dotenv').config({path:'./env'})
-import dotenv from "dotenv"
+
 import connectDB from "./db/index.js";
 
-dotenv.config({
-    path:'./.env'
-})
+
 
 connectDB()  //ye async use kiye hai to promise bhi return karega isliye
 .then(()=>{
@@ -22,3 +22,4 @@ connectDB()  //ye async use kiye hai to promise bhi return karega isliye
     console.log("MONGODB connection failed !!!",err);
     
 })
+
