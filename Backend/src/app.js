@@ -37,4 +37,7 @@ app.use("/api/v1/cart",cartRoutes)
 import getProductRoutes from "./route/getProduct.route.js"
 app.use("/api/v1/getProduct",getProductRoutes)
 
+import orderRoutes from "./route/order.route.js"
+app.use("/api/v1/order",orderRoutes)
+
 export {app}

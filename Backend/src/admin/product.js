@@ -100,7 +100,28 @@ export async function deleteItem(id) {
 }
 
 
+export async function getList() {
+    const list = await productSchema.find();
 
+    return {
+        total: list.length,
+        flowers: list.map(item => ({
+            id: item.product_id,
+            name: item.name,
+            description: item.description,
+            category: item.category,
+            subcategory: item.subcategory,
+            price: item.price,
+            sizes: item.sizes,
+            stock: item.stock,
+            images: item.images_uri || [],
+            isActive: item.is_active,
+            isBestSeller: item.bestSeller,
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt
+        }))
+    };
+}
 
 
 
