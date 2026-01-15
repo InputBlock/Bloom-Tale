@@ -21,7 +21,15 @@ export default function ForgotPassword() {
         body: JSON.stringify({ email }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to send OTP")
@@ -52,7 +60,15 @@ export default function ForgotPassword() {
         body: JSON.stringify({ otp: otpValue, newPassword: password }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to reset password")
@@ -79,7 +95,15 @@ export default function ForgotPassword() {
         body: JSON.stringify({ email: userEmail }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to resend OTP")
