@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
 
-const API_URL = "/api/v1"
+
 
 export default function L_email({ onNext }) {
   const [email, setEmail] = useState("")
@@ -102,7 +102,10 @@ export default function L_email({ onNext }) {
         <div className="flex-1 border-t border-gray-300"></div>
       </div>
 
-      <button className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl transition duration-200 flex items-center justify-center gap-2">
+      <button 
+        onClick={() => window.location.href = '/api/v1/google'}
+        className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl transition duration-200 flex items-center justify-center gap-2"
+      >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path
             fill="#4285F4"
