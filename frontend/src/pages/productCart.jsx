@@ -1,5 +1,5 @@
 import { useCart } from "../context/CartContext"
-import { Minus, Plus, Trash2, MapPin, Heart } from "lucide-react"
+import { Minus, Plus, Trash2, MapPin } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -106,12 +106,6 @@ export default function ProductCart() {
                   <p className="text-2xl font-bold text-gray-900">
                     ₹ {(item.price * item.quantity).toLocaleString()}
                   </p>
-                  <button
-                    className="text-gray-400 hover:text-red-500 transition"
-                    aria-label="Add to wishlist"
-                  >
-                    <Heart size={24} />
-                  </button>
                   <button
                     onClick={() => removeFromCart(item.cartId)}
                     className="text-gray-400 hover:text-red-500 transition"

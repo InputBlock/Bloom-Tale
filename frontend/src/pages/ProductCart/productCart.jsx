@@ -1,12 +1,14 @@
 import { useCart } from "../../context/CartContext"
-import { Minus, Plus, Trash2, MapPin, Heart } from "lucide-react"
+import { Minus, Plus, Trash2, MapPin } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import Header from "../../components/common/Header"
+import { IoCheckboxOutline, IoSquareOutline } from "react-icons/io5"
 
 export default function ProductCart() {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, isLoggedIn, fetchCart, loading } = useCart()
   const [pincode, setPincode] = useState("400018")
+  const [selectedItems, setSelectedItems] = useState([])
   const navigate = useNavigate()
 
   // Immediately redirect if not logged in - before any other useEffect
@@ -22,9 +24,41 @@ export default function ProductCart() {
     }
   }, [])
 
+  // Initialize all items as selected when cart loads
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      setSelectedItems(cartItems.map(item => item.product_id))
+    }
+  }, [cartItems.length])
+
   const deliveryCharge = 25
-  const cartTotal = getCartTotal()
-  const totalAmount = cartTotal + deliveryCharge
+  
+  // Calculate total for selected items only
+  const selectedItemsTotal = cartItems
+    .filter(item => selectedItems.includes(item.product_id))
+    .reduce((total, item) => total + (item.price * item.quantity), 0)
+  
+  const totalAmount = selectedItemsTotal + (selectedItems.length > 0 ? deliveryCharge : 0)
+
+  // Handle checkbox selection
+  const handleSelectItem = (product_id) => {
+    setSelectedItems(prev => 
+      prev.includes(product_id) 
+        ? prev.filter(id => id !== product_id)
+        : [...prev, product_id]
+    )
+  }
+
+  // Handle select all
+  const handleSelectAll = () => {
+    if (selectedItems.length === cartItems.length) {
+      setSelectedItems([])
+    } else {
+      setSelectedItems(cartItems.map(item => item.product_id))
+    }
+  }
+
+  const isAllSelected = selectedItems.length === cartItems.length && cartItems.length > 0
 
   const handleQuantityChange = (product_id, currentQuantity, type) => {
     if (type === "increment") {
@@ -86,16 +120,24 @@ export default function ProductCart() {
         {/* Header */}
         <div className="text-center mb-4 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-gray-900 mb-3 sm:mb-4">Shopping Cart</h1>
-          <div className="flex flex-wrap items-center justify-center gap-2 text-sm sm:text-base text-gray-700">
-            <MapPin size={18} className="sm:w-5 sm:h-5" />
-            <span className="font-medium">Delivery to:</span>
-            <input
-              type="text"
-              value={pincode}
-              onChange={(e) => setPincode(e.target.value)}
-              className="border border-gray-300 rounded px-2 sm:px-3 py-1 w-28 sm:w-40 text-center text-sm sm:text-base"
-              placeholder="Enter pincode"
-            />
+        </div>
+
+        {/* Select All Checkbox */}
+        <div className="mb-3 sm:mb-4 bg-white rounded-lg shadow-sm p-4 sm:p-5 border border-gray-200 hover:border-[#5d6c4e] transition-colors">
+          <div 
+            onClick={handleSelectAll}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="flex-shrink-0">
+              {isAllSelected ? (
+                <IoCheckboxOutline className="w-6 h-6 text-[#5d6c4e] transition-transform group-hover:scale-110" />
+              ) : (
+                <IoSquareOutline className="w-6 h-6 text-gray-400 transition-all group-hover:text-[#5d6c4e] group-hover:scale-110" />
+              )}
+            </div>
+            <span className="text-sm sm:text-base font-semibold text-gray-900">
+              Select All ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})
+            </span>
           </div>
         </div>
 
@@ -108,8 +150,24 @@ export default function ProductCart() {
             return (
               <div
                 key={item._id || item.product_id}
-                className="bg-white rounded-lg shadow-sm p-3 sm:p-4 lg:p-6"
+                className={`relative bg-white rounded-lg shadow-sm p-3 sm:p-4 lg:p-6 border-2 transition-all ${
+                  selectedItems.includes(item.product_id) 
+                    ? 'border-[#5d6c4e] shadow-md' 
+                    : 'border-transparent hover:border-gray-200'
+                }`}
               >
+                {/* Checkbox - Top Right */}
+                <div 
+                  onClick={() => handleSelectItem(item.product_id)}
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 cursor-pointer group z-10"
+                >
+                  {selectedItems.includes(item.product_id) ? (
+                    <IoCheckboxOutline className="w-7 h-7 sm:w-8 sm:h-8 text-[#5d6c4e] transition-transform group-hover:scale-110" />
+                  ) : (
+                    <IoSquareOutline className="w-7 h-7 sm:w-8 sm:h-8 text-gray-300 transition-all group-hover:text-[#5d6c4e] group-hover:scale-110" />
+                  )}
+                </div>
+
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6">
                   {/* Product Image */}
                   <div className="flex-shrink-0 mx-auto sm:mx-0">
@@ -142,33 +200,17 @@ export default function ProductCart() {
                       <p className="text-gray-600">Pincode - {pincode}</p>
                     </div>
 
-                    {/* Price and Actions Row - Mobile/Tablet */}
-                    <div className="flex items-center justify-between gap-2 mt-auto">
+                    {/* Price and Quantity Row */}
+                    <div className="flex items-center justify-between gap-3 mt-auto flex-wrap">
                       {/* Price */}
                       <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                         ₹ {(item.price * item.quantity).toLocaleString()}
                       </p>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <button
-                          className="text-gray-400 hover:text-red-500 transition p-1"
-                          aria-label="Add to wishlist"
-                        >
-                          <Heart size={20} className="sm:w-6 sm:h-6" />
-                        </button>
-                        <button
-                          onClick={() => removeFromCart(item.product_id)}
-                          className="text-gray-400 hover:text-red-500 transition p-1"
-                          aria-label="Remove from cart"
-                        >
-                          <Trash2 size={20} className="sm:w-6 sm:h-6" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Quantity Selector */}
-                    <div className="flex items-center gap-2 border border-gray-300 rounded-md w-fit">
+                      {/* Quantity Selector and Delete Button */}
+                      <div className="flex items-center gap-3">
+                        {/* Quantity Selector */}
+                        <div className="flex items-center gap-2 border border-gray-300 rounded-md">
                       <button
                         onClick={() => handleQuantityChange(item.product_id, item.quantity, "decrement")}
                         className="p-2 sm:p-3 hover:bg-gray-100 transition"
@@ -183,6 +225,17 @@ export default function ProductCart() {
                         <Plus size={14} className="sm:w-4 sm:h-4" />
                       </button>
                     </div>
+                    
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => removeFromCart(item.product_id)}
+                      className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition p-2 rounded-md border border-gray-300 hover:border-red-300"
+                      aria-label="Remove from cart"
+                    >
+                      <Trash2 size={20} className="sm:w-5 sm:h-5" />
+                    </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -196,12 +249,26 @@ export default function ProductCart() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-10">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
-            <p className="text-base sm:text-lg lg:text-xl font-medium text-gray-900 text-center sm:text-left">
-              Total Amount : <span className="font-bold">₹ {totalAmount.toLocaleString()}</span>
-            </p>
+            <div className="text-center sm:text-left">
+              <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                {selectedItems.length} item(s) selected
+              </p>
+              <p className="text-base sm:text-lg lg:text-xl font-medium text-gray-900">
+                Total Amount : <span className="font-bold">₹ {totalAmount.toLocaleString()}</span>
+              </p>
+            </div>
             <button 
-              onClick={() => navigate("/checkout")}
-              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 sm:py-3 px-6 sm:px-12 lg:px-16 text-sm sm:text-base transition whitespace-nowrap rounded"
+              onClick={() => {
+                if (selectedItems.length > 0) {
+                  navigate("/checkout", { state: { selectedItems, totalAmount } })
+                }
+              }}
+              disabled={selectedItems.length === 0}
+              className={`w-full sm:w-auto font-semibold py-2.5 sm:py-3 px-6 sm:px-12 lg:px-16 text-sm sm:text-base transition whitespace-nowrap rounded shadow-md ${
+                selectedItems.length === 0 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-[#5d6c4e] hover:bg-[#4a5840] text-white hover:shadow-lg'
+              }`}
             >
               PROCEED TO CHECKOUT
             </button>

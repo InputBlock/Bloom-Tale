@@ -94,9 +94,6 @@ export default function Header() {
               {getCartCount()}
             </span>
           </button>
-          <button className="p-2 hover:bg-[#4a5840] rounded-full transition-colors duration-300">
-            <User size={20} />
-          </button>
           
           {/* Profile Button with Logout Dropdown */}
           <div className="relative" ref={logoutRef}>

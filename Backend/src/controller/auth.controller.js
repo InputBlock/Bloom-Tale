@@ -5,7 +5,6 @@ import {ApiError} from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import sendOtpEmail from "../utils/sendOtp.js";
-import { buildGoogleAuthUrl, getVerifiedGoogleProfile } from "../service/google.service.js";
 
 const createAccessToken = (userId) => {
   return jwt.sign({ sub: userId }, process.env.JWT_SECRET, { 
@@ -75,8 +74,7 @@ export const googleCallback = async (req, res) => {
       user = new User({
         username,
         email: email.toLowerCase(),
-        authProvider: "google",
-        isEmailVerified: true,
+        password_hash: "",
         metadata: {
           social_profiles: [{
             provider,
@@ -97,17 +95,21 @@ export const googleCallback = async (req, res) => {
     user.current_token = token;
     await user.save();
 
-    // Redirect to frontend with token
-    const frontendURL = process.env.CORS_ORIGIN || 'http://localhost:5173';
-    const userData = encodeURIComponent(JSON.stringify({
-      id: user._id,
-      email: user.email,
-      username: user.username
-    }));
-    return res.redirect(`${frontendURL}/auth/callback?token=${token}&user=${userData}`);
+    return res.status(200).json({
+      success: true,
+      access_token: token,
+      token_type: "bearer",
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username
+      }
+    });
   } catch (error) {
-    const frontendURL = process.env.CORS_ORIGIN || 'http://localhost:5173';
-    return res.redirect(`${frontendURL}/login?error=${encodeURIComponent(error.message)}`);
+    return res.status(400).json({
+      success: false,
+      message: `Failed to verify Google profile: ${error.message}`
+    });
   }
 };
 

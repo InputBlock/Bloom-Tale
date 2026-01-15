@@ -49,7 +49,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative h-96 md:h-125 bg-[#EDE8E0] overflow-hidden">
+    <section className="relative h-96 md:h-125 bg-[#EDE8E0] overflow-hidden mt-3">
       {/* Background decorative elements */}
       <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-[#5e6043]/5 blur-3xl" />
       <div className="absolute bottom-20 left-20 w-80 h-80 rounded-full bg-[#3e4026]/5 blur-3xl" />
