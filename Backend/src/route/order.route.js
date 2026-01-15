@@ -22,6 +22,6 @@ router.post("/verify-payment", verifyJWT, verifyPayment);
 // webhook (NO auth)
 router.post("/webhook", razorpayWebhook);
 
-router.post("/makePaymentFailed",makePaymentFailed)
+router.post("/markPaymentFailed",markPaymentFailed)
 
 export default router;

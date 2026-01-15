@@ -180,9 +180,6 @@ export default function OrdersTable() {
               <Filter size={18} />
               <span className="text-sm font-medium">Filter</span>
             </button>
-            <button className="px-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
-              <ChevronDown size={18} />
-            </button>
           </div>
         </div>
 
