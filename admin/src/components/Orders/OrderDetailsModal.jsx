@@ -5,8 +5,8 @@ import OrderStatusBadge from "./OrderStatusBadge"
 
 export default function OrderDetailsModal({ order, onClose }) {
   return (
-    <div className="fixed inset-0 bg-gray-100 bg-opacity-90 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-1000 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto my-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <button onClick={onClose} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4">
