@@ -10,7 +10,7 @@ export default function Login() {
 
   const handleLogin = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/login", {
+      const response = await fetch("/api/v1/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -19,7 +19,15 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed")
@@ -35,7 +43,7 @@ export default function Login() {
       return { success: true, message: data.message }
     } catch (error) {
       console.error("Login error:", error)
-      return { success: false, message: error.message }
+      return { success: false, message: error.message || "Something went wrong" }
     }
   }
 

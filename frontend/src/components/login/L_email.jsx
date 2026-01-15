@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
 
-const API_URL = "http://localhost:8000/api/v1"
+const API_URL = "/api/v1"
 
 export default function L_email({ onNext }) {
   const [email, setEmail] = useState("")

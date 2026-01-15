@@ -16,7 +16,7 @@ export default function ProductDetailsPage() {
     const fetchProductDetails = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`http://localhost:8000/api/v1/getProductDetail/${productId}`, {
+        const response = await fetch(`/api/v1/getProductDetail/${productId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

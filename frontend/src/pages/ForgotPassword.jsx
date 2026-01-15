@@ -14,7 +14,7 @@ export default function ForgotPassword() {
 
   const handleEmailNext = async (email) => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/forgotPassword", {
+      const response = await fetch("/api/v1/forgotPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -45,7 +45,7 @@ export default function ForgotPassword() {
 
   const handlePasswordSubmit = async (password) => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/resetPassword", {
+      const response = await fetch("/api/v1/resetPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -72,7 +72,7 @@ export default function ForgotPassword() {
 
   const handleResendOtp = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/forgotPassword", {
+      const response = await fetch("/api/v1/forgotPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
