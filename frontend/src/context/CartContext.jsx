@@ -32,7 +32,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true)
-      const response = await fetch("http://localhost:8000/api/v1/cart/getCart", {
+      const response = await fetch("/api/v1/cart/getCart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/cart/addToCart", {
+      const response = await fetch("/api/v1/cart/addToCart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

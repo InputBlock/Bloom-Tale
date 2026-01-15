@@ -23,7 +23,7 @@ export default function BestsellingBlooms() {
     const fetchBestsellerProducts = async () => {
       try {
         setLoading(true)
-        const response = await fetch('http://localhost:8000/api/v1/getProduct/bestseller', {
+        const response = await fetch('/api/v1/getProduct/bestseller', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

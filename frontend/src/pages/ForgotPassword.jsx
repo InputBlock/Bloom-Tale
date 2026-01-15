@@ -14,14 +14,22 @@ export default function ForgotPassword() {
 
   const handleEmailNext = async (email) => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/forgotPassword", {
+      const response = await fetch("/api/v1/forgotPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to send OTP")
@@ -45,14 +53,22 @@ export default function ForgotPassword() {
 
   const handlePasswordSubmit = async (password) => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/resetPassword", {
+      const response = await fetch("/api/v1/resetPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ otp: otpValue, newPassword: password }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to reset password")
@@ -72,14 +88,22 @@ export default function ForgotPassword() {
 
   const handleResendOtp = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/forgotPassword", {
+      const response = await fetch("/api/v1/forgotPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email: userEmail }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to resend OTP")

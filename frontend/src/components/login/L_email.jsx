@@ -2,6 +2,8 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
 
+const API_URL = "/api/v1"
+
 export default function L_email({ onNext }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
