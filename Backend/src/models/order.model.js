@@ -34,7 +34,6 @@ const addressSchema = {
   alternateMobile: String,
   email: String,
 
-  addressTag: String, // Home / Office
 };
 
 const orderSchema = new Schema(
