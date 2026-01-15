@@ -115,21 +115,17 @@ export default function Checkout() {
                   exit={{ opacity: 0, x: 20 }}
                   className="bg-white rounded-xl shadow-lg p-8"
                 >
-                  <form onSubmit={handleDeliverySubmit} className="space-y-6">
-                    {/* Save Address Checkbox */}
-                    <div className="flex items-center gap-3 p-4 bg-[#EDE8E0]/30 rounded-lg">
-                      <input
-                        type="checkbox"
-                        id="saveAddress"
-                        checked={formData.saveAddress}
-                        onChange={(e) => handleInputChange('saveAddress', e.target.checked)}
-                        className="w-5 h-5 accent-[#3e4026]"
-                      />
-                      <label htmlFor="saveAddress" className="text-gray-700 font-medium cursor-pointer">
-                        Save this address as 🏠 'My Home'
-                      </label>
-                    </div>
+                  {/* Back to Cart Button */}
+                  <button
+                    type="button"
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 text-gray-600 hover:text-[#3e4026] font-medium mb-6 transition-colors"
+                  >
+                    <ChevronLeft size={20} />
+                    <span>Back to Cart</span>
+                  </button>
 
+                  <form onSubmit={handleDeliverySubmit} className="space-y-6">
                     {/* Title and Name */}
                     <div className="grid grid-cols-4 gap-4">
                       <div>
@@ -162,100 +158,6 @@ export default function Checkout() {
                         />
                         <p className="text-xs text-gray-500 mt-1 text-right">(0/60)</p>
                       </div>
-                    </div>
-
-                    {/* Country */}
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Delivery Country <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={formData.country}
-                        onChange={(e) => handleInputChange('country', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
-                        required
-                      >
-                        <option>🇮🇳 India</option>
-                        <option>🇺🇸 United States</option>
-                        <option>🇬🇧 United Kingdom</option>
-                      </select>
-                    </div>
-
-                    {/* Street Address */}
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Street Address <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.streetAddress}
-                        onChange={(e) => handleInputChange('streetAddress', e.target.value)}
-                        placeholder="Building / Area / Locality"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1 text-right">(0/180)</p>
-                    </div>
-
-                    {/* Apartment */}
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        House/Apartment <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.apartment}
-                        onChange={(e) => handleInputChange('apartment', e.target.value)}
-                        placeholder="Flat No. / Floor / Unit No"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1 text-right">(0/180)</p>
-                    </div>
-
-                    {/* Pincode and City */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Pincode/Zipcode <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.pincode}
-                          onChange={(e) => handleInputChange('pincode', e.target.value)}
-                          placeholder="400008"
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                          City <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.city}
-                          onChange={(e) => handleInputChange('city', e.target.value)}
-                          placeholder="Mumbai"
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    {/* State */}
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        State <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.state}
-                        onChange={(e) => handleInputChange('state', e.target.value)}
-                        placeholder="Maharashtra"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
-                        required
-                      />
                     </div>
 
                     {/* Mobile Numbers */}
@@ -297,68 +199,98 @@ export default function Checkout() {
                       </div>
                     </div>
 
-                    {/* Email */}
+                    {/* Country */}
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
-                        Recipient Email ID
+                        Delivery Country <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        placeholder="Recipient Email ID"
+                      <select
+                        value={formData.country}
+                        onChange={(e) => handleInputChange('country', e.target.value)}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
-                      />
+                        required
+                      >
+                        <option>🇮🇳 India</option>
+                        <option>🇺🇸 United States</option>
+                        <option>🇬🇧 United Kingdom</option>
+                      </select>
                     </div>
 
-                    {/* What3words */}
+                    {/* State */}
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
-                        What3words (optional)
+                        State <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        value={formData.what3words}
-                        onChange={(e) => handleInputChange('what3words', e.target.value)}
-                        placeholder="e.g. ///lock.spout.radar"
+                        value={formData.state}
+                        onChange={(e) => handleInputChange('state', e.target.value)}
+                        placeholder="Maharashtra"
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
+                        required
                       />
                     </div>
 
-                    {/* Address Type */}
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-3">
-                        Recipient Address Type <span className="text-red-500">*</span>
-                      </label>
-                      <div className="flex gap-6">
-                        {['Home', 'Office', 'Other'].map((type) => (
-                          <label key={type} className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="radio"
-                              name="addressType"
-                              value={type}
-                              checked={formData.addressType === type}
-                              onChange={(e) => handleInputChange('addressType', e.target.value)}
-                              className="w-5 h-5 accent-[#3e4026]"
-                            />
-                            <span className="text-gray-700">{type}</span>
-                          </label>
-                        ))}
+                    {/* Pincode and City */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Pincode/Zipcode <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.pincode}
+                          onChange={(e) => handleInputChange('pincode', e.target.value)}
+                          placeholder="400008"
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-gray-700 font-medium mb-2">
+                          City <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.city}
+                          onChange={(e) => handleInputChange('city', e.target.value)}
+                          placeholder="Mumbai"
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
+                          required
+                        />
                       </div>
                     </div>
 
-                    {/* Address Tag */}
+                    {/* Street Address */}
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
-                        Address Tag
+                        Street Address <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        value={formData.addressTag}
-                        onChange={(e) => handleInputChange('addressTag', e.target.value)}
-                        placeholder="Enter Title"
+                        value={formData.streetAddress}
+                        onChange={(e) => handleInputChange('streetAddress', e.target.value)}
+                        placeholder="Building / Area / Locality"
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
+                        required
                       />
+                      <p className="text-xs text-gray-500 mt-1 text-right">(0/180)</p>
+                    </div>
+
+                    {/* Apartment */}
+                    <div>
+                      <label className="block text-gray-700 font-medium mb-2">
+                        House/Apartment <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.apartment}
+                        onChange={(e) => handleInputChange('apartment', e.target.value)}
+                        placeholder="Flat No. / Floor / Unit No"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026]"
+                        required
+                      />
+                      <p className="text-xs text-gray-500 mt-1 text-right">(0/180)</p>
                     </div>
 
                     {/* Submit Button */}
@@ -434,16 +366,6 @@ export default function Checkout() {
                           <p>{formData.email}</p>
                         </div>
                       )}
-
-                      <div className="border-b pb-3">
-                        <p className="text-sm text-gray-500 mb-1">Address Type</p>
-                        <p className="inline-flex items-center gap-2 bg-[#EDE8E0] px-3 py-1 rounded-full text-sm font-medium">
-                          {formData.addressType === 'Home' && '🏠'}
-                          {formData.addressType === 'Office' && '🏢'}
-                          {formData.addressType === 'Other' && '📍'}
-                          {formData.addressType}
-                        </p>
-                      </div>
 
                       {formData.what3words && (
                         <div className="border-b pb-3">

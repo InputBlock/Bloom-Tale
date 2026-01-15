@@ -40,17 +40,9 @@ export default function Header() {
     }
   }
 
-  const handleProfileClick = () => {
-    if (!isLoggedIn()) {
-      navigate("/login")
-    } else {
-      setShowLogout(!showLogout)
-    }
-  }
-
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:8000/api/v1/logout", {
+      await fetch("/api/v1/logout", {
         method: "POST",
         credentials: "include",
       })
@@ -106,7 +98,13 @@ export default function Header() {
           {/* Profile Button with Logout Dropdown */}
           <div className="relative" ref={logoutRef}>
             <button 
-              onClick={handleProfileClick}
+              onClick={() => {
+                if (!isLoggedIn()) {
+                  navigate("/login")
+                } else {
+                  setShowLogout(!showLogout)
+                }
+              }}
               className="p-2 hover:bg-[#5e6043] rounded-full transition-colors duration-300"
             >
               {isLoggedIn() ? (

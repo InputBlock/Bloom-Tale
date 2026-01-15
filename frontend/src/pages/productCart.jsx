@@ -1,12 +1,22 @@
 import { useCart } from "../context/CartContext"
-import { Minus, Plus, Trash2, MapPin, Heart } from "lucide-react"
-import { useState } from "react"
+import { Minus, Plus, Trash2, MapPin } from "lucide-react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 export default function ProductCart() {
-  const { cartItems, updateQuantity, removeFromCart, getCartTotal } = useCart()
+  const { cartItems, updateQuantity, removeFromCart, getCartTotal, isLoggedIn, fetchCart } = useCart()
   const [pincode, setPincode] = useState("400018")
   const navigate = useNavigate()
+
+  // Protect cart page - require login
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      navigate("/login", { state: { from: "/cart" } })
+    } else {
+      // Fetch cart from DB when page loads
+      fetchCart()
+    }
+  }, [isLoggedIn, navigate, fetchCart])
 
   const deliveryCharge = 25
   const totalAmount = getCartTotal() + deliveryCharge
@@ -106,12 +116,6 @@ export default function ProductCart() {
                   <p className="text-2xl font-bold text-gray-900">
                     ₹ {(item.price * item.quantity).toLocaleString()}
                   </p>
-                  <button
-                    className="text-gray-400 hover:text-red-500 transition"
-                    aria-label="Add to wishlist"
-                  >
-                    <Heart size={24} />
-                  </button>
                   <button
                     onClick={() => removeFromCart(item.cartId)}
                     className="text-gray-400 hover:text-red-500 transition"

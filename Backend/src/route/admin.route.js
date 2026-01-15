@@ -11,6 +11,6 @@ router.post("/list", list_item);
 router.post("/unlist", unlist_item);
 router.post("/update", upload.single("image"), update_item);
 router.post("/delete", delete_item);
-router.post("/showlist",get_list);
+router.get("/showlist",get_list);
 
 export default router;

@@ -8,8 +8,8 @@ import sendOtpEmail from "../utils/sendOtp.js";
 import { buildGoogleAuthUrl, getVerifiedGoogleProfile } from "../service/google.service.js";
 
 const createAccessToken = (userId) => {
-  return jwt.sign({ sub: userId }, process.env.JWT_SECRET, { 
-    expiresIn: process.env.JWT_EXPIRY || "7d" 
+  return jwt.sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET, { 
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "7d" 
   });
 };
 
@@ -28,16 +28,23 @@ export const googleLogin = async (req, res) => {
 
 export const googleCallback = async (req, res) => {
   try {
-    const { code, state } = req.query;
+    const { code, state, error: googleError } = req.query;
 
-    if (!code) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing authorization code"
-      });
+    // Handle Google OAuth errors
+    if (googleError) {
+      console.error('Google OAuth error:', googleError);
+      const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/auth/callback?error=${encodeURIComponent(googleError)}`);
     }
 
+    if (!code) {
+      const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/auth/callback?error=${encodeURIComponent('Missing authorization code')}`);
+    }
+
+    console.log('Google callback received code, exchanging for tokens...');
     const profile = await getVerifiedGoogleProfile(code);
+    console.log('Google profile received:', profile?.email);
 
     const email = profile.email;
     if (!email) {
@@ -75,8 +82,7 @@ export const googleCallback = async (req, res) => {
       user = new User({
         username,
         email: email.toLowerCase(),
-        authProvider: "google",
-        isEmailVerified: true,
+        password_hash: "",
         metadata: {
           social_profiles: [{
             provider,
@@ -97,17 +103,19 @@ export const googleCallback = async (req, res) => {
     user.current_token = token;
     await user.save();
 
-    // Redirect to frontend with token
-    const frontendURL = process.env.CORS_ORIGIN || 'http://localhost:5173';
+    // Redirect to frontend with token and user data
+    const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
     const userData = encodeURIComponent(JSON.stringify({
       id: user._id,
       email: user.email,
       username: user.username
     }));
-    return res.redirect(`${frontendURL}/auth/callback?token=${token}&user=${userData}`);
+    
+    return res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${userData}`);
   } catch (error) {
-    const frontendURL = process.env.CORS_ORIGIN || 'http://localhost:5173';
-    return res.redirect(`${frontendURL}/login?error=${encodeURIComponent(error.message)}`);
+    console.error('Google callback error:', error);
+    const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
+    return res.redirect(`${frontendUrl}/auth/callback?error=${encodeURIComponent(error.message || 'Authentication failed')}`);
   }
 };
 

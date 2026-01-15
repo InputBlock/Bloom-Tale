@@ -19,7 +19,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Cart is empty");
   }
 
-  // 🧮 Calculate totals
+  //  Calculate totals
   let totalAmount = 0;
   cart.items.forEach((item) => {
     totalAmount += item.price * item.quantity;

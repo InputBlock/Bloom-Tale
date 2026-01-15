@@ -11,7 +11,7 @@ export default function Register() {
 
   const handleCredentialsNext = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/register", {
+      const response = await fetch("/api/v1/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -20,7 +20,15 @@ export default function Register() {
         body: JSON.stringify({ email, password }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Registration failed")
@@ -34,13 +42,13 @@ export default function Register() {
       return { success: true, message: data.message }
     } catch (error) {
       console.error("Registration error:", error)
-      return { success: false, message: error.message }
+      return { success: false, message: error.message || "Something went wrong" }
     }
   }
 
   const handleOtpSubmit = async (otpValue) => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/verifyOtp", {
+      const response = await fetch("/api/v1/verifyOtp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,7 +57,15 @@ export default function Register() {
         body: JSON.stringify({ otp: otpValue }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "OTP verification failed")
@@ -63,13 +79,13 @@ export default function Register() {
       return { success: true, message: data.message }
     } catch (error) {
       console.error("OTP verification error:", error)
-      return { success: false, message: error.message }
+      return { success: false, message: error.message || "Something went wrong" }
     }
   }
 
   const handleResendOtp = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/register", {
+      const response = await fetch("/api/v1/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +94,15 @@ export default function Register() {
         body: JSON.stringify({ email: userEmail, password: userPassword }),
       })
 
-      const data = await response.json()
+      // Handle non-JSON responses gracefully
+      let data
+      const contentType = response.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        data = { message: text || "Server error occurred" }
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to resend OTP")
@@ -88,7 +112,7 @@ export default function Register() {
       return { success: true, message: "OTP resent successfully" }
     } catch (error) {
       console.error("Resend OTP error:", error)
-      return { success: false, message: error.message }
+      return { success: false, message: error.message || "Something went wrong" }
     }
   }
 

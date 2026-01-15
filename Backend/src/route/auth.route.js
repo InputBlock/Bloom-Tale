@@ -25,11 +25,7 @@ router.post("/resetPassword", resetPassword);
 router.get("/google", googleLogin);
 router.get("/google/callback", googleCallback);
 
-// router.get("/me", verifyJWT, (req, res) => { 
-//   res.status(200).json({
-//     success: true,
-//     user: req.user,
-//   });
-// });
+// Protected routes (example)
+
 
 export default router;

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
 
-const API_URL = "http://localhost:8000/api/v1"
+
 
 export default function L_email({ onNext }) {
   const [email, setEmail] = useState("")
@@ -10,10 +10,6 @@ export default function L_email({ onNext }) {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-
-  const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/google`
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -107,8 +103,7 @@ export default function L_email({ onNext }) {
       </div>
 
       <button 
-        type="button"
-        onClick={handleGoogleLogin}
+        onClick={() => window.location.href = '/api/v1/google'}
         className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl transition duration-200 flex items-center justify-center gap-2"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">

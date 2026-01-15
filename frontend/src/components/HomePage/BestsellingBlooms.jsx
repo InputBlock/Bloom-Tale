@@ -1,16 +1,18 @@
 "use client"
 
-import { Heart, ChevronLeft, ChevronRight, Star } from "lucide-react"
+import { ChevronLeft, ChevronRight, Star } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import { motion, useInView } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../../context/CartContext"
+import SuccessModal from "../common/SuccessModal"
 
 export default function BestsellingBlooms() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [hoveredId, setHoveredId] = useState(null)
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
   const navigate = useNavigate()
@@ -21,7 +23,7 @@ export default function BestsellingBlooms() {
     const fetchBestsellerProducts = async () => {
       try {
         setLoading(true)
-        const response = await fetch('http://localhost:8000/api/v1/getProduct/bestseller', {
+        const response = await fetch('/api/v1/getProduct/bestseller', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -56,10 +58,12 @@ export default function BestsellingBlooms() {
     })
 
     if (result && result.success) {
-      alert("Product added to cart!")
+      setModalState({ isOpen: true, message: "Product added to cart successfully!", type: "success" })
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 3000)
     } else if (result && !result.success) {
       // User will be redirected to login if not logged in
-      alert(result.message || "Failed to add to cart")
+      setModalState({ isOpen: true, message: result.message || "Failed to add to cart", type: "error" })
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 3000)
     }
   }
 
@@ -173,24 +177,6 @@ export default function BestsellingBlooms() {
                       transition={{ duration: 0.3 }}
                       className="absolute inset-0 bg-gradient-to-t from-[#3e4026]/40 to-transparent"
                     />
-                    
-                    {/* Wishlist Button */}
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        // Add to wishlist logic here
-                      }}
-                      className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:shadow-lg transition-all duration-300"
-                    >
-                      <Heart 
-                        size={18} 
-                        className={`transition-colors duration-300 ${
-                          hoveredId === product._id ? "text-red-500 fill-red-500" : "text-gray-600"
-                        }`} 
-                      />
-                    </motion.button>
 
                     {/* Quick View Badge */}
                     <motion.div
@@ -283,6 +269,14 @@ export default function BestsellingBlooms() {
           </div>
         )}
       </div>
+
+      {/* Success Modal */}
+      <SuccessModal 
+        isOpen={modalState.isOpen}
+        message={modalState.message}
+        type={modalState.type}
+        onClose={() => setModalState({ isOpen: false, message: "", type: "success" })}
+      />
     </section>
   )
 }
