@@ -38,7 +38,8 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="relative -mt-8 mb-8 flex justify-center z-20"
+            className="absolute left-1/2 -translate-x-1/2 z-20"
+            style={{ top: 'calc(100vh - 80px)' }}
           >
             <motion.div
               animate={{ y: [0, 10, 0] }}

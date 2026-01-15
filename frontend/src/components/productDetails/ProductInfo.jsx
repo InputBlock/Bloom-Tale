@@ -2,10 +2,12 @@ import { useState } from "react"
 import { Minus, Plus } from "lucide-react"
 import { useCart } from "../../context/CartContext"
 import { useNavigate } from "react-router-dom"
+import SuccessModal from "../common/SuccessModal"
 
 export default function ProductInfo({ product }) {
   const [quantity, setQuantity] = useState(1)
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || null)
+  const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
   const { addToCart } = useCart()
   const navigate = useNavigate()
 
@@ -31,12 +33,16 @@ export default function ProductInfo({ product }) {
     })
 
     if (result && result.success) {
-      // Show success message or navigate to cart
-      alert("Product added to cart successfully!")
-      navigate("/cart")
+      // Show success message
+      setModalState({ isOpen: true, message: "Product added to cart successfully!", type: "success" })
+      setTimeout(() => {
+        setModalState({ isOpen: false, message: "", type: "success" })
+        navigate("/cart")
+      }, 1500)
     } else if (result && !result.success) {
       // Show error message
-      alert(result.message || "Failed to add product to cart")
+      setModalState({ isOpen: true, message: result.message || "Failed to add product to cart", type: "error" })
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 3000)
     }
   }
 
@@ -155,6 +161,14 @@ export default function ProductInfo({ product }) {
           BUY IT NOW
         </button>
       </div>
+
+      {/* Success Modal */}
+      <SuccessModal 
+        isOpen={modalState.isOpen}
+        message={modalState.message}
+        type={modalState.type}
+        onClose={() => setModalState({ isOpen: false, message: "", type: "success" })}
+      />
     </div>
   )
 }

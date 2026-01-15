@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Edit2, Trash2, Plus } from "lucide-react"
 import EditProductModal from "../components/ListItems/EditProductModal"
 import StatusToggleModal from "../components/ListItems/StatusToggleModal"
@@ -6,17 +6,41 @@ import axios from "axios"
 
 export default function ListItems() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [products, setProducts] = useState([
-    { id: "PRO1", name: "Red Rose Bouquet", category: "Roses", price: "25", stock: 142, isListed: true },
-    { id: "PRO2", name: "Sunflower Delight", category: "Sunflowers", price: "45", stock: 87, isListed: true },
-    { id: "PRO3", name: "Tulip Garden", category: "Tulips", price: "65", stock: 0, isListed: false },
-    { id: "PRO4", name: "Lily Elegance", category: "Lilies", price: "89", stock: 23, isListed: true },
-    { id: "PRO5", name: "Mixed Bouquet", category: "Mixed", price: "120", stock: 45, isListed: true },
-  ])
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [editModal, setEditModal] = useState(false)
   const [editProduct, setEditProduct] = useState(null)
   const [statusModal, setStatusModal] = useState(false)
   const [statusProduct, setStatusProduct] = useState(null)
+
+  // Fetch products from backend
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get("http://localhost:8000/api/v1/admin/showlist")
+      
+      // Transform backend data to match frontend format
+      const transformedProducts = response.data.flowers.map(product => ({
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        price: product.price.toString(),
+        stock: product.stock,
+        isListed: product.isActive
+      }))
+      
+      setProducts(transformedProducts)
+    } catch (error) {
+      console.error("Error fetching products:", error)
+      alert("Failed to fetch products. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -156,8 +180,18 @@ export default function ListItems() {
         />
       </div>
 
-      {/* Products Table */}
-      <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+      {/* Loading State */}
+      {loading ? (
+        <div className="p-12 text-center bg-white border border-gray-200 rounded-lg">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+            <p className="text-gray-500 font-medium">Loading products...</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Products Table */}
+          <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="border-b border-gray-200">
@@ -226,10 +260,14 @@ export default function ListItems() {
       </div>
 
       {/* No Results */}
-      {filteredProducts.length === 0 && (
+      {!loading && filteredProducts.length === 0 && (
         <div className="p-12 text-center bg-gray-50 border border-gray-200 rounded-lg">
-          <p className="text-gray-500 font-medium">No products found matching "{searchTerm}"</p>
+          <p className="text-gray-500 font-medium">
+            {searchTerm ? `No products found matching "${searchTerm}"` : "No products available"}
+          </p>
         </div>
+      )}
+        </>
       )}
 
       {/* Edit Modal */}

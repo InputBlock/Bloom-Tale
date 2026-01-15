@@ -30,7 +30,7 @@ export default function SubHeader() {
   ]
 
   return (
-    <div className="bg-[#EDE8E0] px-4 pt-2 pb-2">
+    <div className="bg-[#EDE8E0] px-4 pt-2 pb-2 mt-3">
       {/* Sub Navigation with Glass Effect */}
       <div className="relative backdrop-blur-2xl bg-white/50 border border-white/30 shadow-xl rounded-2xl overflow-hidden">
         {/* Glass overlay for enhanced effect */}
