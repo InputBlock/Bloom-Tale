@@ -94,5 +94,26 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
   );
 });
 
+export const getOrderSummary = asyncHandler(async (req,res)=>{
+  const userId = req.user._id;
+  const {orderId } = req.params;
+  
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+   if (order.user.toString() !== userId.toString()) {
+    throw new ApiError(403, "You are not allowed to view this order");
+  }
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      order,
+      "Order Summary Fetched successfully"
+    )
+  );
+
+}) 
 //Razorpay => Goto util razorpay.js
 
