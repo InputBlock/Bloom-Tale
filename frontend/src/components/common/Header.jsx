@@ -40,14 +40,6 @@ export default function Header() {
     }
   }
 
-  const handleProfileClick = () => {
-    if (!isLoggedIn()) {
-      navigate("/login")
-    } else {
-      setShowLogout(!showLogout)
-    }
-  }
-
   const handleLogout = async () => {
     try {
       await fetch("/api/v1/logout", {
@@ -94,7 +86,7 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-2 ml-4">
           <button 
-            onClick={handleCartClick}
+            onClick={() => navigate("/cart")}
             className="relative p-2 hover:bg-[#4a5840] rounded-full transition-colors duration-300"
           >
             <ShoppingCart size={20} />
@@ -106,7 +98,7 @@ export default function Header() {
           {/* Profile Button with Logout Dropdown */}
           <div className="relative" ref={logoutRef}>
             <button 
-              onClick={handleProfileClick}
+              onClick={() => setShowLogout(!showLogout)}
               className="p-2 hover:bg-[#5e6043] rounded-full transition-colors duration-300"
             >
               {isLoggedIn() ? (
