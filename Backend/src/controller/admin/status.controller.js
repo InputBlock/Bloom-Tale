@@ -10,3 +10,5 @@ const get_user_info=async(req , res)=>{
     }   
 
 }
+
+export {get_user_info};
