@@ -55,12 +55,13 @@ const orderSchema = new Schema(
     paymentMethod: {
       type: String,
       enum: ["COD", "ONLINE"],
-      required: true,
+      // required: true,
+      default:null
     },
 
     status: {
       type: String,
-      enum: ["PENDING", "PAID", "CANCELLED"],
+      enum: ["PENDING", "PAYMENT_FAILED", "PAID", "CANCELLED"],
       default: "PENDING",
     },
 
