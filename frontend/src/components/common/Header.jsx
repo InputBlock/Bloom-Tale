@@ -60,12 +60,14 @@ export default function Header() {
       })
       
       localStorage.removeItem("user")
+      localStorage.removeItem("token")
       clearCart()
       navigate("/home")
       window.location.reload()
     } catch (error) {
       console.error("Logout error:", error)
       localStorage.removeItem("user")
+      localStorage.removeItem("token")
       clearCart()
       navigate("/home")
       window.location.reload()

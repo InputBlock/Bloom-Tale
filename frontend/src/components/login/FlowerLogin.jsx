@@ -299,6 +299,9 @@ export default function FlowerLogin() {
       // Success!
       setLoginState("success");
       localStorage.setItem("user", JSON.stringify(data.data.user));
+      if (data.data.accessToken) {
+        localStorage.setItem("token", data.data.accessToken);
+      }
 
       // Wait for welcome animation then redirect (longer delay for text animation)
       setTimeout(() => {
@@ -321,7 +324,7 @@ export default function FlowerLogin() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "/api/v1/auth/google";
+    window.location.href = "/api/v1/google";
   };
 
   return (
