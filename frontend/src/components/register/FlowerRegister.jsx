@@ -4,6 +4,99 @@ import { Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlowerScene } from "../login/flowers";
 import { showToast } from "../common/ToastContainer";
+import ErrorMessage from "../common/ErrorMessage";
+
+// Email validation helper
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Password strength validation
+const validatePassword = (password) => {
+  if (!password) return { isValid: false, message: '' };
+  if (password.length < 8) {
+    return { isValid: false, message: 'Password must be at least 8 characters long' };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { isValid: false, message: 'Password must contain at least one number' };
+  }
+  return { isValid: true, message: 'Strong password!' };
+};
+
+// Parse and improve error messages
+const getErrorMessage = (errorMsg) => {
+  const msg = errorMsg.toLowerCase();
+  
+  if (msg.includes('already exists') || msg.includes('email already') || msg.includes('already registered')) {
+    return {
+      title: 'Account Already Exists',
+      message: 'An account with this email already exists. Would you like to log in instead?',
+      type: 'exists',
+      action: { text: 'Go to Login', link: '/login' }
+    };
+  }
+  
+  if (msg.includes('invalid email') || (msg.includes('email') && msg.includes('invalid'))) {
+    return {
+      title: 'Invalid Email',
+      message: 'Please enter a valid email address.',
+      type: 'email'
+    };
+  }
+  
+  if (msg.includes('password') && (msg.includes('weak') || msg.includes('short') || msg.includes('requirements'))) {
+    return {
+      title: 'Weak Password',
+      message: 'Password must be at least 8 characters with uppercase, lowercase, and numbers.',
+      type: 'password'
+    };
+  }
+  
+  if (msg.includes('invalid otp') || msg.includes('wrong otp') || msg.includes('incorrect otp')) {
+    return {
+      title: 'Invalid OTP',
+      message: 'The code you entered is incorrect. Please check and try again.',
+      type: 'otp'
+    };
+  }
+  
+  if (msg.includes('expired otp') || msg.includes('otp expired')) {
+    return {
+      title: 'OTP Expired',
+      message: 'Your verification code has expired. Please request a new one.',
+      type: 'expired'
+    };
+  }
+  
+  if (msg.includes('network') || msg.includes('fetch')) {
+    return {
+      title: 'Connection Error',
+      message: 'Unable to connect to the server. Please check your internet connection.',
+      type: 'network'
+    };
+  }
+  
+  if (msg.includes('server error') || msg.includes('500')) {
+    return {
+      title: 'Server Error',
+      message: 'Something went wrong on our end. Please try again in a moment.',
+      type: 'server'
+    };
+  }
+  
+  return {
+    title: 'Error',
+    message: errorMsg || 'An unexpected error occurred. Please try again.',
+    type: 'general'
+  };
+};
 
 // Handwritten Letter-by-Letter Text Animation Component
 const HandwrittenText = ({ text, delay = 0, className = "", style = {} }) => {
@@ -144,7 +237,10 @@ export default function FlowerRegister() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(null);
   const [focusedField, setFocusedField] = useState(null);
   const [registerState, setRegisterState] = useState("idle"); // idle, typing, error, success
   
@@ -153,12 +249,62 @@ export default function FlowerRegister() {
   const [resending, setResending] = useState(false);
   const inputRefs = useRef([]);
 
+  // Validate email on blur
+  const handleEmailBlur = () => {
+    setFocusedField(null);
+    if (email && !isValidEmail(email)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  // Clear email error on focus
+  const handleEmailFocus = () => {
+    setFocusedField("email");
+    setEmailError('');
+  };
+
+  // Validate password strength in real-time
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    
+    if (newPassword) {
+      const validation = validatePassword(newPassword);
+      setPasswordStrength(validation);
+      if (!validation.isValid) {
+        setPasswordError(validation.message);
+      } else {
+        setPasswordError('');
+      }
+    } else {
+      setPasswordStrength(null);
+      setPasswordError('');
+    }
+  };
+
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) return;
 
+    // Validate email format
+    if (!isValidEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    // Validate password strength
+    const passValidation = validatePassword(password);
+    if (!passValidation.isValid) {
+      setPasswordError(passValidation.message);
+      return;
+    }
+
     setLoading(true);
-    setError("");
+    setError(null);
+    setEmailError('');
+    setPasswordError('');
     setRegisterState("typing");
 
     try {
@@ -192,7 +338,8 @@ export default function FlowerRegister() {
 
     } catch (err) {
       console.error("Registration error:", err);
-      setError(err.message || "Something went wrong");
+      const errorInfo = getErrorMessage(err.message);
+      setError(errorInfo);
       setRegisterState("error");
       
       setTimeout(() => {
@@ -227,7 +374,7 @@ export default function FlowerRegister() {
     if (otpValue.length !== 6) return;
 
     setLoading(true);
-    setError("");
+    setError(null);
 
     try {
       const response = await fetch("/api/v1/verifyOtp", {
@@ -262,7 +409,8 @@ export default function FlowerRegister() {
 
     } catch (err) {
       console.error("OTP verification error:", err);
-      setError(err.message || "Something went wrong");
+      const errorInfo = getErrorMessage(err.message);
+      setError(errorInfo);
     } finally {
       setLoading(false);
     }
@@ -270,7 +418,7 @@ export default function FlowerRegister() {
 
   const handleResendOtp = async () => {
     setResending(true);
-    setError("");
+    setError(null);
 
     try {
       const response = await fetch("/api/v1/register", {
@@ -301,7 +449,8 @@ export default function FlowerRegister() {
 
     } catch (err) {
       console.error("Resend OTP error:", err);
-      setError(err.message || "Something went wrong");
+      const errorInfo = getErrorMessage(err.message);
+      setError(errorInfo);
     } finally {
       setResending(false);
     }
@@ -383,33 +532,48 @@ export default function FlowerRegister() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                {/* Error Message */}
-                {error && (
-                  <motion.div 
-                    className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    {error}
-                  </motion.div>
-                )}
+                {/* Error Message - Professional UI */}
+                <AnimatePresence mode="wait">
+                  {error && (
+                    <ErrorMessage 
+                      error={error} 
+                      onClose={() => setError(null)}
+                    />
+                  )}
+                </AnimatePresence>
 
                 {/* Email Field */}
                 <div>
                   <label className="block text-gray-700 text-sm font-medium mb-2">
                     Email
                   </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onFocus={() => setFocusedField("email")}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="Enter your email"
-                    className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59] transition-all duration-300 shadow-sm"
-                    required
-                    disabled={loading}
-                  />
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onFocus={handleEmailFocus}
+                      onBlur={handleEmailBlur}
+                      placeholder="Enter your email"
+                      className={`w-full px-4 py-3.5 bg-white border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm ${
+                        emailError 
+                          ? 'border-red-300 focus:ring-red-100 focus:border-red-400' 
+                          : 'border-gray-200 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59]'
+                      }`}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                  {emailError && (
+                    <motion.p 
+                      className="mt-1.5 text-xs text-red-600 flex items-center gap-1"
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <span className="inline-block w-1 h-1 rounded-full bg-red-600"></span>
+                      {emailError}
+                    </motion.p>
+                  )}
                 </div>
 
                 {/* Password Field */}
@@ -421,11 +585,15 @@ export default function FlowerRegister() {
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                       onFocus={() => setFocusedField("password")}
                       onBlur={() => setFocusedField(null)}
                       placeholder="••••••••"
-                      className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59] transition-all duration-300 pr-12 shadow-sm"
+                      className={`w-full px-4 py-3.5 bg-white border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 pr-12 shadow-sm ${
+                        passwordError 
+                          ? 'border-red-300 focus:ring-red-100 focus:border-red-400' 
+                          : 'border-gray-200 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59]'
+                      }`}
                       required
                       disabled={loading}
                     />
@@ -438,6 +606,26 @@ export default function FlowerRegister() {
                       {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                     </button>
                   </div>
+                  {passwordError && (
+                    <motion.p 
+                      className="mt-1.5 text-xs text-red-600 flex items-center gap-1"
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <span className="inline-block w-1 h-1 rounded-full bg-red-600"></span>
+                      {passwordError}
+                    </motion.p>
+                  )}
+                  {passwordStrength && passwordStrength.isValid && (
+                    <motion.p 
+                      className="mt-1.5 text-xs text-green-600 flex items-center gap-1"
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <span className="inline-block w-1 h-1 rounded-full bg-green-600"></span>
+                      {passwordStrength.message}
+                    </motion.p>
+                  )}
                 </div>
 
                 {/* Send OTP Button */}
@@ -546,16 +734,15 @@ export default function FlowerRegister() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                {/* Error Message */}
-                {error && (
-                  <motion.div 
-                    className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    {error}
-                  </motion.div>
-                )}
+                {/* Error Message - Professional UI */}
+                <AnimatePresence mode="wait">
+                  {error && (
+                    <ErrorMessage 
+                      error={error} 
+                      onClose={() => setError(null)}
+                    />
+                  )}
+                </AnimatePresence>
 
                 {/* OTP Input Boxes */}
                 <div className="flex gap-3 justify-center">
