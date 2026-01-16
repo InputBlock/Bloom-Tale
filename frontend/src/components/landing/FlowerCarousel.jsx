@@ -1,6 +1,54 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+// Petal images from public folder
+const petalImages = ["/petal 1.jpg", "/petal 2.jpg", "/petal 3.jpg"];
+
+// Petal component for cursor trail effect - soft wind-like motion
+const Petal = ({ id, x, y, image, size, rotation, delay, driftX, driftY, rotateAmount, duration, swayAmount, onComplete }) => {
+  return (
+    <motion.img
+      src={image}
+      alt=""
+      className="absolute pointer-events-none select-none"
+      style={{
+        left: x,
+        top: y,
+        width: size,
+        height: size,
+        objectFit: 'contain',
+        mixBlendMode: 'multiply',
+        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.05))',
+      }}
+      initial={{ 
+        opacity: 0, 
+        scale: 0,
+        rotate: rotation,
+        x: 0,
+        y: 0 
+      }}
+      animate={{ 
+        opacity: [0, 0.5, 0.45, 0.35, 0.2, 0],
+        scale: [0.2, 0.8, 1, 0.95, 0.8, 0.4],
+        rotate: rotation + rotateAmount,
+        x: [0, swayAmount, driftX - swayAmount, driftX + swayAmount * 0.5, driftX],
+        y: [0, driftY * 0.25, driftY * 0.5, driftY * 0.75, driftY],
+      }}
+      transition={{ 
+        duration: duration,
+        delay: delay,
+        ease: "easeOut",
+        opacity: { duration: duration, times: [0, 0.08, 0.25, 0.5, 0.75, 1] },
+        scale: { duration: duration, times: [0, 0.1, 0.3, 0.5, 0.7, 1] },
+        x: { duration: duration, times: [0, 0.2, 0.45, 0.7, 1], ease: "easeInOut" },
+        y: { duration: duration, ease: "easeOut" },
+        rotate: { duration: duration, ease: "easeInOut" },
+      }}
+      onAnimationComplete={() => onComplete(id)}
+    />
+  );
+};
 
 // Import flower images
 import flowersCouples from "../../assets/flowers-couples.jpg";
@@ -53,6 +101,65 @@ const categories = [
 const FlowerCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [petals, setPetals] = useState([]);
+  const containerRef = useRef(null);
+  const lastPetalTime = useRef(0);
+  const petalIdCounter = useRef(0);
+
+  // Remove petal when animation completes
+  const removePetal = useCallback((id) => {
+    setPetals(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  // Handle mouse move to create petals - high intensity with smooth wind effect
+  const handleMouseMove = useCallback((e) => {
+    const now = Date.now();
+    // Create petals every 35ms for high intensity
+    if (now - lastPetalTime.current < 35) return;
+    lastPetalTime.current = now;
+
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Create 3-5 petals at once for higher intensity
+    const petalCount = Math.floor(Math.random() * 3) + 3;
+    const newPetals = [];
+
+    for (let i = 0; i < petalCount; i++) {
+      const id = petalIdCounter.current++;
+      const image = petalImages[Math.floor(Math.random() * petalImages.length)];
+      const size = Math.random() * 18 + 10; // 10-28px size (cute small petals)
+      const rotation = Math.random() * 360;
+      const offsetX = (Math.random() - 0.5) * 40;
+      const offsetY = (Math.random() - 0.5) * 40;
+      // Pre-compute random animation values for smooth wind effect
+      const driftX = (Math.random() - 0.5) * 150; // Wider horizontal drift
+      const driftY = Math.random() * 120 + 60; // Float downward
+      const rotateAmount = (Math.random() - 0.5) * 360; // Gentle rotation
+      const duration = 3.5 + Math.random() * 2; // 3.5-5.5 seconds
+      const swayAmount = (Math.random() - 0.5) * 60; // Wind sway
+
+      newPetals.push({
+        id,
+        x: x + offsetX - size / 2,
+        y: y + offsetY - size / 2,
+        image,
+        size,
+        rotation,
+        delay: i * 0.04,
+        driftX,
+        driftY,
+        rotateAmount,
+        duration,
+        swayAmount,
+      });
+    }
+
+    setPetals(prev => [...prev, ...newPetals]);
+  }, []);
 
   // Auto-rotate every 5 seconds
   useEffect(() => {
@@ -95,9 +202,24 @@ const FlowerCarousel = () => {
   const activeCategory = categories[activeIndex];
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-8">
+    <div 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-8"
+    >
       {/* Background linear */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#fffdf8,#e9e5d7)]" />
+      
+      {/* Petal cursor trail effect - in background behind cards */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {petals.map((petal) => (
+          <Petal
+            key={petal.id}
+            {...petal}
+            onComplete={removePetal}
+          />
+        ))}
+      </div>
       
       {/* Decorative circles */}
       <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-accent/10 blur-3xl" />

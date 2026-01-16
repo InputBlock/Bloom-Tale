@@ -1,6 +1,61 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+// Petal colors - soft pink, rose, and cream tones (higher opacity)
+const petalColors = [
+  "rgba(255, 182, 193, 0.85)", // light pink
+  "rgba(255, 218, 233, 0.8)", // soft rose
+  "rgba(255, 200, 200, 0.75)", // blush
+  "rgba(252, 228, 236, 0.85)", // cream pink
+  "rgba(255, 192, 203, 0.8)", // pink
+  "rgba(255, 240, 245, 0.75)", // lavender blush
+];
+
+
+
+// Petal component using CSS shapes - soft wind-like motion
+const Petal = ({ id, x, y, color, size, rotation, delay, driftX, driftY, rotateAmount, duration, swayAmount, onComplete }) => {
+  return (
+    <motion.div
+      className="absolute pointer-events-none"
+      style={{
+        left: x,
+        top: y,
+        width: size,
+        height: size * 1.3,
+        background: `radial-gradient(ellipse at 30% 30%, ${color}, transparent 70%)`,
+        borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+        boxShadow: `inset 0 0 ${size/4}px rgba(255,255,255,0.3)`,
+      }}
+      initial={{ 
+        opacity: 0, 
+        scale: 0,
+        rotate: rotation,
+        x: 0,
+        y: 0 
+      }}
+      animate={{ 
+        opacity: [0, 1, 0.9, 0.7, 0.4, 0],
+        scale: [0.3, 1, 1.05, 0.95, 0.8, 0.4],
+        rotate: rotation + rotateAmount,
+        x: [0, swayAmount * 0.4, -swayAmount * 0.25, swayAmount * 0.3, driftX],
+        y: [0, driftY * 0.2, driftY * 0.45, driftY * 0.7, driftY],
+      }}
+      transition={{ 
+        duration: duration,
+        delay: delay,
+        ease: "easeOut",
+        opacity: { duration: duration, times: [0, 0.1, 0.3, 0.55, 0.8, 1] },
+        scale: { duration: duration, times: [0, 0.15, 0.4, 0.65, 0.85, 1] },
+        x: { duration: duration, times: [0, 0.25, 0.5, 0.75, 1], ease: "easeInOut" },
+        y: { duration: duration, ease: "easeOut" },
+        rotate: { duration: duration, ease: "easeInOut" },
+      }}
+      onAnimationComplete={() => onComplete(id)}
+    />
+  );
+};
 
 // Import flower images
 import flowersCouples from "../../assets/flowers-couples.jpg";
@@ -53,6 +108,112 @@ const categories = [
 const FlowerCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [petals, setPetals] = useState([]);
+  const [leaves, setLeaves] = useState([]);
+  const containerRef = useRef(null);
+  const lastPetalTime = useRef(0);
+  const petalIdCounter = useRef(0);
+  const leafIdCounter = useRef(0);
+
+  // Remove petal when animation completes
+  const removePetal = useCallback((id) => {
+    setPetals(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  // Remove leaf when animation completes
+  const removeLeaf = useCallback((id) => {
+    setLeaves(prev => prev.filter(l => l.id !== id));
+  }, []);
+
+  // Handle mouse move to create petals and leaves
+  const handleMouseMove = useCallback((e) => {
+    const now = Date.now();
+    // Create petals every 50ms
+    if (now - lastPetalTime.current < 50) return;
+    lastPetalTime.current = now;
+
+    // Limit maximum petals and leaves to prevent lag
+    if (petals.length > 100 || leaves.length > 40) return;
+
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Create 3-5 petals at once
+    const petalCount = Math.floor(Math.random() * 3) + 3;
+    const newPetals = [];
+
+    for (let i = 0; i < petalCount; i++) {
+      const id = petalIdCounter.current++;
+      const color = petalColors[Math.floor(Math.random() * petalColors.length)];
+      const size = Math.random() * 16 + 8; // 8-24px size (cute small petals)
+      const rotation = Math.random() * 360;
+      const offsetX = (Math.random() - 0.5) * 40;
+      const offsetY = (Math.random() - 0.5) * 40;
+      // Pre-compute random animation values for smooth wind effect
+      const driftX = (Math.random() - 0.5) * 120; // Horizontal drift
+      const driftY = Math.random() * 100 + 60; // Float downward 60-160px
+      const rotateAmount = (Math.random() - 0.5) * 200; // Gentle rotation
+      const duration = 3 + Math.random() * 1.5; // 3-4.5 seconds
+      const swayAmount = (Math.random() - 0.5) * 50; // Wind sway
+
+      newPetals.push({
+        id,
+        x: x + offsetX - size / 2,
+        y: y + offsetY - size / 2,
+        color,
+        size,
+        rotation,
+        delay: i * 0.05,
+        driftX,
+        driftY,
+        rotateAmount,
+        duration,
+        swayAmount,
+      });
+    }
+
+    setPetals(prev => [...prev, ...newPetals]);
+
+    // Add 1-2 leaves occasionally (30% chance)
+    if (Math.random() < 0.3) {
+      const leafCount = Math.floor(Math.random() * 2) + 1;
+      const newLeaves = [];
+
+      for (let i = 0; i < leafCount; i++) {
+        const id = leafIdCounter.current++;
+        const color = leafColors[Math.floor(Math.random() * leafColors.length)];
+        const size = Math.random() * 14 + 10; // 10-24px
+        const rotation = Math.random() * 360;
+        const offsetX = (Math.random() - 0.5) * 50;
+        const offsetY = (Math.random() - 0.5) * 50;
+        const driftX = (Math.random() - 0.5) * 100;
+        const driftY = Math.random() * 120 + 70;
+        const rotateAmount = (Math.random() - 0.5) * 180;
+        const duration = 3.5 + Math.random() * 1.5;
+        const swayAmount = (Math.random() - 0.5) * 60;
+
+        newLeaves.push({
+          id,
+          x: x + offsetX - size / 2,
+          y: y + offsetY - size / 2,
+          color,
+          size,
+          rotation,
+          delay: i * 0.08,
+          driftX,
+          driftY,
+          rotateAmount,
+          duration,
+          swayAmount,
+        });
+      }
+
+      setLeaves(prev => [...prev, ...newLeaves]);
+    }
+  }, [petals.length, leaves.length]);
 
   // Auto-rotate every 5 seconds
   useEffect(() => {
@@ -95,16 +256,38 @@ const FlowerCarousel = () => {
   const activeCategory = categories[activeIndex];
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col  overflow-hidden">
+    <div 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full min-h-screen flex flex-col overflow-hidden"
+    >
       {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#efefef,#ede0c0)]" />
+      
+      {/* Petal and leaf cursor trail effect - in background behind everything */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {petals.map((petal) => (
+          <Petal
+            key={petal.id}
+            {...petal}
+            onComplete={removePetal}
+          />
+        ))}
+        {leaves.map((leaf) => (
+          <Leaf
+            key={leaf.id}
+            {...leaf}
+            onComplete={removeLeaf}
+          />
+        ))}
+      </div>
 
       {/* Top banner */}
       <div className="relative w-full h-40 flex flex-row ">
-        <div className="text-[#5d6c4e] text-sm font-bold md:text-4xl/tight p-5 pl-6 w-200" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* <div className="text-[#5d6c4e] text-sm font-bold md:text-4xl/tight p-5 pl-6 w-200" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Choose the moment you want to Enhance with flowers
-        </div>
-        <div className="bg-white h-43 w-55 rounded-b-4xl drop-shadow-sm ml-115 flex items-center justify-center ">
+        </div> */}
+        <div className="bg h-43 w-60 rounded-b-4xl drop-shadow-sm ml-10 flex items-center justify-center ">
           <img src="/BloomTaleLogopng(500x350px).png" alt="BloomTale Logo" className="w-full h-full object-contain" />
         </div>
       </div>
@@ -149,8 +332,8 @@ const FlowerCarousel = () => {
 
           {/* Central Showcase Card */}
           <motion.div
-            className="absolute z-20 w-72 h-96 md:w-80 md:h-[450px]"
-            initial={{ opacity: 0, scale: 0.9 }}
+            className="absolute z-20 w-72 h-96 md:w-80 md:h-110"
+            initial={{ opacity: 1, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
@@ -158,10 +341,10 @@ const FlowerCarousel = () => {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeCategory.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.5 }}
                   className="h-full flex flex-col"
                 >
                   {/* Scene Image */}
@@ -171,7 +354,7 @@ const FlowerCarousel = () => {
                       alt={activeCategory.tagline}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FBF8F3]/80" />
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#FBF8F3]" />
                   </div>
 
                   {/* Content */}
