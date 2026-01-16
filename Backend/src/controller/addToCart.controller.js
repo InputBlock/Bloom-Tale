@@ -11,6 +11,11 @@ export const addToCart = asyncHandler(async (req, res) => {
   const userId = req.user._id; // from auth middleware
   const { product_id, quantity } = req.body;
 
+  const user=await User.findById(userId);
+  if(!user){
+    throw new ApiError(404, "User not found");
+  }
+
   if (!product_id || !quantity)
     throw new ApiError(400, "Product id and quantity are required");
 
@@ -24,6 +29,8 @@ export const addToCart = asyncHandler(async (req, res) => {
   if (!cart) {
     cart = await Cart.create({
       user: userId,
+      username: user.username,
+      email: user.email,
       items: [],
     });
   }

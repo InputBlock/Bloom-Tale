@@ -4,7 +4,7 @@ import axios from "axios"
 import OrderStatusBadge from "./OrderStatusBadge"
 import OrderDetailsModal from "./OrderDetailsModal"
 
-const API_URL = "http://localhost:8000/api/v1/admin"
+const API_URL = "/api/v1/admin"
 
 export default function OrdersTable() {
   const [selectedOrder, setSelectedOrder] = useState(null)

@@ -21,12 +21,19 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
     try {
       const paymentMethodValue = paymentMethod === "upi" ? "ONLINE" : "COD"
       
+      // Get token from localStorage for auth
+      const token = localStorage.getItem("token")
+      const headers = {
+        "Content-Type": "application/json",
+      }
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`
+      }
+
       // Step 1: Set payment method
-      const response = await fetch(`http://localhost:8000/api/v1/order/${orderId}/payment-method`, {
+      const response = await fetch(`/api/v1/order/${orderId}/payment-method`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         credentials: "include",
         body: JSON.stringify({
           paymentMethod: paymentMethodValue

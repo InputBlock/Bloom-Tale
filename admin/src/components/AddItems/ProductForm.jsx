@@ -62,7 +62,7 @@ export default function ProductForm({ images, setImages }) {
       }
 
       await axios.post(
-        "http://localhost:8000/api/v1/admin/add",
+        "/api/v1/admin/add",
         formDataToSend,
         {
           headers: {

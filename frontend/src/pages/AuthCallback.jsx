@@ -11,10 +11,6 @@ export default function AuthCallback() {
     const userParam = searchParams.get('user')
     const error = searchParams.get('error')
 
-    console.log('AuthCallback - token:', token ? 'exists' : 'missing')
-    console.log('AuthCallback - user:', userParam ? 'exists' : 'missing')
-    console.log('AuthCallback - error:', error)
-
     if (error) {
       setStatus('Error: ' + error)
       setTimeout(() => navigate('/login', { state: { error } }), 2000)

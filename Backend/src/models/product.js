@@ -10,9 +10,10 @@ const productSchema = new mongoose.Schema(
     },
     category: { type: String, required: true,
     },
-    subcategory: { type: String, //required: true,
-    },
-    price: {type: Number, required: true,
+    pricing: {
+      small : {type : Number},
+      medium : {type :Number},
+      large : {type : Number}
     },
     sizes: [String],
     bestSeller: { type: Boolean,default: false,

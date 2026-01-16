@@ -63,7 +63,8 @@ const userSchema = new Schema(
 
 //mongoose hook (middleware)
 userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+  // Skip if password not modified or is empty (Google OAuth users)
+  if (!this.isModified("password") || !this.password) return;
 
   this.password = await bcrypt.hash(this.password, 10);
 });
