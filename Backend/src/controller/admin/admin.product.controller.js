@@ -6,10 +6,13 @@ const add_item = async (req, res) => {
         let images_uri = [];
         let image_public = [];
         
-        if (req.file) {
-            const result = await uploadToCloudinary(req.file.buffer);
-            images_uri.push(result.url);
-            image_public.push(result.public_id);
+        // Handle multiple images - first image is the main image
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const result = await uploadToCloudinary(file.buffer);
+                images_uri.push(result.url);
+                image_public.push(result.public_id);
+            }
         }
 
         const details = {

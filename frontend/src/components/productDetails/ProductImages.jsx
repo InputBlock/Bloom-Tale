@@ -20,67 +20,92 @@ export default function ProductImages({ product }) {
   }
 
   return (
-    <div className="w-full space-y-4">
-      {/* Main Image */}
-      <div className="relative group">
-        <div 
-          className="relative w-full aspect-square bg-[#f9f8f6] rounded-lg overflow-hidden cursor-pointer"
-          onClick={() => hasImages && setIsZoomed(true)}
-        >
-          {hasImages ? (
-            <>
-              <img
-                src={images[selectedIndex]}
-                alt={product?.name || "Product"}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              
-              {/* Navigation Arrows */}
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handlePrev() }}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white"
-                    aria-label="Previous image"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleNext() }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white"
-                    aria-label="Next image"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </>
-              )}
+    <div className="w-full">
+      <div className="flex gap-0">
+        {/* Thumbnails - Left Side (Desktop) */}
+        {hasImages && images.length > 1 && (
+          <div className="hidden md:flex flex-col gap-2 w-[100px] flex-shrink-0 pr-3">
+            {images.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedIndex(index)}
+                className={`w-[95px] h-[95px] rounded-md overflow-hidden transition-all ${
+                  selectedIndex === index 
+                    ? "opacity-100 ring-2 ring-[#3e4026]/30" 
+                    : "opacity-50 hover:opacity-100"
+                }`}
+              >
+                <img
+                  src={image}
+                  alt={`${product?.name || "Product"} ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
 
-              {/* Image Counter */}
-              {images.length > 1 && (
-                <div className="absolute bottom-4 left-4 text-[10px] tracking-widest uppercase bg-white rounded-full px-3 py-1.5 text-[#3e4026]">
-                  {selectedIndex + 1} / {images.length}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-gray-300">No Image</div>
-            </div>
-          )}
+        {/* Main Image */}
+        <div className="relative group flex-1">
+          <div 
+            className="relative w-full aspect-[3/4] md:aspect-square bg-[#f9f8f6] rounded-lg overflow-hidden cursor-pointer"
+            onClick={() => hasImages && setIsZoomed(true)}
+          >
+            {hasImages ? (
+              <>
+                <img
+                  src={images[selectedIndex]}
+                  alt={product?.name || "Product"}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                
+                {/* Navigation Arrows */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handlePrev() }}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white shadow-md"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleNext() }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white shadow-md"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </>
+                )}
+
+                {/* Image Counter */}
+                {images.length > 1 && (
+                  <div className="absolute bottom-3 left-3 text-[10px] tracking-widest uppercase bg-white/90 rounded-full px-3 py-1.5 text-[#3e4026] shadow-sm">
+                    {selectedIndex + 1} / {images.length}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-gray-300">No Image</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Thumbnails */}
+      {/* Thumbnails - Mobile (Bottom) */}
       {hasImages && images.length > 1 && (
-        <div className="flex gap-3">
+        <div className="flex md:hidden gap-2 mt-3 overflow-x-auto pb-2">
           {images.map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedIndex(index)}
-              className={`w-20 h-20 rounded-md overflow-hidden transition-all ${
+              className={`w-16 h-16 rounded-md overflow-hidden transition-all border-2 flex-shrink-0 ${
                 selectedIndex === index 
-                  ? "ring-2 ring-[#3e4026]" 
-                  : "opacity-60 hover:opacity-100"
+                  ? "border-[#3e4026] opacity-100" 
+                  : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
               <img

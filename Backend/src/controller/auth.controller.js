@@ -386,7 +386,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  // 🧹 Clear reset cookie
+  //  Clear reset cookie
   res.clearCookie("resetPasswordToken");
 
   return res.status(200).json(

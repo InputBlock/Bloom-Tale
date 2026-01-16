@@ -30,6 +30,12 @@ const cartSchema = new Schema(
       required: true,
       unique: true, // one cart per user
     },
+    username: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
     items: [cartItemSchema],
   },
   { timestamps: true }

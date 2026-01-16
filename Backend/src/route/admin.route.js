@@ -8,10 +8,10 @@ import { getAllOrders, getOrderById, updateOrderStatus, getOrderStats } from "..
 const router = Router();
 
 router.post("/login", admin_login);
-router.post("/add", upload.single("image"), add_item);
+router.post("/add", upload.array("images", 5), add_item); // Accept up to 5 images
 router.post("/list", list_item);
 router.post("/unlist", unlist_item);
-router.post("/update", upload.single("image"), update_item);
+router.post("/update", upload.array("images", 5), update_item); // Accept up to 5 images
 router.post("/delete", delete_item);
 router.get("/showlist",get_list);
 router.get("/user_list",get_user_info);
