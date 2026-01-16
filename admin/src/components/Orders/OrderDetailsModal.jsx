@@ -2,7 +2,7 @@ import { X, ArrowLeft, Package, MapPin, CreditCard, User } from "lucide-react"
 import axios from "axios"
 import OrderStatusBadge from "./OrderStatusBadge"
 
-const API_URL = "http://localhost:8000/api/v1/admin"
+const API_URL = "/api/v1/admin"
 
 export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
   

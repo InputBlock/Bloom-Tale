@@ -82,7 +82,8 @@ export const googleCallback = async (req, res) => {
       user = new User({
         username,
         email: email.toLowerCase(),
-        password_hash: "",
+        password: "", // Empty password for Google users
+        isEmailVerified: true, // Google users are already verified
         metadata: {
           social_profiles: [{
             provider,
@@ -94,14 +95,27 @@ export const googleCallback = async (req, res) => {
       });
     }
 
-    // Update last login time
+    // Update last login time and mark as verified
     if (!user.metadata) user.metadata = {};
     user.metadata.last_login = new Date();
-    await user.save();
+    user.isEmailVerified = true; // Ensure Google users are always verified
+    await user.save({ validateBeforeSave: false });
 
-    const token = createAccessToken(user._id.toString());
-    user.current_token = token;
-    await user.save();
+    // Generate tokens
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+    
+    // Save refresh token
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
+    // Set cookies for the session
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    };
 
     // Redirect to frontend with token and user data
     const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
@@ -111,7 +125,10 @@ export const googleCallback = async (req, res) => {
       username: user.username
     }));
     
-    return res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${userData}`);
+    return res
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .redirect(`${frontendUrl}/auth/callback?token=${accessToken}&user=${userData}`);
   } catch (error) {
     console.error('Google callback error:', error);
     const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
@@ -245,11 +262,12 @@ export const loginUser = asyncHandler(async (req, res) => {
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
 
-  // 7️⃣ Cookie options
+  // 7️⃣ Cookie options (consistent with Google OAuth)
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   };
 
   // 8️⃣ Send response

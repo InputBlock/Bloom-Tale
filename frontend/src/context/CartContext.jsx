@@ -16,6 +16,18 @@ export const CartProvider = ({ children }) => {
   const [loading, setLoading] = useState(false)
   const [totalAmount, setTotalAmount] = useState(0)
 
+  // Get auth headers (token from localStorage for Google auth, cookies for normal login)
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token")
+    const headers = {
+      "Content-Type": "application/json",
+    }
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`
+    }
+    return headers
+  }
+
   // Check if user is logged in
   const isLoggedIn = () => {
     const user = localStorage.getItem("user")
@@ -34,9 +46,7 @@ export const CartProvider = ({ children }) => {
       setLoading(true)
       const response = await fetch("/api/v1/cart/getCart", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         credentials: "include", // Important for cookies
       })
 
@@ -70,9 +80,7 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await fetch("/api/v1/cart/addToCart", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         credentials: "include",
         body: JSON.stringify({
           product_id: product.product_id,

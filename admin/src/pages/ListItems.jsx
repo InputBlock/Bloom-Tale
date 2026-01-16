@@ -21,7 +21,7 @@ export default function ListItems() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const response = await axios.get("http://localhost:8000/api/v1/admin/showlist")
+      const response = await axios.get("/api/v1/admin/showlist")
       
       // Transform backend data to match frontend format
       const transformedProducts = response.data.flowers.map(product => ({
@@ -61,7 +61,7 @@ export default function ListItems() {
       try {
         const token = localStorage.getItem("adminToken")
         await axios.post(
-          "http://localhost:8000/api/v1/admin/update",
+          "/api/v1/admin/update",
           { 
             id: id,
             stock: stockValue
@@ -103,8 +103,8 @@ export default function ListItems() {
     try {
       const token = localStorage.getItem("adminToken")
       const endpoint = statusProduct.isListed 
-        ? "http://localhost:8000/api/v1/admin/unlist"
-        : "http://localhost:8000/api/v1/admin/list"
+        ? "/api/v1/admin/unlist"
+        : "/api/v1/admin/list"
       
       await axios.post(
         endpoint,
@@ -134,7 +134,7 @@ export default function ListItems() {
     try {
       const token = localStorage.getItem("adminToken")
       await axios.post(
-        "http://localhost:8000/api/v1/admin/update",
+        "/api/v1/admin/update",
         {
           id: updatedProduct.id,
           name: updatedProduct.name,

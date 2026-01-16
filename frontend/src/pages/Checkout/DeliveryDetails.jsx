@@ -12,11 +12,18 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
     setError("")
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/order/checkout", {
+      // Get token from localStorage for auth
+      const token = localStorage.getItem("token")
+      const headers = {
+        "Content-Type": "application/json",
+      }
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`
+      }
+
+      const response = await fetch("/api/v1/order/checkout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         credentials: "include",
         body: JSON.stringify({
           address: {

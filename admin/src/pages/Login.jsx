@@ -19,7 +19,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await axios.post("http://localhost:8000/api/v1/admin/login", {
+      const response = await axios.post("/api/v1/admin/login", {
         email: formData.email,
         password: formData.password,
       })
