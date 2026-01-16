@@ -1,27 +1,31 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 const heroSlides = [
   {
     id: 1,
-    title: "Anniversary Special",
-    description: "Fresh blooms for milestones, yours or someone special's",
-    buttonText: "ORDER NOW",
+    subtitle: "Fresh Flowers, Delivered Daily",
+    title: "Bloom Tale",
+    description: "Handcrafted bouquets for life's most meaningful moments",
+    buttonText: "Shop Now",
     image: "/annivarsary-carousel.jpg",
   },
   {
     id: 2,
-    title: "Wedding Blooms",
-    description: "Elegant arrangements to make your special day unforgettable",
-    buttonText: "EXPLORE NOW",
+    subtitle: "Wedding Collection",
+    title: "Your Perfect Day",
+    description: "Elegant arrangements to make your celebration unforgettable",
+    buttonText: "Explore Wedding",
     image: "/wedding-blooms-carousel.jpg",
   },
   {
     id: 3,
-    title: "Seasonal Collection",
-    description: "Discover the beauty of fresh seasonal flowers",
-    buttonText: "SHOP NOW",
+    subtitle: "Seasonal Favorites",
+    title: "Spring Blooms",
+    description: "Discover the beauty of nature's freshest flowers",
+    buttonText: "View Collection",
     image: "/seasonal-carousel.jpg",
   },
 ]
@@ -29,12 +33,13 @@ const heroSlides = [
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!isAutoPlaying) return
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 5000)
+    }, 6000)
     return () => clearInterval(interval)
   }, [isAutoPlaying])
 
@@ -49,89 +54,111 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative h-96 md:h-125 bg-[#EDE8E0] overflow-hidden mt-3">
-      {/* Background decorative elements */}
-      <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-[#5e6043]/5 blur-3xl" />
-      <div className="absolute bottom-20 left-20 w-80 h-80 rounded-full bg-[#3e4026]/5 blur-3xl" />
-
+    <section className="relative h-[90vh] md:h-screen overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.7 }}
-          className="relative h-full bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${heroSlides[currentSlide].image})`,
-          }}
+          transition={{ duration: 1.2 }}
+          className="absolute inset-0"
         >
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${heroSlides[currentSlide].image})` }}
+          />
+          
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
-
-          {/* Content */}
-          <div className="relative h-full flex flex-col justify-center items-start px-6 md:px-20 lg:px-24 max-w-3xl pt-8 pb-16">
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-4 leading-tight whitespace-nowrap"
-              style={{ fontFamily: 'Playfair Display, serif' }}
-            >
-              {heroSlides[currentSlide].title}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-lg md:text-xl lg:text-2xl text-gray-50 mb-8 leading-relaxed max-w-xl"
-            >
-              {heroSlides[currentSlide].description}
-            </motion.p>
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-[#3e4026] text-white px-10 py-4 text-base font-semibold hover:bg-[#5e6043] transition-all duration-300 rounded-sm shadow-lg"
-            >
-              {heroSlides[currentSlide].buttonText}
-            </motion.button>
-          </div>
+          <div className="absolute inset-0 bg-black/40" />
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation Arrows */}
-      <button
-        onClick={handlePrev}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-2 md:p-3 transition-all duration-300 z-10"
-      >
-        <ChevronLeft size={24} />
-      </button>
-      <button
-        onClick={handleNext}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-2 md:p-3 transition-all duration-300 z-10"
-      >
-        <ChevronRight size={24} />
-      </button>
+      {/* Content */}
+      <div className="relative h-full flex items-center z-10">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
+          <div className="max-w-2xl">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
+                {/* Subtitle */}
+                <motion.p
+                  className="text-white/80 text-sm md:text-base tracking-[0.3em] uppercase mb-4"
+                >
+                  {heroSlides[currentSlide].subtitle}
+                </motion.p>
 
-      {/* Carousel Indicators */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-        {heroSlides.map((_, index) => (
-          <motion.div
-            key={index}
-            onClick={() => {
-              setIsAutoPlaying(false)
-              setCurrentSlide(index)
-            }}
-            className={`cursor-pointer transition-all duration-300 ${index === currentSlide
-                ? "w-8 h-2 bg-white rounded-full"
-                : "w-2 h-2 bg-gray-400 rounded-full hover:bg-gray-300"
-              }`}
-            whileHover={{ scale: 1.2 }}
-          />
-        ))}
+                {/* Title */}
+                <h1 
+                  className="text-5xl md:text-7xl lg:text-8xl text-white font-light mb-6 leading-tight"
+                  style={{ fontFamily: 'Playfair Display, serif' }}
+                >
+                  {heroSlides[currentSlide].title}
+                </h1>
+
+                {/* Description */}
+                <p className="text-white/90 text-lg md:text-xl mb-8 font-light max-w-lg">
+                  {heroSlides[currentSlide].description}
+                </p>
+
+                {/* CTA Button */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate('/shop')}
+                  className="group inline-flex items-center gap-3 bg-white text-gray-900 px-8 py-4 text-sm font-medium tracking-wide hover:bg-gray-100 transition-all duration-300"
+                >
+                  {heroSlides[currentSlide].buttonText}
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Arrows */}
+      <div className="absolute bottom-12 right-12 flex gap-3 z-20">
+        <button
+          onClick={handlePrev}
+          className="w-12 h-12 border border-white/40 hover:bg-white/10 text-white flex items-center justify-center transition-all duration-300"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          onClick={handleNext}
+          className="w-12 h-12 border border-white/40 hover:bg-white/10 text-white flex items-center justify-center transition-all duration-300"
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
+      {/* Slide Counter */}
+      <div className="absolute bottom-12 left-12 z-20">
+        <div className="flex items-center gap-4 text-white">
+          <span className="text-3xl font-light" style={{ fontFamily: 'Playfair Display, serif' }}>
+            0{currentSlide + 1}
+          </span>
+          <div className="w-12 h-px bg-white/40" />
+          <span className="text-sm text-white/60">0{heroSlides.length}</span>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
+        <motion.div
+          key={currentSlide}
+          initial={{ width: 0 }}
+          animate={{ width: '100%' }}
+          transition={{ duration: 6, ease: 'linear' }}
+          className="h-full bg-white"
+        />
       </div>
     </section>
   )

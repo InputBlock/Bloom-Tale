@@ -8,6 +8,8 @@ const orderItemSchema = new Schema({
     ref: "Product",
   },
   product_id: String,
+  productName: String,
+  productImage: String,
   quantity: Number,
   price: Number,
 });
@@ -34,7 +36,6 @@ const addressSchema = {
   alternateMobile: String,
   email: String,
 
-  addressTag: String, // Home / Office
 };
 
 const orderSchema = new Schema(
@@ -55,12 +56,13 @@ const orderSchema = new Schema(
     paymentMethod: {
       type: String,
       enum: ["COD", "ONLINE"],
-      required: true,
+      // required: true,
+      default:null
     },
 
     status: {
       type: String,
-      enum: ["PENDING", "PAID", "CANCELLED"],
+      enum: ["PENDING", "PAYMENT_FAILED", "PAID", "CANCELLED"],
       default: "PENDING",
     },
 

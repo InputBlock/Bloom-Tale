@@ -5,10 +5,11 @@ import {ApiError} from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import sendOtpEmail from "../utils/sendOtp.js";
+import { buildGoogleAuthUrl, getVerifiedGoogleProfile } from "../service/google.service.js";
 
 const createAccessToken = (userId) => {
-  return jwt.sign({ sub: userId }, process.env.JWT_SECRET, { 
-    expiresIn: process.env.JWT_EXPIRY || "7d" 
+  return jwt.sign({ sub: userId }, process.env.ACCESS_TOKEN_SECRET, { 
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "7d" 
   });
 };
 
@@ -27,16 +28,23 @@ export const googleLogin = async (req, res) => {
 
 export const googleCallback = async (req, res) => {
   try {
-    const { code, state } = req.query;
+    const { code, state, error: googleError } = req.query;
 
-    if (!code) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing authorization code"
-      });
+    // Handle Google OAuth errors
+    if (googleError) {
+      console.error('Google OAuth error:', googleError);
+      const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/auth/callback?error=${encodeURIComponent(googleError)}`);
     }
 
+    if (!code) {
+      const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/auth/callback?error=${encodeURIComponent('Missing authorization code')}`);
+    }
+
+    console.log('Google callback received code, exchanging for tokens...');
     const profile = await getVerifiedGoogleProfile(code);
+    console.log('Google profile received:', profile?.email);
 
     const email = profile.email;
     if (!email) {
@@ -95,21 +103,19 @@ export const googleCallback = async (req, res) => {
     user.current_token = token;
     await user.save();
 
-    return res.status(200).json({
-      success: true,
-      access_token: token,
-      token_type: "bearer",
-      user: {
-        id: user._id,
-        email: user.email,
-        username: user.username
-      }
-    });
+    // Redirect to frontend with token and user data
+    const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
+    const userData = encodeURIComponent(JSON.stringify({
+      id: user._id,
+      email: user.email,
+      username: user.username
+    }));
+    
+    return res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${userData}`);
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: `Failed to verify Google profile: ${error.message}`
-    });
+    console.error('Google callback error:', error);
+    const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173';
+    return res.redirect(`${frontendUrl}/auth/callback?error=${encodeURIComponent(error.message || 'Authentication failed')}`);
   }
 };
 

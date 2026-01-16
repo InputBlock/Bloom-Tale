@@ -5,7 +5,9 @@ import {
   loginUser,
   logoutUser,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  googleLogin,
+  googleCallback
 } from "../controller/auth.controller.js";
 // import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -19,11 +21,11 @@ router.post("/logout", logoutUser);
 router.post("/forgotPassword", forgotPassword);
 router.post("/resetPassword", resetPassword);
 
-// router.get("/me", verifyJWT, (req, res) => { 
-//   res.status(200).json({
-//     success: true,
-//     user: req.user,
-//   });
-// });
+// Google OAuth routes
+router.get("/google", googleLogin);
+router.get("/google/callback", googleCallback);
+
+// Protected routes (example)
+
 
 export default router;
