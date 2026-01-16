@@ -20,7 +20,7 @@ export default function CategoryShowcase() {
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+            <div className="aspect-[4/3]  overflow-hidden shadow-2xl">
               {/* Save your Valentine flowers image as: /valentine-flowers-frame.jpg in the public folder */}
               <img
                 src="/Valentine.png"

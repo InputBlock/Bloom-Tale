@@ -14,6 +14,7 @@ export default function Header() {
   const [showLogout, setShowLogout] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
   const logoutRef = useRef(null)
 
   useEffect(() => {
@@ -78,9 +79,16 @@ export default function Header() {
     return userEmail ? userEmail.charAt(0).toUpperCase() : "U"
   }
 
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      console.log("Searching for:", searchQuery)
+      // navigate(`/search?q=${searchQuery}`)
+    }
+  }
+
   const navLinks = [
     { name: "Home", path: "/home" },
-    { name: "Shop", path: "/shop" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ]
@@ -92,19 +100,47 @@ export default function Header() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="flex items-center justify-between gap-4 md:gap-8 h-20">
           {/* Logo */}
-          <Link to="/home" className="flex items-center">
+          <Link to="/home" className="flex items-center flex-shrink-0">
             <img 
               src="/BloomTaleLogopng(500x350px).png" 
               alt="Bloom Tale" 
-              className="h-16 md:h-20 w-auto object-contain "
+              className="h-14 md:h-16 w-auto object-contain"
             />
           </Link>
 
+          {/* Centered Search Bar - Desktop */}
+          <div className="hidden md:flex flex-1 max-w-xl mx-4">
+            <form onSubmit={handleSearch} className="w-full relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search flowers, arrangements, occasions..."
+                className={`w-full px-4 py-2.5 pr-12 rounded-full border transition-all duration-300 ${
+                  scrolled || !isHomePage 
+                    ? "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-[#3e4026]" 
+                    : "bg-white/10 border-white/30 text-white placeholder-white/70 focus:bg-white/20 focus:border-white/50"
+                } focus:outline-none focus:ring-2 focus:ring-[#3e4026]/20`}
+              />
+              <button
+                type="submit"
+                className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-300 ${
+                  scrolled || !isHomePage 
+                    ? "text-gray-600 hover:bg-gray-100" 
+                    : "text-white hover:bg-white/10"
+                }`}
+                aria-label="Search"
+              >
+                <Search size={18} strokeWidth={2} />
+              </button>
+            </form>
+          </div>
+
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8 flex-shrink-0">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -119,14 +155,7 @@ export default function Header() {
           </nav>
 
           {/* Right Icons */}
-          <div className="flex items-center gap-4">
-            {/* Search */}
-            <button 
-              className={`p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
-              aria-label="Search"
-            >
-              <Search size={20} strokeWidth={1.5} />
-            </button>
+          <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
 
             {/* Cart */}
             <button 

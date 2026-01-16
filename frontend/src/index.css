@@ -123,11 +123,35 @@ html {
   overflow: hidden;
 }
 
-/* Custom focus styles */
-button:focus-visible,
-a:focus-visible {
+/* Custom focus styles - removes outline on mouse click, keeps for keyboard */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
   outline: 2px solid #3e4026;
   outline-offset: 2px;
+  border-radius: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #3e4026;
+  outline-offset: 2px;
+}
+
+/* Remove focus outline specifically for mouse/touch interactions */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+div:focus:not(:focus-visible),
+img:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Backdrop blur support */
