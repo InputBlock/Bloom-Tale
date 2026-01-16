@@ -37,7 +37,7 @@ const userSchema = new Schema(
       lowercase: true,
     },
     password: { type: String },
-    rereshToken: {
+    refreshToken: {
       type: String,
     },
     metadata: {
