@@ -15,7 +15,7 @@ export default function ProductImages({ product }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#EDE8E0] to-[#5e6043]/10">
-            <span className="text-9xl">🌸</span>
+            <span className="text-9xl"></span>
           </div>
         )}
       </div>

@@ -8,6 +8,8 @@ const orderItemSchema = new Schema({
     ref: "Product",
   },
   product_id: String,
+  productName: String,
+  productImage: String,
   quantity: Number,
   price: Number,
 });

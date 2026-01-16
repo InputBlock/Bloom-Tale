@@ -142,7 +142,7 @@ const FlowerCarousel = () => {
 
           {/* Central Showcase Card */}
           <motion.div
-            className="absolute z-20 w-72 h-96 md:w-80 md:h-[450px]"
+            className="absolute z-20 w-72 h-96 md:w-80 md:h-112.5"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
@@ -164,7 +164,7 @@ const FlowerCarousel = () => {
                       alt={activeCategory.tagline}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FBF8F3]/80" />
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#FBF8F3]/80" />
                   </div>
 
                   {/* Content */}

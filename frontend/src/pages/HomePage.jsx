@@ -2,9 +2,14 @@ import Header from "../components/common/Header"
 import SubHeader from "../components/common/SubHeader"
 import Hero from "../components/HomePage/Hero"
 import BestsellingBlooms from "../components/HomePage/BestsellingBlooms"
+import AboutSection from "../components/HomePage/AboutSection"
+import WhyChooseUs from "../components/HomePage/WhyChooseUs"
+import CategoryShowcase from "../components/HomePage/CategoryShowcase"
+import Testimonials from "../components/HomePage/Testimonials"
+import Newsletter from "../components/HomePage/Newsletter"
 import Footer from "../components/common/Footer"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ArrowUp } from "lucide-react"
 import { useState, useEffect } from "react"
 
 export default function HomePage() {
@@ -12,7 +17,6 @@ export default function HomePage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show scroll to top button when user scrolls past 500px
       setShowScrollTop(window.scrollY > 500)
     }
 
@@ -25,51 +29,35 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EDE8E0]">
+    <div className="min-h-screen bg-white">
       <Header />
-      <SubHeader />
       <Hero />
-      
-      {/* Scroll Down Indicator - Only show when at top */}
-      <AnimatePresence>
-        {!showScrollTop && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="absolute left-1/2 -translate-x-1/2 z-20"
-            style={{ top: 'calc(100vh - 80px)' }}
-          >
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="flex flex-col items-center bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border-2 border-white/40 shadow-lg"
-            >
-              <span className="text-gray-700 text-sm font-semibold mb-1">Scroll Down</span>
-              <ChevronDown size={28} className="text-gray-700 font-bold" strokeWidth={3} />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Categories SubHeader below hero */}
+      <SubHeader />
 
-      {/* Scroll to Top Button - Show when scrolled down */}
+      {/* Scroll to Top Button */}
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3 }}
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-50 flex flex-col items-center bg-[#5d6c4e] hover:bg-[#4a5840] backdrop-blur-md p-4 rounded-full shadow-2xl transition-colors duration-300"
+            className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-[#3e4026] hover:bg-[#2d2f1c] flex items-center justify-center shadow-lg transition-colors duration-300"
+            aria-label="Scroll to top"
           >
-            <ChevronUp size={28} className="text-white font-bold" strokeWidth={3} />
+            <ArrowUp size={20} className="text-white" />
           </motion.button>
         )}
       </AnimatePresence>
 
+      <AboutSection />
       <BestsellingBlooms />
+      <CategoryShowcase />
+      <WhyChooseUs />
+      <Testimonials />
+      <Newsletter />
       <Footer />
     </div>
   )
