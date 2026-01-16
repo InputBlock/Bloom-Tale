@@ -97,7 +97,7 @@ export default function Header() {
             <img 
               src="/BloomTaleLogopng(500x350px).png" 
               alt="Bloom Tale" 
-              className="h-16 md:h-20 w-auto object-contain drop-shadow-lg"
+              className="h-16 md:h-20 w-auto object-contain "
             />
           </Link>
 

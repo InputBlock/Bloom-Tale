@@ -14,6 +14,7 @@ export default function ProductForm({ images, setImages }) {
       large: ""
     },
     inStock: true,
+    sameDayDelivery: false,
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ type: "", text: "" })
@@ -53,6 +54,7 @@ export default function ProductForm({ images, setImages }) {
       formDataToSend.append("category", formData.type)
       formDataToSend.append("pricing", JSON.stringify(formData.pricing))
       formDataToSend.append("stock", formData.inStock ? 100 : 0)
+      formDataToSend.append("same_day_delivery", formData.sameDayDelivery)
       
       // Append image file if exists
       if (images.length > 0 && images[0].file) {
@@ -82,6 +84,7 @@ export default function ProductForm({ images, setImages }) {
           large: ""
         },
         inStock: true,
+        sameDayDelivery: false,
       })
       // Clear images
       setImages([])
@@ -275,17 +278,31 @@ export default function ProductForm({ images, setImages }) {
         <p className="mt-2 text-sm text-gray-500">Set different prices for small, medium, and large arrangements</p>
       </div>
 
-      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <input
-          type="checkbox"
-          id="inStock"
-          checked={formData.inStock}
-          onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
-          className="w-5 h-5 accent-black cursor-pointer"
-        />
-        <label htmlFor="inStock" className="text-gray-900 font-medium cursor-pointer select-none">
-          In Stock
-        </label>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <input
+            type="checkbox"
+            id="inStock"
+            checked={formData.inStock}
+            onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
+            className="w-5 h-5 accent-black cursor-pointer"
+          />
+          <label htmlFor="inStock" className="text-gray-900 font-medium cursor-pointer select-none">
+            In Stock
+          </label>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <input
+            type="checkbox"
+            id="sameDayDelivery"
+            checked={formData.sameDayDelivery}
+            onChange={(e) => setFormData({ ...formData, sameDayDelivery: e.target.checked })}
+            className="w-5 h-5 accent-black cursor-pointer"
+          />
+          <label htmlFor="sameDayDelivery" className="text-gray-900 font-medium cursor-pointer select-none">
+            Same Day Delivery Available
+          </label>
+        </div>
       </div>
 
       <button

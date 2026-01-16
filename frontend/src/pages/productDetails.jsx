@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
+import { ChevronRight } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
 import ProductImages from "../components/productDetails/ProductImages"
@@ -16,6 +17,8 @@ export default function ProductDetailsPage() {
     const fetchProductDetails = async () => {
       try {
         setLoading(true)
+        setError(null)
+        
         const response = await fetch(`/api/v1/getProductDetail/${productId}`, {
           method: 'POST',
           headers: {
@@ -41,15 +44,36 @@ export default function ProductDetailsPage() {
     if (productId) {
       fetchProductDetails()
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [productId])
 
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3e4026]"></div>
-        </div>
+        <main className="max-w-7xl mx-auto px-6 md:px-12 py-12">
+          <div className="h-4 bg-gray-100 w-48 mb-12"></div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="aspect-[3/4] bg-[#f9f8f6] animate-pulse"></div>
+            
+            <div className="space-y-6">
+              <div className="h-4 bg-gray-100 w-24"></div>
+              <div className="h-10 bg-gray-100 w-3/4"></div>
+              <div className="h-6 bg-gray-100 w-1/3"></div>
+              <div className="h-4 bg-gray-100 w-full"></div>
+              <div className="h-4 bg-gray-100 w-5/6"></div>
+              <div className="flex gap-3 pt-4">
+                <div className="h-12 bg-gray-100 w-24"></div>
+                <div className="h-12 bg-gray-100 w-24"></div>
+                <div className="h-12 bg-gray-100 w-24"></div>
+              </div>
+              <div className="h-14 bg-gray-100 w-full"></div>
+              <div className="h-14 bg-gray-100 w-full"></div>
+            </div>
+          </div>
+        </main>
         <Footer />
       </div>
     )
@@ -59,14 +83,28 @@ export default function ProductDetailsPage() {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            {error || 'Product not found'}
-          </h2>
-          <a href="/home" className="text-[#3e4026] hover:underline">
-            Return to Home
-          </a>
-        </div>
+        <main className="max-w-7xl mx-auto px-6 md:px-12 py-20">
+          <div className="text-center">
+            <p className="text-[11px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-4">
+              Error
+            </p>
+            <h2 
+              className="text-3xl md:text-4xl text-[#3e4026] mb-4"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              {error || 'Product not found'}
+            </h2>
+            <p className="text-[#3e4026]/60 mb-8">
+              We couldn't find the product you're looking for.
+            </p>
+            <Link 
+              to="/home" 
+              className="inline-block bg-[#3e4026] text-white py-4 px-8 hover:bg-[#2d2f1c] transition-colors"
+            >
+              Back to Shop
+            </Link>
+          </div>
+        </main>
         <Footer />
       </div>
     )
@@ -76,19 +114,41 @@ export default function ProductDetailsPage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Main Product Section */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left: Product Images */}
-          <ProductImages product={product} />
+      <main className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-12">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-[#3e4026]/60 mb-8 md:mb-12">
+          <Link to="/home" className="hover:text-[#3e4026] transition-colors">
+            Home
+          </Link>
+          <ChevronRight size={14} />
+          {product.category && (
+            <>
+              <Link 
+                to={`/shop?category=${product.category}`}
+                className="hover:text-[#3e4026] transition-colors"
+              >
+                {product.category}
+              </Link>
+              <ChevronRight size={14} />
+            </>
+          )}
+          <span className="text-[#3e4026]">{product.name}</span>
+        </nav>
 
-          {/* Right: Product Info */}
-          <ProductInfo product={product} />
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <ProductImages product={product} />
+          </div>
+
+          <div>
+            <ProductInfo product={product} />
+          </div>
         </div>
 
-        {/* Product Details & Description */}
+        {/* Related Products */}
         <ProductDetails product={product} />
-      </div>
+      </main>
 
       <Footer />
     </div>

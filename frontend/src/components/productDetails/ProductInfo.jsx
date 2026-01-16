@@ -1,19 +1,23 @@
 import { useState } from "react"
-import { Minus, Plus } from "lucide-react"
+import { Minus, Plus, Heart } from "lucide-react"
 import { useCart } from "../../context/CartContext"
 import { useNavigate } from "react-router-dom"
 import SuccessModal from "../common/SuccessModal"
 
 export default function ProductInfo({ product }) {
   const [quantity, setQuantity] = useState(1)
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || null)
+  const [selectedSize, setSelectedSize] = useState("Medium")
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
-  const { addToCart } = useCart()
+  const [isWishlisted, setIsWishlisted] = useState(false)
+  const [showFullDescription, setShowFullDescription] = useState(false)
+  const { addToCart, isLoggedIn } = useCart()
   const navigate = useNavigate()
 
   const handleQuantityChange = (type) => {
     if (type === "increment") {
-      setQuantity((prev) => prev + 1)
+      if (!product.stock || quantity < product.stock) {
+        setQuantity((prev) => prev + 1)
+      }
     } else if (type === "decrement" && quantity > 1) {
       setQuantity((prev) => prev - 1)
     }
@@ -21,6 +25,11 @@ export default function ProductInfo({ product }) {
 
   const handleAddToCart = async () => {
     if (!product) return
+
+    if (!isLoggedIn()) {
+      navigate("/login", { state: { from: `/product/${product.product_id}` } })
+      return
+    }
     
     if (!addToCart) {
       console.error("addToCart function not available")
@@ -33,133 +42,227 @@ export default function ProductInfo({ product }) {
     })
 
     if (result && result.success) {
-      // Show success message
       setModalState({ isOpen: true, message: "Product added to cart successfully!", type: "success" })
       setTimeout(() => {
         setModalState({ isOpen: false, message: "", type: "success" })
         navigate("/cart")
       }, 1500)
     } else if (result && !result.success) {
-      // Show error message
       setModalState({ isOpen: true, message: result.message || "Failed to add product to cart", type: "error" })
       setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 3000)
     }
   }
 
+  const handleBuyNow = async () => {
+    if (!product) return
+
+    if (!isLoggedIn()) {
+      navigate("/login", { state: { from: `/product/${product.product_id}` } })
+      return
+    }
+
+    await handleAddToCart()
+  }
+
   if (!product) {
-    return <div>Loading product information...</div>
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-gray-200 w-3/4"></div>
+        <div className="h-6 bg-gray-200 w-1/4"></div>
+        <div className="h-12 bg-gray-200 w-1/3"></div>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
+      {/* Category */}
+      {product.category && (
+        <p className="text-[10px] tracking-[0.3em] uppercase text-[#3e4026]/60">
+          {product.category}
+        </p>
+      )}
+
       {/* Product Title */}
-      <div>
-        <h1 className="text-3xl font-serif text-gray-900 mb-2">
-          {product.name}
-        </h1>
-        <div className="flex items-center gap-2">
-          <span className="text-sm bg-[#EDE8E0] text-[#3e4026] px-3 py-1 rounded-full">
-            {product.category}
-          </span>
-          {product.subcategory && (
-            <span className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
-              {product.subcategory}
-            </span>
-          )}
-        </div>
-      </div>
+      <h1 
+        className="text-3xl md:text-4xl text-[#3e4026]"
+        style={{ fontFamily: 'Playfair Display, serif' }}
+      >
+        {product.name}
+      </h1>
 
       {/* Price */}
-      <div>
-        <p className="text-2xl font-bold text-gray-900">₹ {product.price}</p>
-        {product.bestSeller && (
-          <p className="text-sm text-yellow-600 mt-1 flex items-center gap-1">
-            <span className="text-lg">⭐</span> Bestseller
-          </p>
+      <div className="flex items-baseline gap-3">
+        <span className="text-2xl font-light text-[#3e4026]">
+          ₹{product.price?.toLocaleString()}
+        </span>
+        {product.originalPrice && product.originalPrice > product.price && (
+          <>
+            <span className="text-lg text-gray-400 line-through">
+              ₹{product.originalPrice?.toLocaleString()}
+            </span>
+            <span className="text-[10px] tracking-widest uppercase bg-[#3e4026] text-white px-2 py-1">
+              {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% off
+            </span>
+          </>
         )}
       </div>
 
       {/* Stock Status */}
-      <div>
-        {product.stock && product.stock > 0 ? (
-          <p className="text-sm text-green-600 font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
-            In Stock ({product.stock} available)
-          </p>
-        ) : (
-          <p className="text-sm text-red-600 font-semibold">Out of Stock</p>
-        )}
-      </div>
-
-      {/* Size Selection */}
-      {product.sizes && product.sizes.length > 0 && (
-        <div>
-          <p className="text-sm font-medium text-gray-900 mb-3">Select Size</p>
-          <div className="flex gap-3">
-            {product.sizes.map((size, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedSize(size)}
-                className={`px-4 py-2 border-2 rounded-lg transition ${
-                  selectedSize === size 
-                    ? "border-gray-900 bg-gray-900 text-white" 
-                    : "border-gray-300 hover:border-gray-400"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        </div>
+      {product.stock && product.stock > 0 ? (
+        <p className="text-xs text-green-600 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+          In Stock {product.stock <= 10 && `• Only ${product.stock} left`}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-400">Out of Stock</p>
       )}
 
-      {/* Quantity Selector */}
-      <div>
-        <p className="text-sm font-medium text-gray-900 mb-3">Quantity</p>
-        <div className="flex items-center gap-4 border border-gray-300 rounded-md w-fit">
-          <button
-            onClick={() => handleQuantityChange("decrement")}
-            className="p-3 hover:bg-gray-100"
-            disabled={quantity <= 1}
-          >
-            <Minus size={16} />
-          </button>
-          <span className="text-lg font-medium w-8 text-center">{quantity}</span>
-          <button
-            onClick={() => handleQuantityChange("increment")}
-            className="p-3 hover:bg-gray-100"
-            disabled={product.stock && quantity >= product.stock}
-          >
-            <Plus size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Description */}
+      {/* Description with Show More/Less */}
       {product.description && (
         <div>
-          <h2 className="text-2xl font-serif text-gray-900 mb-4 border-b pb-2">
-            Description:
-          </h2>
-          <p className="text-gray-700 leading-relaxed">{product.description}</p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-2">Description</p>
+          <p className={`text-[#3e4026]/70 leading-relaxed ${!showFullDescription && product.description.length > 100 ? 'line-clamp-2' : ''}`}>
+            {product.description}
+          </p>
+          {product.description.length > 100 && (
+            <button
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="text-[#3e4026] text-sm font-medium mt-2 hover:underline cursor-pointer"
+            >
+              {showFullDescription ? 'Show Less' : 'Show More'}
+            </button>
+          )}
         </div>
       )}
 
+      {/* Divider */}
+      <div className="border-t border-gray-200"></div>
+
+      {/* Size Selection */}
+      <div>
+        <p className="text-[10px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-3">Size</p>
+        <div className="flex gap-3">
+          {['Small', 'Medium', 'Large'].map((size) => (
+            <button
+              key={size}
+              onClick={() => setSelectedSize(size)}
+              className={`px-6 py-3 text-sm transition-all border ${
+                selectedSize === size 
+                  ? "bg-[#3e4026] text-white border-[#3e4026]" 
+                  : "bg-white text-[#3e4026] border-gray-200 hover:border-[#3e4026]"
+              }`}
+            >
+              {size}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Quantity */}
+      <div>
+        <p className="text-[10px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-3">Quantity</p>
+        <div className="inline-flex items-center border border-gray-200">
+          <button
+            onClick={() => handleQuantityChange("decrement")}
+            className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-40"
+            disabled={quantity <= 1}
+          >
+            <Minus size={16} className="text-[#3e4026]" />
+          </button>
+          <span className="w-14 text-center text-[#3e4026]">{quantity}</span>
+          <button
+            onClick={() => handleQuantityChange("increment")}
+            className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-40"
+            disabled={product.stock && quantity >= product.stock}
+          >
+            <Plus size={16} className="text-[#3e4026]" />
+          </button>
+        </div>
+      </div>
+
       {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex gap-3 pt-2">
         <button 
           onClick={handleAddToCart}
           disabled={!product.stock || product.stock === 0}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-md transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="flex-1 bg-[#3e4026] text-white py-4 text-sm font-medium hover:bg-[#2d2f1c] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          ADD TO CART
+          Add to Cart
         </button>
         <button 
-          disabled={!product.stock || product.stock === 0}
-          className="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 rounded-md transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+          onClick={() => setIsWishlisted(!isWishlisted)}
+          className={`w-14 h-14 flex items-center justify-center border transition-colors ${
+            isWishlisted 
+              ? "border-[#3e4026] bg-[#3e4026] text-white" 
+              : "border-gray-200 text-[#3e4026] hover:border-[#3e4026]"
+          }`}
         >
-          BUY IT NOW
+          <Heart size={20} className={isWishlisted ? "fill-current" : ""} />
         </button>
+      </div>
+
+      {/* Buy Now */}
+      <button 
+        onClick={handleBuyNow}
+        disabled={!product.stock || product.stock === 0}
+        className="w-full border border-[#3e4026] text-[#3e4026] py-4 text-sm font-medium rounded-sm hover:bg-[#3e4026] hover:text-white transition-colors disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+      >
+        Buy Now
+      </button>
+
+      {/* Product Highlights */}
+      <div className="border-t border-gray-200 pt-6 mt-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">Free Delivery</p>
+              <p className="text-[10px] text-[#3e4026]/60">Orders above ₹999</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">
+                {product.same_day_delivery ? "Same Day Delivery" : "Standard Delivery"}
+              </p>
+              <p className="text-[10px] text-[#3e4026]/60">
+                {product.same_day_delivery ? "Order before 2 PM" : "2-3 business days"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">Fresh Guarantee</p>
+              <p className="text-[10px] text-[#3e4026]/60">7-day freshness</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">Hand Crafted</p>
+              <p className="text-[10px] text-[#3e4026]/60">By expert florists</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Success Modal */}

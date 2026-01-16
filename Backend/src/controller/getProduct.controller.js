@@ -44,3 +44,12 @@ export const getBestSellerProducts = asyncHandler(async (req, res) => {
     new ApiResponse(200, products, "Bestseller products fetched")
   );
 });
+
+// Get all active products for public display
+export const getActiveProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find({ is_active: true });
+
+  return res.status(200).json(
+    new ApiResponse(200, products, "Products fetched successfully")
+  );
+});

@@ -117,6 +117,7 @@ export async function getList() {
             images: item.images_uri || [],
             isActive: item.is_active,
             isBestSeller: item.bestSeller,
+            sameDayDelivery: item.same_day_delivery,
             createdAt: item.createdAt,
             updatedAt: item.updatedAt
         }))
