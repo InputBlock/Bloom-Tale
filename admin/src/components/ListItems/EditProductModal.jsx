@@ -4,21 +4,40 @@ import { X } from "lucide-react"
 export default function EditProductModal({ product, isOpen, onClose, onSave }) {
   const [editProduct, setEditProduct] = useState(null)
 
+  const categories = [
+    "Same Day Delivery",
+    "Birthday",
+    "Anniversary",
+    "Forever Flowers",
+    "Fragrances",
+    "Premium",
+    "Corporate",
+    "Combos"
+  ]
+
   useEffect(() => {
     if (product) {
-      setEditProduct({ ...product })
+      setEditProduct({ 
+        ...product,
+        pricing: product.pricing || { small: 0, medium: 0, large: 0 }
+      })
     }
   }, [product])
 
   if (!isOpen || !editProduct) return null
 
   const handleSave = () => {
-    // If stock is 0, automatically unlist
-    const updatedProduct = {
+    onSave(editProduct)
+  }
+
+  const handlePricingChange = (size, value) => {
+    setEditProduct({
       ...editProduct,
-      isListed: editProduct.stock > 0 ? editProduct.isListed : false
-    }
-    onSave(updatedProduct)
+      pricing: {
+        ...editProduct.pricing,
+        [size]: value === "" ? "" : parseFloat(value) || 0
+      }
+    })
   }
 
   return (
@@ -49,34 +68,59 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
           {/* Category */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <input
-              type="text"
+            <select
               value={editProduct.category}
               onChange={(e) => setEditProduct({ ...editProduct, category: e.target.value })}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
 
-          {/* Price */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
-            <input
-              type="text"
-              value={editProduct.price}
-              onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
-          </div>
+          {/* Pricing Section */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">Pricing</label>
+            
+            {/* Small Price */}
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Small ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={editProduct.pricing.small}
+                onChange={(e) => handlePricingChange('small', e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                placeholder="0.00"
+              />
+            </div>
 
-          {/* Stock */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-            <input
-              type="number"
-              value={editProduct.stock}
-              onChange={(e) => setEditProduct({ ...editProduct, stock: parseInt(e.target.value) || 0 })}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
+            {/* Medium Price */}
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Medium ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={editProduct.pricing.medium}
+                onChange={(e) => handlePricingChange('medium', e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                placeholder="0.00"
+              />
+            </div>
+
+            {/* Large Price */}
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Large ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={editProduct.pricing.large}
+                onChange={(e) => handlePricingChange('large', e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                placeholder="0.00"
+              />
+            </div>
           </div>
 
           {/* Same Day Delivery Toggle */}
@@ -103,38 +147,21 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
           <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg">
             <div>
               <p className="font-medium text-gray-900">List this product</p>
-              <p className="text-sm text-gray-500">
-                {editProduct.stock === 0 
-                  ? "Cannot list - Out of stock" 
-                  : "Show this product to customers"}
-              </p>
+              <p className="text-sm text-gray-500">Show this product to customers</p>
             </div>
             <button
-              onClick={() => editProduct.stock > 0 && setEditProduct({ ...editProduct, isListed: !editProduct.isListed })}
-              disabled={editProduct.stock === 0}
+              onClick={() => setEditProduct({ ...editProduct, isListed: !editProduct.isListed })}
               className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
-                editProduct.stock === 0 
-                  ? "bg-gray-200 cursor-not-allowed" 
-                  : editProduct.isListed 
-                    ? "bg-green-500" 
-                    : "bg-gray-300"
+                editProduct.isListed ? "bg-green-500" : "bg-gray-300"
               }`}
             >
               <span
                 className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
-                  editProduct.isListed && editProduct.stock > 0 ? "translate-x-6" : "translate-x-0"
+                  editProduct.isListed ? "translate-x-6" : "translate-x-0"
                 }`}
               />
             </button>
           </div>
-
-          {/* Status Badge */}
-          {editProduct.stock === 0 && (
-            <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <p className="text-sm text-red-600 font-medium">This product is out of stock and will not be listed</p>
-            </div>
-          )}
         </div>
 
         {/* Actions */}

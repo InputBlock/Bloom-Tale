@@ -9,15 +9,17 @@ export async function addItem(details) {
     if (!details.category || !details.category.trim()) {
         throw new Error("Category is required");
     }
-    if (!details.price || details.price <= 0) {
-        throw new Error("Valid price is required");
+    if (!details.pricing || !details.pricing.small || !details.pricing.medium || !details.pricing.large) {
+        throw new Error("All pricing tiers (small, medium, large) are required");
     }
-
+    if (details.pricing.small <= 0 || details.pricing.medium <= 0 || details.pricing.large <= 0) {
+        throw new Error("All prices must be greater than 0");
+    }
     const existing = await productSchema.findOne({ name: details.name.trim() });
     if (existing) {
         throw new Error("Product with this name already exists");
     }
-    
+
 
     let retries = 3;
     while (retries > 0) {
@@ -32,7 +34,7 @@ export async function addItem(details) {
             }
             details.product_id = `PRO${nextNum}`;
             details.name = details.name.trim();
-            
+
             const p = new productSchema(details);
             return await p.save();
         } catch (err) {
@@ -73,16 +75,16 @@ export async function updateItem(id, updateData) {
     if (!id || !id.trim()) {
         throw new Error("Product ID is required");
     }
-    
+
     // Prevent updating product_id
     delete updateData.product_id;
     delete updateData._id;
-    
+
     const existing = await productSchema.findOne({ product_id: id.trim() });
     if (!existing) {
         throw new Error("Product not found");
     }
-    
+
     Object.assign(existing, updateData);
     return await existing.save();
 }
@@ -111,7 +113,7 @@ export async function getList() {
             description: item.description,
             category: item.category,
             subcategory: item.subcategory,
-            price: item.price,
+            price: item.pricing,
             sizes: item.sizes,
             stock: item.stock,
             images: item.images_uri || [],

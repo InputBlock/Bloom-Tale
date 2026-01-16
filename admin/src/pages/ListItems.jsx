@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Search, Edit2, Trash2, Plus } from "lucide-react"
+import { Search, Edit2, Trash2 } from "lucide-react"
 import EditProductModal from "../components/ListItems/EditProductModal"
 import StatusToggleModal from "../components/ListItems/StatusToggleModal"
 import axios from "axios"
@@ -28,12 +28,12 @@ export default function ListItems() {
         id: product.id,
         name: product.name,
         category: product.category,
-        price: product.price.toString(),
+        pricing: product.pricing || { small: 0, medium: 0, large: 0 },
         stock: product.stock,
         isListed: product.isActive,
         sameDayDelivery: product.sameDayDelivery || false
       }))
-      
+
       setProducts(transformedProducts)
     } catch (error) {
       console.error("Error fetching products:", error)
@@ -116,8 +116,8 @@ export default function ListItems() {
           }
         }
       )
-      
-      setProducts(products.map((p) => 
+
+      setProducts(products.map((p) =>
         p.id === statusProduct.id ? { ...p, isListed: !p.isListed } : p
       ))
     } catch (error) {
@@ -139,8 +139,7 @@ export default function ListItems() {
           id: updatedProduct.id,
           name: updatedProduct.name,
           category: updatedProduct.category,
-          price: updatedProduct.price,
-          stock: updatedProduct.stock,
+          pricing: updatedProduct.pricing,
           same_day_delivery: updatedProduct.sameDayDelivery
         },
         {
@@ -150,8 +149,8 @@ export default function ListItems() {
           }
         }
       )
-      
-      setProducts(products.map((p) => 
+
+      setProducts(products.map((p) =>
         p.id === updatedProduct.id ? updatedProduct : p
       ))
       setEditModal(false)
@@ -194,91 +193,83 @@ export default function ListItems() {
         <>
           {/* Products Table */}
           <div className="overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b border-gray-200">
-              <tr>
-                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Product</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Category</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Price</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Stock</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Same Day</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Status</th>
-                <th className="text-center py-4 px-6 font-semibold text-gray-900 text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((product) => (
-                <tr
-                  key={product.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <td className="py-4 px-6">
-                    <span className="text-gray-900 font-medium">{product.name}</span>
-                  </td>
-                  <td className="py-4 px-6 text-gray-600 text-sm">{product.category}</td>
-                  <td className="py-4 px-6 text-gray-900 font-semibold">${product.price}</td>
-                  <td className="py-4 px-6">
-                    <button
-                      onClick={() => handleUpdateStock(product.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 transition-colors duration-200"
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="border-b border-gray-200">
+                  <tr>
+                    <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Product</th>
+                    <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Category</th>
+                    <th className="text-center py-4 px-4 font-semibold text-gray-900 text-sm">S</th>
+                    <th className="text-center py-4 px-4 font-semibold text-gray-900 text-sm">M</th>
+                    <th className="text-center py-4 px-4 font-semibold text-gray-900 text-sm">L</th>
+                    <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Same Day</th>
+                    <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Status</th>
+                    <th className="text-center py-4 px-6 font-semibold text-gray-900 text-sm">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr
+                      key={product.id}
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
                     >
-                      {product.stock} items
-                      <Plus size={12} />
-                    </button>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-                      product.sameDayDelivery
-                        ? "bg-blue-100 text-blue-700 border border-blue-200"
-                        : "bg-gray-100 text-gray-500 border border-gray-200"
-                    }`}>
-                      {product.sameDayDelivery ? "Yes" : "No"}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <button
-                      onClick={() => openStatusModal(product.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${
-                        product.isListed
-                          ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
-                          : "bg-red-100 text-red-600 border-red-200 hover:bg-red-200"
-                      }`}
-                    >
-                      {product.isListed ? "Active" : "Inactive"}
-                    </button>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center justify-center gap-3">
-                      <button
-                        onClick={() => handleEdit(product)}
-                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                      <td className="py-4 px-6">
+                        <span className="text-gray-900 font-medium">{product.name}</span>
+                      </td>
+                      <td className="py-4 px-6 text-gray-600 text-sm">{product.category}</td>
+                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">${product.pricing?.small || 0}</td>
+                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">${product.pricing?.medium || 0}</td>
+                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">${product.pricing?.large || 0}</td>
+                      <td className="py-4 px-6">
+                        <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${product.sameDayDelivery
+                            ? "bg-blue-100 text-blue-700 border border-blue-200"
+                            : "bg-gray-100 text-gray-500 border border-gray-200"
+                          }`}>
+                          {product.sameDayDelivery ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <button
+                          onClick={() => openStatusModal(product.id)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${product.isListed
+                              ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
+                              : "bg-red-100 text-red-600 border-red-200 hover:bg-red-200"
+                            }`}
+                        >
+                          {product.isListed ? "Active" : "Inactive"}
+                        </button>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center justify-center gap-3">
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button
+                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                            onClick={() => handleDelete(product.id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-      {/* No Results */}
-      {!loading && filteredProducts.length === 0 && (
-        <div className="p-12 text-center bg-gray-50 border border-gray-200 rounded-lg">
-          <p className="text-gray-500 font-medium">
-            {searchTerm ? `No products found matching "${searchTerm}"` : "No products available"}
-          </p>
-        </div>
-      )}
+          {/* No Results */}
+          {!loading && filteredProducts.length === 0 && (
+            <div className="p-12 text-center bg-gray-50 border border-gray-200 rounded-lg">
+              <p className="text-gray-500 font-medium">
+                {searchTerm ? `No products found matching "${searchTerm}"` : "No products available"}
+              </p>
+            </div>
+          )}
         </>
       )}
 
