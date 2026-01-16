@@ -4,6 +4,65 @@ import { Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlowerScene } from "./flowers";
 import { showToast } from "../common/ToastContainer";
+import ErrorMessage from "../common/ErrorMessage";
+
+// Email validation helper
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Parse and improve error messages
+const getErrorMessage = (errorMsg) => {
+  const msg = errorMsg.toLowerCase();
+  
+  if (msg.includes('invalid credentials') || msg.includes('incorrect password') || msg.includes('wrong password')) {
+    return {
+      title: 'Invalid Credentials',
+      message: 'The email or password you entered is incorrect. Please try again.',
+      type: 'credentials'
+    };
+  }
+  
+  if (msg.includes('user not found') || msg.includes('email not found') || msg.includes('no user')) {
+    return {
+      title: 'Account Not Found',
+      message: 'We couldn\'t find an account with this email. Would you like to sign up?',
+      type: 'notfound',
+      action: { text: 'Create Account', link: '/register' }
+    };
+  }
+  
+  if (msg.includes('email') && (msg.includes('invalid') || msg.includes('format'))) {
+    return {
+      title: 'Invalid Email',
+      message: 'Please enter a valid email address.',
+      type: 'email'
+    };
+  }
+  
+  if (msg.includes('network') || msg.includes('fetch')) {
+    return {
+      title: 'Connection Error',
+      message: 'Unable to connect to the server. Please check your internet connection.',
+      type: 'network'
+    };
+  }
+  
+  if (msg.includes('server error') || msg.includes('500')) {
+    return {
+      title: 'Server Error',
+      message: 'Something went wrong on our end. Please try again in a moment.',
+      type: 'server'
+    };
+  }
+  
+  return {
+    title: 'Error',
+    message: errorMsg || 'An unexpected error occurred. Please try again.',
+    type: 'general'
+  };
+};
 
 // Handwritten Letter-by-Letter Text Animation Component
 const HandwrittenText = ({ text, delay = 0, className = "", style = {} }) => {
@@ -170,24 +229,48 @@ export default function FlowerLogin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [emailError, setEmailError] = useState("");
   const [focusedField, setFocusedField] = useState(null);
   const [loginState, setLoginState] = useState("idle"); // idle, typing, error, success
 
   // Reset error when user starts typing
   useEffect(() => {
     if (error && (email || password)) {
-      setError("");
+      setError(null);
       setLoginState("typing");
     }
   }, [email, password]);
+
+  // Validate email on blur
+  const handleEmailBlur = () => {
+    setFocusedField(null);
+    if (email && !isValidEmail(email)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  // Clear email error on focus
+  const handleEmailFocus = () => {
+    setFocusedField("email");
+    setEmailError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) return;
 
+    // Validate email format before submitting
+    if (!isValidEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
     setLoading(true);
-    setError("");
+    setError(null);
+    setEmailError('');
     setLoginState("typing");
 
     try {
@@ -219,13 +302,13 @@ export default function FlowerLogin() {
 
       // Wait for welcome animation then redirect (longer delay for text animation)
       setTimeout(() => {
-        showToast("Welcome back, bloom lover! 🌸", "success");
         navigate(from);
       }, 4500);
 
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.message || "Something went wrong");
+      const errorInfo = getErrorMessage(err.message);
+      setError(errorInfo);
       setLoginState("error");
       
       // Reset error state after animation
@@ -313,33 +396,48 @@ export default function FlowerLogin() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            {/* Error Message */}
-            {error && (
-              <motion.div 
-                className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {error}
-              </motion.div>
-            )}
+            {/* Error Message - Professional UI */}
+            <AnimatePresence mode="wait">
+              {error && (
+                <ErrorMessage 
+                  error={error} 
+                  onClose={() => setError(null)}
+                />
+              )}
+            </AnimatePresence>
 
             {/* Email Field */}
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
                 Email
               </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onFocus={() => setFocusedField("email")}
-                onBlur={() => setFocusedField(null)}
-                placeholder="Enter your email"
-                className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59] transition-all duration-300 shadow-sm"
-                required
-                disabled={loading || loginState === "success"}
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onFocus={handleEmailFocus}
+                  onBlur={handleEmailBlur}
+                  placeholder="Enter your email"
+                  className={`w-full px-4 py-3.5 bg-white border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm ${
+                    emailError 
+                      ? 'border-red-300 focus:ring-red-100 focus:border-red-400' 
+                      : 'border-gray-200 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59]'
+                  }`}
+                  required
+                  disabled={loading || loginState === "success"}
+                />
+              </div>
+              {emailError && (
+                <motion.p 
+                  className="mt-1.5 text-xs text-red-600 flex items-center gap-1"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <span className="inline-block w-1 h-1 rounded-full bg-red-600"></span>
+                  {emailError}
+                </motion.p>
+              )}
             </div>
 
             {/* Password Field */}
