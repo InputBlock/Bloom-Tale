@@ -26,6 +26,8 @@ const productSchema = new mongoose.Schema(
     },
     is_active: { type: Boolean, default: false,
     },
+    same_day_delivery: { type: Boolean, default: false,
+    },
   },
   { timestamps: true },
 )

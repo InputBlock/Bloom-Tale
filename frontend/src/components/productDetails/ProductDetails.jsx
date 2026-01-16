@@ -12,7 +12,7 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
     const fetchRelatedProducts = async () => {
       if (relatedProducts.length === 0 && product?.category) {
         try {
-          const response = await fetch('/api/v1/getList', {
+          const response = await fetch('/api/v1/getProduct/list', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
           })
@@ -92,13 +92,13 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                   
                   {/* Arrow Icon */}
-                  <div className="absolute top-4 right-4 w-10 h-10 bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute top-4 right-4 w-10 h-10 bg-white rounded-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <ArrowUpRight size={18} className="text-[#3e4026]" />
                   </div>
 
                   {/* Category Badge */}
                   <div className="absolute top-4 left-4">
-                    <span className="text-[10px] tracking-widest uppercase bg-white px-3 py-1.5 text-[#3e4026]">
+                    <span className="text-[10px] tracking-widest uppercase bg-white rounded-sm px-3 py-1.5 text-[#3e4026]">
                       {item.category}
                     </span>
                   </div>

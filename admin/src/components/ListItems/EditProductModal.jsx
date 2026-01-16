@@ -79,6 +79,26 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
             />
           </div>
 
+          {/* Same Day Delivery Toggle */}
+          <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg">
+            <div>
+              <p className="font-medium text-gray-900">Same Day Delivery</p>
+              <p className="text-sm text-gray-500">Enable same day delivery for this product</p>
+            </div>
+            <button
+              onClick={() => setEditProduct({ ...editProduct, sameDayDelivery: !editProduct.sameDayDelivery })}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
+                editProduct.sameDayDelivery ? "bg-blue-500" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
+                  editProduct.sameDayDelivery ? "translate-x-6" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+
           {/* List Toggle */}
           <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg">
             <div>

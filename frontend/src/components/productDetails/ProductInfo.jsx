@@ -9,6 +9,7 @@ export default function ProductInfo({ product }) {
   const [selectedSize, setSelectedSize] = useState("Medium")
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
   const [isWishlisted, setIsWishlisted] = useState(false)
+  const [showFullDescription, setShowFullDescription] = useState(false)
   const { addToCart, isLoggedIn } = useCart()
   const navigate = useNavigate()
 
@@ -117,11 +118,22 @@ export default function ProductInfo({ product }) {
         <p className="text-xs text-gray-400">Out of Stock</p>
       )}
 
-      {/* Description */}
+      {/* Description with Show More/Less */}
       {product.description && (
-        <p className="text-[#3e4026]/70 leading-relaxed">
-          {product.description}
-        </p>
+        <div>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-2">Description</p>
+          <p className={`text-[#3e4026]/70 leading-relaxed ${!showFullDescription && product.description.length > 100 ? 'line-clamp-2' : ''}`}>
+            {product.description}
+          </p>
+          {product.description.length > 100 && (
+            <button
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="text-[#3e4026] text-sm font-medium mt-2 hover:underline cursor-pointer"
+            >
+              {showFullDescription ? 'Show Less' : 'Show More'}
+            </button>
+          )}
+        </div>
       )}
 
       {/* Divider */}
@@ -194,29 +206,62 @@ export default function ProductInfo({ product }) {
       <button 
         onClick={handleBuyNow}
         disabled={!product.stock || product.stock === 0}
-        className="w-full border border-[#3e4026] text-[#3e4026] py-4 text-sm font-medium hover:bg-[#3e4026] hover:text-white transition-colors disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        className="w-full border border-[#3e4026] text-[#3e4026] py-4 text-sm font-medium rounded-sm hover:bg-[#3e4026] hover:text-white transition-colors disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         Buy Now
       </button>
 
-      {/* Product Details */}
-      <div className="border-t border-gray-200 pt-6 mt-6 space-y-4">
-        <p className="text-[10px] tracking-[0.3em] uppercase text-[#3e4026]/60">Details</p>
-        <div className="space-y-2 text-sm text-[#3e4026]/70">
-          <div className="flex justify-between">
-            <span>Product ID</span>
-            <span className="text-[#3e4026]">{product.product_id}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Category</span>
-            <span className="text-[#3e4026]">{product.category}</span>
-          </div>
-          {product.subcategory && (
-            <div className="flex justify-between">
-              <span>Subcategory</span>
-              <span className="text-[#3e4026]">{product.subcategory}</span>
+      {/* Product Highlights */}
+      <div className="border-t border-gray-200 pt-6 mt-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
             </div>
-          )}
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">Free Delivery</p>
+              <p className="text-[10px] text-[#3e4026]/60">Orders above ₹999</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">
+                {product.same_day_delivery ? "Same Day Delivery" : "Standard Delivery"}
+              </p>
+              <p className="text-[10px] text-[#3e4026]/60">
+                {product.same_day_delivery ? "Order before 2 PM" : "2-3 business days"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">Fresh Guarantee</p>
+              <p className="text-[10px] text-[#3e4026]/60">7-day freshness</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-[#3e4026]">Hand Crafted</p>
+              <p className="text-[10px] text-[#3e4026]/60">By expert florists</p>
+            </div>
+          </div>
         </div>
       </div>
 

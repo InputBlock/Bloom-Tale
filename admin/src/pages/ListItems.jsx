@@ -30,7 +30,8 @@ export default function ListItems() {
         category: product.category,
         price: product.price.toString(),
         stock: product.stock,
-        isListed: product.isActive
+        isListed: product.isActive,
+        sameDayDelivery: product.sameDayDelivery || false
       }))
       
       setProducts(transformedProducts)
@@ -139,7 +140,8 @@ export default function ListItems() {
           name: updatedProduct.name,
           category: updatedProduct.category,
           price: updatedProduct.price,
-          stock: updatedProduct.stock
+          stock: updatedProduct.stock,
+          same_day_delivery: updatedProduct.sameDayDelivery
         },
         {
           headers: {
@@ -200,6 +202,7 @@ export default function ListItems() {
                 <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Category</th>
                 <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Price</th>
                 <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Stock</th>
+                <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Same Day</th>
                 <th className="text-left py-4 px-6 font-semibold text-gray-900 text-sm">Status</th>
                 <th className="text-center py-4 px-6 font-semibold text-gray-900 text-sm">Actions</th>
               </tr>
@@ -223,6 +226,15 @@ export default function ListItems() {
                       {product.stock} items
                       <Plus size={12} />
                     </button>
+                  </td>
+                  <td className="py-4 px-6">
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${
+                      product.sameDayDelivery
+                        ? "bg-blue-100 text-blue-700 border border-blue-200"
+                        : "bg-gray-100 text-gray-500 border border-gray-200"
+                    }`}>
+                      {product.sameDayDelivery ? "Yes" : "No"}
+                    </span>
                   </td>
                   <td className="py-4 px-6">
                     <button

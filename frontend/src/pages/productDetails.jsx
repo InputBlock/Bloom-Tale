@@ -52,24 +52,25 @@ export default function ProductDetailsPage() {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="h-4 bg-gray-100 rounded w-48 mb-8"></div>
+        <main className="max-w-7xl mx-auto px-6 md:px-12 py-12">
+          <div className="h-4 bg-gray-100 w-48 mb-12"></div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="aspect-square bg-gray-100 rounded-lg animate-pulse"></div>
+            <div className="aspect-[3/4] bg-[#f9f8f6] animate-pulse"></div>
             
             <div className="space-y-6">
-              <div className="h-8 bg-gray-100 rounded w-3/4 animate-pulse"></div>
-              <div className="h-6 bg-gray-100 rounded w-1/3 animate-pulse"></div>
-              <div className="h-4 bg-gray-100 rounded w-full animate-pulse"></div>
-              <div className="h-4 bg-gray-100 rounded w-5/6 animate-pulse"></div>
+              <div className="h-4 bg-gray-100 w-24"></div>
+              <div className="h-10 bg-gray-100 w-3/4"></div>
+              <div className="h-6 bg-gray-100 w-1/3"></div>
+              <div className="h-4 bg-gray-100 w-full"></div>
+              <div className="h-4 bg-gray-100 w-5/6"></div>
               <div className="flex gap-3 pt-4">
-                <div className="h-12 bg-gray-100 rounded w-24 animate-pulse"></div>
-                <div className="h-12 bg-gray-100 rounded w-24 animate-pulse"></div>
-                <div className="h-12 bg-gray-100 rounded w-24 animate-pulse"></div>
+                <div className="h-12 bg-gray-100 w-24"></div>
+                <div className="h-12 bg-gray-100 w-24"></div>
+                <div className="h-12 bg-gray-100 w-24"></div>
               </div>
-              <div className="h-12 bg-gray-100 rounded-md w-full animate-pulse"></div>
-              <div className="h-12 bg-gray-100 rounded-md w-full animate-pulse"></div>
+              <div className="h-14 bg-gray-100 w-full"></div>
+              <div className="h-14 bg-gray-100 w-full"></div>
             </div>
           </div>
         </main>
@@ -82,17 +83,23 @@ export default function ProductDetailsPage() {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <main className="max-w-7xl mx-auto px-6 md:px-12 py-20">
           <div className="text-center">
-            <h2 className="text-xl font-medium text-gray-900 mb-3">
+            <p className="text-[11px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-4">
+              Error
+            </p>
+            <h2 
+              className="text-3xl md:text-4xl text-[#3e4026] mb-4"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
               {error || 'Product not found'}
             </h2>
-            <p className="text-gray-500 mb-6">
+            <p className="text-[#3e4026]/60 mb-8">
               We couldn't find the product you're looking for.
             </p>
             <Link 
               to="/home" 
-              className="inline-block bg-gray-900 text-white font-medium py-3 px-8 rounded-md hover:bg-gray-800 transition-colors"
+              className="inline-block bg-[#3e4026] text-white py-4 px-8 hover:bg-[#2d2f1c] transition-colors"
             >
               Back to Shop
             </Link>
@@ -107,29 +114,29 @@ export default function ProductDetailsPage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+      <main className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-12">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-          <Link to="/home" className="hover:text-gray-900 transition-colors">
+        <nav className="flex items-center gap-2 text-sm text-[#3e4026]/60 mb-8 md:mb-12">
+          <Link to="/home" className="hover:text-[#3e4026] transition-colors">
             Home
           </Link>
           <ChevronRight size={14} />
           {product.category && (
             <>
               <Link 
-                to={`/home?category=${product.category}`}
-                className="hover:text-gray-900 transition-colors"
+                to={`/shop?category=${product.category}`}
+                className="hover:text-[#3e4026] transition-colors"
               >
                 {product.category}
               </Link>
               <ChevronRight size={14} />
             </>
           )}
-          <span className="text-gray-900">{product.name}</span>
+          <span className="text-[#3e4026]">{product.name}</span>
         </nav>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           <div className="lg:sticky lg:top-24 lg:self-start">
             <ProductImages product={product} />
           </div>
