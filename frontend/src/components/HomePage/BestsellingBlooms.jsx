@@ -198,7 +198,7 @@ export default function BestsellingBlooms() {
                   {/* Stock Status */}
                   {product.stock && product.stock > 0 ? (
                     <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+                      <span className="w-1.5 h-1.5 bg-green-600"></span>
                       In Stock
                     </p>
                   ) : (

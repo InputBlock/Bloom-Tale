@@ -26,19 +26,19 @@ export default function AboutSection() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4">
                 <img
-                  src="/colorful-flowers-arrangement.jpg"
+                  src="/1.png"
                   alt="Colorful flower arrangement"
                   className="w-full h-64 object-cover"
                 />
                 <img
-                  src="/purple-flowers-birthday.jpg"
+                  src="/5.png"
                   alt="Purple flowers"
                   className="w-full h-48 object-cover"
                 />
               </div>
               <div className="pt-8">
                 <img
-                  src="/red-roses-bouquet.png"
+                  src="/4.png"
                   alt="Red roses bouquet"
                   className="w-full h-80 object-cover"
                 />

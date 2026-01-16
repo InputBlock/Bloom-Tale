@@ -78,7 +78,7 @@ export default function ProductInfo({ product }) {
     <div className="space-y-6">
       {/* Category */}
       {product.category && (
-        <p className="text-[10px] tracking-[0.3em] uppercase text-[#3e4026]/60">
+        <p className="text-[11px] tracking-[0.3em] uppercase text-[#3e4026]/70 font-medium">
           {product.category}
         </p>
       )}
@@ -111,7 +111,7 @@ export default function ProductInfo({ product }) {
       {/* Stock Status */}
       {product.stock && product.stock > 0 ? (
         <p className="text-xs text-green-600 flex items-center gap-1">
-          <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+          <span className="w-1.5 h-1.5 bg-green-600"></span>
           In Stock {product.stock <= 10 && `• Only ${product.stock} left`}
         </p>
       ) : (
@@ -206,7 +206,7 @@ export default function ProductInfo({ product }) {
       <button 
         onClick={handleBuyNow}
         disabled={!product.stock || product.stock === 0}
-        className="w-full border border-[#3e4026] text-[#3e4026] py-4 text-sm font-medium rounded-sm hover:bg-[#3e4026] hover:text-white transition-colors disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        className="w-full border border-[#3e4026] text-[#3e4026] py-4 text-sm font-medium hover:bg-[#3e4026] hover:text-white transition-colors disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         Buy Now
       </button>
@@ -215,7 +215,7 @@ export default function ProductInfo({ product }) {
       <div className="border-t border-gray-200 pt-6 mt-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#f9f8f6] flex items-center justify-center">
               <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
               </svg>
@@ -226,7 +226,7 @@ export default function ProductInfo({ product }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#f9f8f6] flex items-center justify-center">
               <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -241,7 +241,7 @@ export default function ProductInfo({ product }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#f9f8f6] flex items-center justify-center">
               <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
@@ -252,7 +252,7 @@ export default function ProductInfo({ product }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#f9f8f6] flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#f9f8f6] flex items-center justify-center">
               <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>

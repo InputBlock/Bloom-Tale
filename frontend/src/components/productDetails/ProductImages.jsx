@@ -29,7 +29,7 @@ export default function ProductImages({ product }) {
               <button
                 key={index}
                 onClick={() => setSelectedIndex(index)}
-                className={`w-[95px] h-[95px] rounded-md overflow-hidden transition-all ${
+                className={`w-[95px] h-[95px] overflow-hidden transition-all ${
                   selectedIndex === index 
                     ? "opacity-100 ring-2 ring-[#3e4026]/30" 
                     : "opacity-50 hover:opacity-100"
@@ -48,7 +48,7 @@ export default function ProductImages({ product }) {
         {/* Main Image */}
         <div className="relative group flex-1">
           <div 
-            className="relative w-full aspect-[3/4] md:aspect-square bg-[#f9f8f6] rounded-lg overflow-hidden cursor-pointer"
+            className="relative w-full aspect-[3/4] md:aspect-square bg-[#f9f8f6] overflow-hidden cursor-pointer"
             onClick={() => hasImages && setIsZoomed(true)}
           >
             {hasImages ? (
@@ -64,14 +64,14 @@ export default function ProductImages({ product }) {
                   <>
                     <button
                       onClick={(e) => { e.stopPropagation(); handlePrev() }}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white shadow-md"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white shadow-md"
                       aria-label="Previous image"
                     >
                       <ChevronLeft size={18} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleNext() }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white shadow-md"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#3e4026] hover:text-white shadow-md"
                       aria-label="Next image"
                     >
                       <ChevronRight size={18} />
@@ -81,7 +81,7 @@ export default function ProductImages({ product }) {
 
                 {/* Image Counter */}
                 {images.length > 1 && (
-                  <div className="absolute bottom-3 left-3 text-[10px] tracking-widest uppercase bg-white/90 rounded-full px-3 py-1.5 text-[#3e4026] shadow-sm">
+                  <div className="absolute bottom-3 left-3 text-[10px] tracking-widest uppercase bg-white/90 px-3 py-1.5 text-[#3e4026] shadow-sm">
                     {selectedIndex + 1} / {images.length}
                   </div>
                 )}
@@ -102,7 +102,7 @@ export default function ProductImages({ product }) {
             <button
               key={index}
               onClick={() => setSelectedIndex(index)}
-              className={`w-16 h-16 rounded-md overflow-hidden transition-all border-2 flex-shrink-0 ${
+              className={`w-16 h-16 overflow-hidden transition-all border-2 flex-shrink-0 ${
                 selectedIndex === index 
                   ? "border-[#3e4026] opacity-100" 
                   : "border-transparent opacity-60 hover:opacity-100"
@@ -126,7 +126,7 @@ export default function ProductImages({ product }) {
         >
           <button
             onClick={() => setIsZoomed(false)}
-            className="absolute top-6 right-6 w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-[#3e4026] hover:text-white transition-colors"
+            className="absolute top-6 right-6 w-12 h-12 bg-white flex items-center justify-center hover:bg-[#3e4026] hover:text-white transition-colors"
             aria-label="Close"
           >
             <X size={20} />
@@ -136,14 +136,14 @@ export default function ProductImages({ product }) {
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); handlePrev() }}
-                className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-[#3e4026] hover:text-white transition-colors"
+                className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white flex items-center justify-center hover:bg-[#3e4026] hover:text-white transition-colors"
                 aria-label="Previous"
               >
                 <ChevronLeft size={24} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); handleNext() }}
-                className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-[#3e4026] hover:text-white transition-colors"
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white flex items-center justify-center hover:bg-[#3e4026] hover:text-white transition-colors"
                 aria-label="Next"
               >
                 <ChevronRight size={24} />
