@@ -138,3 +138,4 @@ export async function getVerifiedGoogleProfile(code) {
   const payload = await verifyIdToken(idToken);
   return payload;
 }
+

@@ -457,7 +457,7 @@ export default function FlowerRegister() {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "/api/v1/auth/google";
+    window.location.href = "/api/v1/google";
   };
 
   return (

@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
 
 export default function ProductForm({ images, setImages }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    type: "Rose",
-    color: "Red",
-    price: "",
-    quantities: [],
+    type: "Same Day Delivery",
+    pricing: {
+      small: "",
+      medium: "",
+      large: ""
+    },
     inStock: true,
     sameDayDelivery: false,
   })
@@ -26,16 +28,16 @@ export default function ProductForm({ images, setImages }) {
     }
   }, [message])
 
-  const quantities = [6, 12, 24, 36, 50]
-
-  const toggleQuantity = (qty) => {
-    setFormData(prev => ({
-      ...prev,
-      quantities: prev.quantities.includes(qty)
-        ? prev.quantities.filter(q => q !== qty)
-        : [...prev.quantities, qty]
-    }))
-  }
+  const categories = [
+    "Same Day Delivery",
+    "Birthday",
+    "Anniversary",
+    "Forever Flowers",
+    "Fragrances",
+    "Premium",
+    "Corporate",
+    "Combos"
+  ]
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -50,9 +52,7 @@ export default function ProductForm({ images, setImages }) {
       formDataToSend.append("name", formData.name)
       formDataToSend.append("description", formData.description)
       formDataToSend.append("category", formData.type)
-      formDataToSend.append("subcategory", formData.color)
-      formDataToSend.append("price", formData.price)
-      formDataToSend.append("sizes", JSON.stringify(formData.quantities))
+      formDataToSend.append("pricing", JSON.stringify(formData.pricing))
       formDataToSend.append("stock", formData.inStock ? 100 : 0)
       formDataToSend.append("same_day_delivery", formData.sameDayDelivery)
       
@@ -61,7 +61,7 @@ export default function ProductForm({ images, setImages }) {
         formDataToSend.append("image", images[0].file)
       }
 
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8000/api/v1/admin/add",
         formDataToSend,
         {
@@ -77,10 +77,12 @@ export default function ProductForm({ images, setImages }) {
       setFormData({
         name: "",
         description: "",
-        type: "Rose",
-        color: "Red",
-        price: "",
-        quantities: [],
+        type: "Same Day Delivery",
+        pricing: {
+          small: "",
+          medium: "",
+          large: ""
+        },
         inStock: true,
         sameDayDelivery: false,
       })
@@ -198,72 +200,82 @@ export default function ProductForm({ images, setImages }) {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-gray-900 font-medium mb-2">Category</label>
-          <select
-            value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-          >
-            <option>Rose</option>
-            <option>Tulip</option>
-            <option>Sunflower</option>
-            <option>Lily</option>
-            <option>Orchid</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-gray-900 font-medium mb-2">sub category</label>
-          <select
-            value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-          >
-            <option>Red</option>
-            <option>White</option>
-            <option>Pink</option>
-            <option>Yellow</option>
-            <option>Purple</option>
-            <option>Mixed</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-gray-900 font-medium mb-2">Price</label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-            <input
-              type="number"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              placeholder="0.00"
-              step="0.01"
-              className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
-          </div>
-        </div>
+      <div>
+        <label className="block text-gray-900 font-medium mb-2">Category</label>
+        <select
+          value={formData.type}
+          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+        >
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>
-        <label className="block text-gray-900 font-medium mb-3">Quantity Options (stems)</label>
-        <div className="flex flex-wrap gap-3">
-          {quantities.map((qty) => (
-            <button
-              key={qty}
-              type="button"
-              onClick={() => toggleQuantity(qty)}
-              className={`px-6 py-3 rounded-full border-2 transition ${
-                formData.quantities.includes(qty)
-                  ? "border-black bg-black text-white"
-                  : "border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400"
-              }`}
-            >
-              {qty}
-            </button>
-          ))}
+        <label className="block text-gray-900 font-medium mb-3">Pricing by Size</label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Small Size */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Small</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="number"
+                value={formData.pricing.small}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  pricing: { ...formData.pricing, small: e.target.value }
+                })}
+                placeholder="0.00"
+                step="0.01"
+                className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+              />
+            </div>
+          </div>
+
+          {/* Medium Size */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Medium</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="number"
+                value={formData.pricing.medium}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  pricing: { ...formData.pricing, medium: e.target.value }
+                })}
+                placeholder="0.00"
+                step="0.01"
+                className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+              />
+            </div>
+          </div>
+
+          {/* Large Size */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Large</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="number"
+                value={formData.pricing.large}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  pricing: { ...formData.pricing, large: e.target.value }
+                })}
+                placeholder="0.00"
+                step="0.01"
+                className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+              />
+            </div>
+          </div>
         </div>
+        <p className="mt-2 text-sm text-gray-500">Set different prices for small, medium, and large arrangements</p>
       </div>
 
       <div className="flex flex-col gap-3">

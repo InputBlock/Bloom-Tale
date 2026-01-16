@@ -266,6 +266,7 @@ export const loginUser = asyncHandler(async (req, res) => {
             email: user.email,
             username: user.username,
           },
+          accessToken,
         },
         "Login successful"
       )
