@@ -79,9 +79,9 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
   order.paymentMethod = paymentMethod;
 
   // If COD → directly mark PAID
-  if (paymentMethod === "COD") {
-    order.status = "PAID";
-  }
+  // if (paymentMethod === "COD") {
+  //   order.status = "PAID";
+  // }
 
   await order.save();
 
