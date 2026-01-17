@@ -50,6 +50,9 @@ app.use("/api/v1/order", orderRoutes)
 import testimonialRoutes from "./route/testimonial.route.js"
 app.use("/api/v1/testimonial", testimonialRoutes)
 
+import enquiry from "./route/enquiryForm.route.js"
+app.use("/api/v1/enquiry",enquiry)
+
 // Global error handler - MUST be after all routes
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

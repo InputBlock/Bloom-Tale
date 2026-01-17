@@ -58,8 +58,8 @@ export const createOrder = asyncHandler(async (req, res) => {
     paymentMethod: null,
   });
 
-  // 🧹 Clear cart
-  await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+  // // 🧹 Clear cart
+  // await Cart.findOneAndUpdate({ user: userId }, { items: [] });
 
   return res
     .status(201)
@@ -111,6 +111,9 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
 
   await order.save();
 
+   // 🧹 Clear cart
+  await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+  
   return res
     .status(200)
     .json(new ApiResponse(200, order, "Payment method updated successfully"));
