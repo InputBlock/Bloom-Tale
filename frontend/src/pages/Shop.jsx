@@ -17,6 +17,7 @@ export default function Shop() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [sortBy, setSortBy] = useState('featured')
   const [hoveredId, setHoveredId] = useState(null)
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
@@ -33,7 +34,13 @@ export default function Shop() {
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [])
+    // Update searchQuery from URL params
+    const search = searchParams.get('search')
+    if (search) {
+      setSearchQuery(search)
+      setSelectedCategory('all') // Reset category when searching
+    }
+  }, [searchParams])
 
   // Categories - matching SubHeader categories
   const categories = [
@@ -58,9 +65,44 @@ export default function Shop() {
 
   // Get page title based on selected category
   const getPageTitle = () => {
+    if (searchQuery) return `SEARCH RESULTS FOR "${searchQuery.toUpperCase()}"`
     if (selectedCategory === 'all') return 'LUXURY FLOWER DELIVERY'
     const category = categories.find(c => c.id === selectedCategory)
     return category ? category.name.toUpperCase() : 'LUXURY FLOWER DELIVERY'
+  }
+
+  // Smart search filter function
+  const filterBySearch = (products, query) => {
+    if (!query) return products
+
+    const queryLower = query.toLowerCase()
+    let filtered = products
+
+    // Extract price from query (e.g., "under 500", "below 1000")
+    const priceMatch = queryLower.match(/(under|below|less than)\s*(\d+)/)
+    const maxPrice = priceMatch ? parseInt(priceMatch[2]) : null
+
+    // Filter products
+    filtered = products.filter(product => {
+      // Name match
+      const nameMatch = product.name?.toLowerCase().includes(queryLower)
+      
+      // Description match
+      const descMatch = product.description?.toLowerCase().includes(queryLower)
+      
+      // Category match
+      const categoryMatch = product.category?.toLowerCase().includes(queryLower)
+      
+      // Price filter if specified
+      if (maxPrice) {
+        const productPrice = product.pricing?.small || product.pricing?.medium || product.pricing?.large || 0
+        return (nameMatch || descMatch || categoryMatch) && productPrice <= maxPrice
+      }
+      
+      return nameMatch || descMatch || categoryMatch
+    })
+
+    return filtered
   }
 
   // Fetch products
@@ -85,17 +127,22 @@ export default function Shop() {
         if (data.success && data.data) {
           let sortedProducts = [...data.data]
           
-          // Filter by category if needed
-          if (selectedCategory !== 'all') {
-            if (selectedCategory === 'same-day-delivery') {
-              // Filter by same_day_delivery flag
-              sortedProducts = sortedProducts.filter(p => p.same_day_delivery === true)
-            } else {
-              // Filter by category name (convert id to match backend format)
-              const categoryName = selectedCategory.replace(/-/g, ' ')
-              sortedProducts = sortedProducts.filter(p => 
-                p.category?.toLowerCase() === categoryName.toLowerCase()
-              )
+          // Apply search filter first if search query exists
+          if (searchQuery) {
+            sortedProducts = filterBySearch(sortedProducts, searchQuery)
+          } else {
+            // Filter by category if no search query
+            if (selectedCategory !== 'all') {
+              if (selectedCategory === 'same-day-delivery') {
+                // Filter by same_day_delivery flag
+                sortedProducts = sortedProducts.filter(p => p.same_day_delivery === true)
+              } else {
+                // Filter by category name (convert id to match backend format)
+                const categoryName = selectedCategory.replace(/-/g, ' ')
+                sortedProducts = sortedProducts.filter(p => 
+                  p.category?.toLowerCase() === categoryName.toLowerCase()
+                )
+              }
             }
           }
           
@@ -128,7 +175,7 @@ export default function Shop() {
     }
 
     fetchProducts()
-  }, [selectedCategory, sortBy])
+  }, [selectedCategory, sortBy, searchQuery])
 
   // Update URL when category changes
   useEffect(() => {
@@ -174,8 +221,23 @@ export default function Shop() {
           <nav className="flex items-center gap-2 text-[11px] tracking-[0.12em] text-[#9a9a9a]">
             <Link to="/home" className="hover:text-[#3e4026] transition-colors">HOME</Link>
             <ChevronRight size={10} className="text-[#c4c4c4]" />
-            <span className="text-[#3e4026]">CATEGORIES</span>
+            <span className="text-[#3e4026]">{searchQuery ? 'SEARCH' : 'CATEGORIES'}</span>
           </nav>
+          
+          {/* Search Results Info */}
+          {searchQuery && (
+            <div className="mt-4 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200">
+              <p className="text-sm text-gray-600">
+                Showing <span className="font-semibold text-[#3e4026]">{products.length}</span> results for 
+                <span className="font-semibold text-[#3e4026]"> "{searchQuery}"</span>
+              </p>
+              {products.length === 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Try searching with different keywords or <button onClick={() => { setSearchQuery(''); navigate('/shop'); }} className="text-[#3e4026] underline">browse all products</button>
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Page Title */}
