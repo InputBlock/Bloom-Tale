@@ -11,6 +11,7 @@ export default function Checkout() {
   const [currentStep, setCurrentStep] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState("upi")
   const [orderId, setOrderId] = useState(null)
+  const [orderDetails, setOrderDetails] = useState(null)
   
   const [formData, setFormData] = useState({
     saveAddress: false,
@@ -39,8 +40,27 @@ export default function Checkout() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleDeliverySubmit = (orderId) => {
+  const handleDeliverySubmit = async (orderId) => {
     setOrderId(orderId)
+    
+    // Fetch order details
+    try {
+      const token = localStorage.getItem("token")
+      const response = await fetch(`/api/v1/order/${orderId}/orderSummary`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setOrderDetails(data.data)
+      }
+    } catch (error) {
+      console.error("Error fetching order details:", error)
+    }
+    
     setCurrentStep(2)
   }
 
@@ -111,6 +131,7 @@ export default function Checkout() {
               {currentStep === 2 && (
                 <OrderSummary
                   formData={formData}
+                  orderDetails={orderDetails}
                   onBack={() => setCurrentStep(1)}
                   onNext={() => setCurrentStep(3)}
                 />
@@ -120,6 +141,7 @@ export default function Checkout() {
                 <Payment
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
+                  orderDetails={orderDetails}
                   onBack={() => setCurrentStep(2)}
                   orderId={orderId}
                 />

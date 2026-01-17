@@ -105,20 +105,30 @@ export const razorpayWebhook = async (req, res) => {
     return res.status(400).json({ message: "Invalid signature" });
   }
 
+  const event = req.body.event;
   const payment = req.body.payload.payment.entity;
 
   const order = await Order.findOne({
     "paymentInfo.orderId": payment.order_id,
   });
 
-  if (!order || order.status === "PAID") {
+  if (!order) {
     return res.json({ ok: true });
   }
 
-  order.status = "PAID";
-  order.paymentInfo.paymentId = payment.id;
+  // Handle payment success
+  if (event === "payment.captured" && order.status !== "PAID") {
+    order.status = "PAID";
+    order.paymentInfo.paymentId = payment.id;
+    await order.save();
+  }
 
-  await order.save();
+  // Handle payment failure
+  if (event === "payment.failed" && order.status !== "PAID") {
+    order.status = "PAYMENT_FAILED";
+    order.paymentInfo.paymentId = payment.id;
+    await order.save();
+  }
 
   res.json({ ok: true });
 };
