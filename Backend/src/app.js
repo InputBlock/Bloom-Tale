@@ -2,7 +2,6 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { generalLimiter, authLimiter, cartLimiter, orderLimiter } from "./middlewares/rateLimiter.middleware.js"
 
 const app = express()
 
@@ -13,7 +12,7 @@ app.use(cors({
 }))
 
 //  Apply general rate limiting to all requests
-app.use(generalLimiter)
+// app.use(generalLimiter)
 
 app.use(express.json({limit:"16kb"}))  //we accept json data
 // app.use(express.urlencoded())       data is from url's
@@ -29,7 +28,7 @@ import authRoutes from "./route/auth.route.js"
 import adminRoutes from "./route/admin.route.js"
 
 // Apply strict auth rate limiting to login/register routes
-app.use("/api/v1", authLimiter, authRoutes);
+app.use("/api/v1", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 
 
@@ -38,7 +37,7 @@ app.use("/api/v1/getProductDetail",productRoutes)
 
 import cartRoutes from "./route/cart.route.js"
 //  Apply cart rate limiting
-app.use("/api/v1/cart", cartLimiter, cartRoutes)
+app.use("/api/v1/cart", cartRoutes)
 
 import getProductRoutes from "./route/getProduct.route.js"
 app.use("/api/v1/getProduct",getProductRoutes)
@@ -46,7 +45,7 @@ app.use("/api/v1/getList", getProductRoutes)
 
 import orderRoutes from "./route/order.route.js"
 //  Apply order rate limiting
-app.use("/api/v1/order", orderLimiter, orderRoutes)
+app.use("/api/v1/order", orderRoutes)
 
 // Global error handler - MUST be after all routes
 app.use((err, req, res, next) => {
