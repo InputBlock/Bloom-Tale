@@ -212,11 +212,12 @@ export default function Header() {
                 onChange={handleSearchInputChange}
                 onFocus={() => searchQuery.trim() && setShowSearchSuggestions(true)}
                 placeholder="Search flowers, arrangements, occasions..."
-                className={`w-full px-4 py-2.5 pr-12 rounded-full border transition-all duration-300 ${
+                className={`w-full px-4 py-2.5 pr-12 rounded-full border transition-colors duration-300 ${
                   scrolled || !isHomePage 
-                    ? "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-gray-200" 
-                    : "bg-white/10 border-white/30 text-white placeholder-white/70 focus:bg-white/20 focus:border-white/50"
-                } focus:outline-none`}
+                    ? "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 focus:border-gray-200" 
+                    : "bg-white/10 border-white/30 text-white placeholder-white/70 focus:border-white/30"
+                } focus:outline-none focus:ring-0 focus:shadow-none focus:rounded-full`}
+                style={{ boxShadow: 'none !important', outline: 'none !important', borderRadius: '9999px !important' }}
               />
               <button
                 type="submit"
