@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { Search, Edit2, Trash2 } from "lucide-react"
 import EditProductModal from "../components/ListItems/EditProductModal"
-import StatusToggleModal from "../components/ListItems/StatusToggleModal"
 import axios from "axios"
 
 export default function ListItems() {
@@ -10,8 +9,6 @@ export default function ListItems() {
   const [loading, setLoading] = useState(true)
   const [editModal, setEditModal] = useState(false)
   const [editProduct, setEditProduct] = useState(null)
-  const [statusModal, setStatusModal] = useState(false)
-  const [statusProduct, setStatusProduct] = useState(null)
 
   // Fetch products from backend
   useEffect(() => {
@@ -53,34 +50,43 @@ export default function ListItems() {
       setProducts(products.filter((p) => p.id !== id))
     }
   }
-
-  const openStatusModal = (id) => {
-    const product = products.find(p => p.id === id)
-    setStatusProduct(product)
-    setStatusModal(true)
-  }
-
-  const closeStatusModal = () => {
-    setStatusModal(false)
-    setStatusProduct(null)
-  }
-
-  const confirmToggleListing = async () => {
-    if (!statusProduct) return
-
-    if (!statusProduct.isListed && statusProduct.stock === 0) {
-      return
+  const handleUpdateStock = async (id) => {
+    const newStock = prompt("Enter new stock quantity:")
+    if (newStock !== null && !isNaN(newStock)) {
+      const stockValue = parseInt(newStock)
+      try {
+        const token = localStorage.getItem("adminToken")
+        await axios.post(
+          "/api/v1/admin/update",
+          { 
+            id: id,
+            stock: stockValue
+          },
+          {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }
+        )
+        setProducts(products.map((p) => 
+          p.id === id ? { ...p, stock: stockValue, isListed: stockValue > 0 ? p.isListed : false } : p
+        ))
+      } catch (error) {
+        console.error("Error updating stock:", error)
+      }
     }
-
+  }
+  const handleToggleStatus = async (id, currentStatus) => {
     try {
       const token = localStorage.getItem("adminToken")
-      const endpoint = statusProduct.isListed
+      const endpoint = currentStatus
         ? "http://localhost:8000/api/v1/admin/unlist"
         : "http://localhost:8000/api/v1/admin/list"
 
       await axios.post(
         endpoint,
-        { id: statusProduct.id },
+        { id: id },
         {
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -90,10 +96,10 @@ export default function ListItems() {
       )
 
       setProducts(products.map((p) =>
-        p.id === statusProduct.id ? { ...p, isListed: !p.isListed } : p
+        p.id === id ? { ...p, isListed: !currentStatus } : p
       ))
     } catch (error) {
-      console.error("Error toggling listing:", error)
+      console.error("Error toggling status:", error)
     }
   }
 
@@ -189,9 +195,9 @@ export default function ListItems() {
                         <span className="text-gray-900 font-medium">{product.name}</span>
                       </td>
                       <td className="py-4 px-6 text-gray-600 text-sm">{product.category}</td>
-                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">${product.pricing?.small || 0}</td>
-                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">${product.pricing?.medium || 0}</td>
-                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">${product.pricing?.large || 0}</td>
+                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">₹{product.pricing?.small || 0}</td>
+                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">₹{product.pricing?.medium || 0}</td>
+                      <td className="py-4 px-4 text-center text-gray-900 font-semibold">₹{product.pricing?.large || 0}</td>
                       <td className="py-4 px-6">
                         <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${product.sameDayDelivery
                             ? "bg-blue-100 text-blue-700 border border-blue-200"
@@ -201,15 +207,15 @@ export default function ListItems() {
                         </span>
                       </td>
                       <td className="py-4 px-6">
-                        <button
-                          onClick={() => openStatusModal(product.id)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${product.isListed
-                              ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
-                              : "bg-red-100 text-red-600 border-red-200 hover:bg-red-200"
-                            }`}
-                        >
-                          {product.isListed ? "Active" : "Inactive"}
-                        </button>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={product.isListed}
+                            onChange={() => handleToggleStatus(product.id, product.isListed)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center justify-center gap-3">
@@ -251,14 +257,6 @@ export default function ListItems() {
         isOpen={editModal}
         onClose={handleCloseModal}
         onSave={handleSaveEdit}
-      />
-
-      {/* Status Toggle Modal */}
-      <StatusToggleModal
-        product={statusProduct}
-        isOpen={statusModal}
-        onClose={closeStatusModal}
-        onConfirm={confirmToggleListing}
       />
     </div>
   )

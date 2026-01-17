@@ -193,7 +193,7 @@ export default function BestsellingBlooms() {
                   >
                     {product.name}
                   </h3>
-                  <p className="text-lg font-light text-[#3e4026]">₹{product.price}</p>
+                  <p className="text-lg font-light text-[#3e4026]">₹{product.pricing?.medium || product.price || 0}</p>
                   
                   {/* Stock Status */}
                   {product.stock && product.stock > 0 ? (

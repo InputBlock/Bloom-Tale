@@ -14,12 +14,17 @@ const generateOrderId = () => {
 
 export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { address} = req.body;
+  const { address } = req.body;
+
+  const user = await User.findById(userId)
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
 
   if (!address) {
     throw new ApiError(400, "Delivery address is required");
   }
-
 
   const cart = await Cart.findOne({ user: userId });
   if (!cart || cart.items.length === 0) {
@@ -32,11 +37,10 @@ export const createOrder = asyncHandler(async (req, res) => {
     totalAmount += item.price * item.quantity;
   });
 
-  // 💾 Save address to user if required
-
-  await User.findByIdAndUpdate(userId, {
-    $push: { addresses: address },
+ await User.findByIdAndUpdate(userId, {
+    $set: { addresses: [address] }
   });
+
 
   // 📦 Create order (CART → ORDER snapshot)
   const order = await Order.create({
@@ -60,6 +64,20 @@ export const createOrder = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(201, order, "Order created successfully"));
+});
+
+export const getMyAddresses = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId).select("addresses");
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user.addresses || [], "Addresses fetched"));
 });
 
 export const updatePaymentMethod = asyncHandler(async (req, res) => {
@@ -87,41 +105,31 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
   order.paymentMethod = paymentMethod;
 
   // If COD → directly mark PAID
-  if (paymentMethod === "COD") {
-    order.status = "PAID";
-  }
+  // if (paymentMethod === "COD") {
+  //   order.status = "PAID";
+  // }
 
   await order.save();
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      order,
-      "Payment method updated successfully"
-    )
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, order, "Payment method updated successfully"));
 });
 
-export const getOrderSummary = asyncHandler(async (req,res)=>{
+export const getOrderSummary = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const {orderId } = req.params;
-  
+  const { orderId } = req.params;
+
   const order = await Order.findById(orderId);
   if (!order) {
     throw new ApiError(404, "Order not found");
   }
 
-   if (order.user.toString() !== userId.toString()) {
+  if (order.user.toString() !== userId.toString()) {
     throw new ApiError(403, "You are not allowed to view this order");
   }
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      order,
-      "Order Summary Fetched successfully"
-    )
-  );
-
-}) 
+  return res
+    .status(200)
+    .json(new ApiResponse(200, order, "Order Summary Fetched successfully"));
+});
 //Razorpay => Goto util razorpay.js
-
