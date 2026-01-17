@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { LayoutDashboard, Plus, List, Package, Users, LogOut, X, Menu } from "lucide-react"
+import { LayoutDashboard, Plus, List, Package, Users, LogOut, X, Menu, FileEdit } from "lucide-react"
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation()
@@ -11,6 +11,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     { icon: List, label: "List Items", path: "/list-items" },
     { icon: Package, label: "Orders", path: "/orders" },
     { icon: Users, label: "Users", path: "/users" },
+    { icon: FileEdit, label: "Edit Content", path: "/edit-content" },
   ]
 
   const isActive = (path) => location.pathname === path

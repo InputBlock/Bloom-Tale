@@ -5,6 +5,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+// Generate unique order ID (e.g., BT-A1B2C3D4)
+const generateOrderId = () => {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${timestamp.slice(-4)}${random}`;
+};
+
 export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { address } = req.body;
@@ -37,6 +44,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   // 📦 Create order (CART → ORDER snapshot)
   const order = await Order.create({
+    order_id: generateOrderId(),
     user: userId,
     items: cart.items.map((item) => ({
       product: item.product,
