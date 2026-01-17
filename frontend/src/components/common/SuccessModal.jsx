@@ -252,7 +252,7 @@ export default function SuccessModal({ isOpen, message, type = "success", onClos
                     <motion.div
                       initial={{ width: "100%" }}
                       animate={{ width: "0%" }}
-                      transition={{ duration: 2.5, ease: "linear" }}
+                      transition={{ duration: 2, ease: "linear" }}
                       className="h-full bg-gradient-to-r from-[#f4b8c5] via-[#a8c899] to-[#f4b8c5] rounded-full"
                     />
                   </motion.div>

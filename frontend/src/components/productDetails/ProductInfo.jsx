@@ -53,11 +53,10 @@ export default function ProductInfo({ product }) {
       setModalState({ isOpen: true, message: "Product added to cart successfully!", type: "success" })
       setTimeout(() => {
         setModalState({ isOpen: false, message: "", type: "success" })
-        navigate("/cart")
       }, 1500)
     } else if (result && !result.success) {
       setModalState({ isOpen: true, message: result.message || "Failed to add product to cart", type: "error" })
-      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 3000)
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
     }
   }
 
@@ -69,7 +68,27 @@ export default function ProductInfo({ product }) {
       return
     }
 
-    await handleAddToCart()
+    if (!addToCart) {
+      console.error("addToCart function not available")
+      return
+    }
+
+    const result = await addToCart({
+      product_id: product.product_id,
+      quantity: quantity,
+      size: selectedSize.toLowerCase(),
+    })
+
+    if (result && result.success) {
+      setModalState({ isOpen: true, message: "Product added to cart successfully!", type: "success" })
+      setTimeout(() => {
+        setModalState({ isOpen: false, message: "", type: "success" })
+        navigate("/cart")
+      }, 1500)
+    } else if (result && !result.success) {
+      setModalState({ isOpen: true, message: result.message || "Failed to add product to cart", type: "error" })
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
+    }
   }
 
   if (!product) {
