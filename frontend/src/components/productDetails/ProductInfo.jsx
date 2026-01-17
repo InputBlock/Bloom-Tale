@@ -39,6 +39,7 @@ export default function ProductInfo({ product }) {
     const result = await addToCart({
       product_id: product.product_id,
       quantity: quantity,
+      size: selectedSize.toLowerCase(),
     })
 
     if (result && result.success) {
