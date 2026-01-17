@@ -1,10 +1,72 @@
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { ChevronLeft, Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, Loader2, MapPin, Edit2 } from "lucide-react"
 
 export default function DeliveryDetails({ formData, handleInputChange, onSubmit }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [savedAddresses, setSavedAddresses] = useState([])
+  const [loadingAddresses, setLoadingAddresses] = useState(true)
+  const [selectedAddressId, setSelectedAddressId] = useState(null)
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false)
+
+  // Fetch saved addresses on component mount
+  useEffect(() => {
+    const fetchSavedAddresses = async () => {
+      try {
+        const token = localStorage.getItem("token")
+        const headers = {
+          "Content-Type": "application/json",
+        }
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`
+        }
+
+        const response = await fetch("/api/v1/order/getaddress", {
+          method: "POST",
+          headers,
+          credentials: "include",
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          // Handle different response structures
+          const addresses = data.data || data.addresses || data || []
+          setSavedAddresses(Array.isArray(addresses) ? addresses : [])
+          
+          // If no saved addresses, show the form
+          if (!addresses || addresses.length === 0) {
+            setShowNewAddressForm(true)
+          }
+        } else {
+          // If no addresses or error, show the form
+          setShowNewAddressForm(true)
+        }
+      } catch (err) {
+        console.error("Error fetching addresses:", err)
+        // On error, show the form
+        setShowNewAddressForm(true)
+      } finally {
+        setLoadingAddresses(false)
+      }
+    }
+
+    fetchSavedAddresses()
+  }, [])
+
+  // Handle address selection
+  const handleAddressSelect = (address) => {
+    setSelectedAddressId(address._id)
+    // Populate form with selected address
+    handleInputChange('recipientName', address.fullName || '')
+    handleInputChange('mobileNumber', address.mobile || '')
+    handleInputChange('apartment', address.house || '')
+    handleInputChange('streetAddress', address.street || '')
+    handleInputChange('city', address.city || '')
+    handleInputChange('state', address.state || '')
+    handleInputChange('pincode', address.pincode || '')
+    handleInputChange('addressTag', address.addressTag || 'Home')
+  }
 
   const handleFormSubmit = async (e) => {
     e.preventDefault()
@@ -72,6 +134,22 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
       setLoading(false)
     }
   }
+
+  if (loadingAddresses) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center min-h-[400px]"
+      >
+        <div className="text-center">
+          <Loader2 className="animate-spin mx-auto mb-4 text-[#3e4026]" size={40} />
+          <p className="text-gray-600">Loading saved addresses...</p>
+        </div>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -94,6 +172,117 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
           <p className="text-red-600 text-sm font-medium">{error}</p>
         </div>
       )}
+
+      {/* Saved Addresses Section */}
+      {savedAddresses.length > 0 && !showNewAddressForm && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl sm:text-2xl font-semibold text-[#3e4026]">
+              Select Delivery Address
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {savedAddresses.map((address) => (
+              <motion.div
+                key={address._id}
+                whileHover={{ scale: 1.02 }}
+                onClick={() => handleAddressSelect(address)}
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  selectedAddressId === address._id
+                    ? 'border-[#3e4026] bg-[#3e4026]/5'
+                    : 'border-gray-200 hover:border-[#3e4026]/50'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <MapPin className={`mt-1 flex-shrink-0 ${
+                    selectedAddressId === address._id ? 'text-[#3e4026]' : 'text-gray-400'
+                  }`} size={20} />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-semibold text-gray-900">{address.fullName}</span>
+                      {address.addressTag && (
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                          {address.addressTag}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {address.house}, {address.street}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {address.city}, {address.state} - {address.pincode}
+                    </p>
+                    <p className="text-sm text-gray-600 font-medium">
+                      Mobile: +91 {address.mobile}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleAddressSelect(address)
+                      setShowNewAddressForm(true)
+                    }}
+                    className="text-[#3e4026] hover:text-[#5e6043] transition-colors p-2 hover:bg-gray-100 rounded"
+                    aria-label="Edit address"
+                  >
+                    <Edit2 size={18} />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {selectedAddressId && (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                handleFormSubmit(e)
+              }}
+              disabled={loading}
+              whileHover={{ scale: loading ? 1 : 1.02 }}
+              whileTap={{ scale: loading ? 1 : 0.98 }}
+              className="w-full mt-6 bg-[#3e4026] text-white py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-[#5e6043] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  <span>PROCESSING...</span>
+                </>
+              ) : (
+                "DELIVER TO THIS ADDRESS"
+              )}
+            </motion.button>
+          )}
+        </div>
+      )}
+
+      {/* New Address Form */}
+      <AnimatePresence>
+        {(showNewAddressForm || savedAddresses.length === 0) && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            {savedAddresses.length > 0 && (
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl sm:text-2xl font-semibold text-[#3e4026]">
+                  Add New Address
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setShowNewAddressForm(false)}
+                  className="text-gray-600 hover:text-[#3e4026] font-medium text-sm sm:text-base transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
 
       <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
         {/* Title and Name */}
@@ -281,6 +470,9 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
           )}
         </motion.button>
       </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
