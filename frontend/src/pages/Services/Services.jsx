@@ -3,8 +3,10 @@ import Footer from "../../components/common/Footer"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowUp, X } from "lucide-react"
 import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 
 export default function Services() {
+  const [searchParams] = useSearchParams()
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [activeTab, setActiveTab] = useState("wedding")
   const [showAll, setShowAll] = useState(false)
@@ -27,6 +29,14 @@ export default function Services() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    // Check URL parameters for tab
+    const tabParam = searchParams.get("tab")
+    if (tabParam && ["wedding", "social", "corporate"].includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     // Reset showAll when tab changes

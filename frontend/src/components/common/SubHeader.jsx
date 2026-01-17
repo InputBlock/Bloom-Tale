@@ -28,7 +28,6 @@ export default function SubHeader() {
     { name: "Premium", icon: Sparkles, path: "/shop?type=premium" },
     { name: "Corporate", icon: Building2, path: "/shop?type=corporate" },
     { name: "Combos", icon: Gift, path: "/shop?type=combo" },
-    { name: "Services", icon: Settings, path: "/services" },
   ]
 
   return (
