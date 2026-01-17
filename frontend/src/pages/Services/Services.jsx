@@ -892,37 +892,6 @@ export default function Services() {
         </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section className="py-8 md:py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-6 md:px-12 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 
-              className="text-4xl md:text-5xl text-[#3e4026] mb-6"
-              style={{ fontFamily: 'Playfair Display, serif' }}
-            >
-              Ready to Plan Your
-              <br />
-              <span className="italic">Perfect Event?</span>
-            </h2>
-            <p className="text-gray-600 text-lg mb-8">
-              Let's discuss how we can make your next event truly exceptional
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-[#3e4026] text-white px-10 py-4 text-lg font-semibold hover:bg-[#2d2f1c] transition-colors shadow-lg"
-            >
-              Contact Us Today
-            </motion.button>
-          </motion.div>
-        </div>
-      </section>
-
       <Footer />
     </div>
   )
