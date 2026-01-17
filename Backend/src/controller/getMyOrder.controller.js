@@ -16,7 +16,7 @@ export const getMyOrder = asyncHandler(async (req, res) => {
 
   // Get all orders for the user, sorted by newest first
   const orders = await order.find({ user: userId })
-    .populate('items.product', 'name image price') // Populate product details
+    .populate('items.product', 'name images_uri price') // Populate product details
     .sort({ createdAt: -1 }); // Newest orders first
 
   return res.status(200).json(new ApiResponse(

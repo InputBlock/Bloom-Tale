@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { Package, Loader2, ChevronRight, MapPin, Calendar, IndianRupee, ShoppingBag } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
 
 export default function Orders() {
+  const navigate = useNavigate()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -222,16 +224,25 @@ export default function Orders() {
                             </h4>
                           </div>
                           <div className="space-y-3">
-                            {order.items.map((item, itemIndex) => (
+                            {order.items.map((item, itemIndex) => {
+                              // Try multiple possible image sources
+                              const imageUrl = item.productImage || 
+                                             item.product?.images_uri?.[0] ||
+                                             item.product?.image || 
+                                             item.product?.images?.[0] ||
+                                             item.image ||
+                                             item.images?.[0];
+                              
+                              return (
                               <div
                                 key={itemIndex}
                                 className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
                               >
                                 <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                                  {item.product?.images?.[0] ? (
+                                  {imageUrl ? (
                                     <img 
-                                      src={item.product.images[0]} 
-                                      alt={item.product.name}
+                                      src={imageUrl} 
+                                      alt={item.productName || item.product?.name || 'Product'}
                                       className="w-full h-full object-cover"
                                     />
                                   ) : (
@@ -242,7 +253,7 @@ export default function Orders() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-gray-800 truncate">
-                                    {item.product?.name || 'Product'}
+                                    {item.productName || item.product?.name || 'Product'}
                                   </p>
                                   <p className="text-sm text-gray-600">
                                     Quantity: {item.quantity || 1}
@@ -255,7 +266,7 @@ export default function Orders() {
                                   </p>
                                 </div>
                               </div>
-                            ))}
+                            )})}
                           </div>
                         </div>
                       )}
@@ -274,14 +285,11 @@ export default function Orders() {
 
                       {/* View Details Button */}
                       <button
-                        onClick={() => setSelectedOrder(selectedOrder === order._id ? null : order._id)}
+                        onClick={() => navigate(`/orders/${order._id}`)}
                         className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 text-[#3e4026] hover:bg-[#3e4026]/5 rounded-lg transition-colors font-medium"
                       >
-                        <span>{selectedOrder === order._id ? 'Hide' : 'View'} Details</span>
-                        <ChevronRight 
-                          className={`transition-transform ${selectedOrder === order._id ? 'rotate-90' : ''}`} 
-                          size={20} 
-                        />
+                        <span>View Details</span>
+                        <ChevronRight size={20} />
                       </button>
                     </div>
                   </motion.div>
