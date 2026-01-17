@@ -15,6 +15,7 @@ export default function ProductForm({ images, setImages }) {
     },
     inStock: true,
     sameDayDelivery: false,
+    isActive: true,
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ type: "", text: "" })
@@ -55,6 +56,7 @@ export default function ProductForm({ images, setImages }) {
       formDataToSend.append("pricing", JSON.stringify(formData.pricing))
       formDataToSend.append("stock", formData.inStock ? 100 : 0)
       formDataToSend.append("same_day_delivery", formData.sameDayDelivery)
+      formDataToSend.append("is_active", formData.isActive)
       
       // Append all image files - first image will be the main image
       if (images.length > 0) {
@@ -89,6 +91,7 @@ export default function ProductForm({ images, setImages }) {
         },
         inStock: true,
         sameDayDelivery: false,
+        isActive: true,
       })
       // Clear images
       setImages([])
@@ -226,7 +229,7 @@ export default function ProductForm({ images, setImages }) {
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Small</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
               <input
                 type="number"
                 value={formData.pricing.small}
@@ -245,7 +248,7 @@ export default function ProductForm({ images, setImages }) {
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Medium</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
               <input
                 type="number"
                 value={formData.pricing.medium}
@@ -264,7 +267,7 @@ export default function ProductForm({ images, setImages }) {
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Large</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
               <input
                 type="number"
                 value={formData.pricing.large}
@@ -283,6 +286,21 @@ export default function ProductForm({ images, setImages }) {
       </div>
 
       <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <label htmlFor="isActive" className="text-gray-900 font-medium cursor-pointer select-none">
+            Product Active
+          </label>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              id="isActive"
+              checked={formData.isActive}
+              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+          </label>
+        </div>
         <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <input
             type="checkbox"

@@ -24,32 +24,28 @@ export default function Shop() {
   // Filter accordion states
   const [openFilters, setOpenFilters] = useState({
     category: true,
-    colour: false,
     price: false,
   })
   
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
 
-  // Categories
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  // Categories - matching SubHeader categories
   const categories = [
     { id: 'all', name: 'All Flowers' },
-    { id: 'roses', name: 'Roses' },
-    { id: 'bouquets', name: 'Bouquets' },
-    { id: 'forever-flowers', name: 'Forever Flowers' },
-    { id: 'seasonal', name: 'Seasonal' },
+    { id: 'same-day-delivery', name: 'Same Day Delivery' },
     { id: 'birthday', name: 'Birthday' },
     { id: 'anniversary', name: 'Anniversary' },
-    { id: 'sympathy', name: 'Sympathy' },
-  ]
-
-  // Colours for filter
-  const colours = [
-    { id: 'red', name: 'RED', hex: '#c41e3a' },
-    { id: 'pink', name: 'PINK', hex: '#ffb6c1' },
-    { id: 'white', name: 'WHITE', hex: '#ffffff' },
-    { id: 'yellow', name: 'YELLOW', hex: '#ffd700' },
-    { id: 'purple', name: 'PURPLE', hex: '#9b59b6' },
+    { id: 'forever-flowers', name: 'Forever Flowers' },
+    { id: 'fragrances', name: 'Fragrances' },
+    { id: 'premium', name: 'Premium' },
+    { id: 'corporate', name: 'Corporate' },
+    { id: 'combos', name: 'Combos' },
   ]
 
   // Price ranges
@@ -59,6 +55,13 @@ export default function Shop() {
     { id: '1000-2000', name: '₹1,000 - ₹2,000' },
     { id: 'above-2000', name: 'ABOVE ₹2,000' },
   ]
+
+  // Get page title based on selected category
+  const getPageTitle = () => {
+    if (selectedCategory === 'all') return 'LUXURY FLOWER DELIVERY'
+    const category = categories.find(c => c.id === selectedCategory)
+    return category ? category.name.toUpperCase() : 'LUXURY FLOWER DELIVERY'
+  }
 
   // Fetch products
   useEffect(() => {
@@ -84,9 +87,16 @@ export default function Shop() {
           
           // Filter by category if needed
           if (selectedCategory !== 'all') {
-            sortedProducts = sortedProducts.filter(p => 
-              p.category?.toLowerCase() === selectedCategory.toLowerCase()
-            )
+            if (selectedCategory === 'same-day-delivery') {
+              // Filter by same_day_delivery flag
+              sortedProducts = sortedProducts.filter(p => p.same_day_delivery === true)
+            } else {
+              // Filter by category name (convert id to match backend format)
+              const categoryName = selectedCategory.replace(/-/g, ' ')
+              sortedProducts = sortedProducts.filter(p => 
+                p.category?.toLowerCase() === categoryName.toLowerCase()
+              )
+            }
           }
           
           // Client-side sorting
@@ -158,23 +168,23 @@ export default function Shop() {
     <div className="min-h-screen bg-[#faf9f7]">
       <Header />
       
-      <main className="pt-8">
+      <main className="pt-24">
         {/* Breadcrumb */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-8">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-6">
           <nav className="flex items-center gap-2 text-[11px] tracking-[0.12em] text-[#9a9a9a]">
-            <Link to="/" className="hover:text-[#3e4026] transition-colors">HOME</Link>
+            <Link to="/home" className="hover:text-[#3e4026] transition-colors">HOME</Link>
             <ChevronRight size={10} className="text-[#c4c4c4]" />
-            <span className="text-[#3e4026]">FRESH FLOWERS</span>
+            <span className="text-[#3e4026]">CATEGORIES</span>
           </nav>
         </div>
 
         {/* Page Title */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 mt-6">
           <h1 
             className="text-2xl md:text-[28px] text-[#3e4026] tracking-[0.08em] mb-4"
             style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400 }}
           >
-            LUXURY FLOWER DELIVERY
+            {getPageTitle()}
           </h1>
           <p className="text-[#7a7a7a] text-[14px] leading-relaxed max-w-xl">
             Send extraordinary <span className="text-[#3e4026] underline underline-offset-2 cursor-pointer hover:no-underline">flowers</span> and{' '}
@@ -189,16 +199,19 @@ export default function Shop() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
           <div className="flex gap-16">
             
-            {/* Left Sidebar - Filters */}
-            <FilterSidebar
-              categories={categories}
-              colours={colours}
-              priceRanges={priceRanges}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              openFilters={openFilters}
-              onToggleFilter={toggleFilter}
-            />
+            {/* Left Sidebar - Filters (Sticky) */}
+            <div className="hidden lg:block w-52 flex-shrink-0">
+              <div className="sticky top-24">
+                <FilterSidebar
+                  categories={categories}
+                  priceRanges={priceRanges}
+                  selectedCategory={selectedCategory}
+                  onCategoryChange={setSelectedCategory}
+                  openFilters={openFilters}
+                  onToggleFilter={toggleFilter}
+                />
+              </div>
+            </div>
 
             {/* Right - Products */}
             <div className="flex-1" ref={sectionRef}>

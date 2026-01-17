@@ -114,25 +114,18 @@ export default function ProductDetailsPage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="max-w-7xl mx-auto pl-0 pr-6 md:pl-0 md:pr-12 py-8 md:py-12">
+      <main className="max-w-7xl mx-auto pl-0 pr-6 md:pl-0 md:pr-12 pt-24 pb-12">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-[#3e4026]/60 mb-8 md:mb-12 pl-6 md:pl-12">
+        <nav className="flex items-center gap-2 text-[11px] tracking-[0.12em] text-[#9a9a9a] mb-8 md:mb-12 pl-6 md:pl-12">
           <Link to="/home" className="hover:text-[#3e4026] transition-colors">
-            Home
+            HOME
           </Link>
-          <ChevronRight size={14} />
-          {product.category && (
-            <>
-              <Link 
-                to={`/shop?category=${product.category}`}
-                className="hover:text-[#3e4026] transition-colors"
-              >
-                {product.category}
-              </Link>
-              <ChevronRight size={14} />
-            </>
-          )}
-          <span className="text-[#3e4026]">{product.name}</span>
+          <ChevronRight size={10} className="text-[#c4c4c4]" />
+          <Link to="/shop" className="hover:text-[#3e4026] transition-colors">
+            CATEGORIES
+          </Link>
+          <ChevronRight size={10} className="text-[#c4c4c4]" />
+          <span className="text-[#3e4026]">{product.name?.toUpperCase()}</span>
         </nav>
 
         {/* Product Grid */}

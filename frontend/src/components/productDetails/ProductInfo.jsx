@@ -13,6 +13,13 @@ export default function ProductInfo({ product }) {
   const { addToCart, isLoggedIn } = useCart()
   const navigate = useNavigate()
 
+  // Get the price based on selected size
+  const getCurrentPrice = () => {
+    if (!product?.pricing) return 0
+    const sizeKey = selectedSize.toLowerCase()
+    return product.pricing[sizeKey] || 0
+  }
+
   const handleQuantityChange = (type) => {
     if (type === "increment") {
       if (!product.stock || quantity < product.stock) {
@@ -95,18 +102,8 @@ export default function ProductInfo({ product }) {
       {/* Price */}
       <div className="flex items-baseline gap-3">
         <span className="text-2xl font-light text-[#3e4026]">
-          ₹{product.price?.toLocaleString()}
+          ₹{getCurrentPrice()?.toLocaleString()}
         </span>
-        {product.originalPrice && product.originalPrice > product.price && (
-          <>
-            <span className="text-lg text-gray-400 line-through">
-              ₹{product.originalPrice?.toLocaleString()}
-            </span>
-            <span className="text-[10px] tracking-widest uppercase bg-[#3e4026] text-white px-2 py-1">
-              {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% off
-            </span>
-          </>
-        )}
       </div>
 
       {/* Stock Status */}
