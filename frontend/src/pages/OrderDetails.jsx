@@ -201,19 +201,19 @@ export default function OrderDetails() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-white rounded-xl shadow-lg p-6"
+                className="bg-white rounded-xl shadow-lg p-8 flex flex-col"
               >
                 <div className="flex items-center gap-2 mb-6">
                   <ShoppingBag className="text-[#3e4026]" size={24} />
                   <h2 
-                    className="text-2xl text-[#3e4026] font-semibold"
+                    className="text-xl text-[#3e4026] font-semibold"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     Order Items ({order.items?.length || 0})
                   </h2>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 flex-1">
                   {order.items && order.items.map((item, index) => (
                     <div
                       key={index}
@@ -256,12 +256,8 @@ export default function OrderDetails() {
                 </div>
 
                 {/* Order Summary */}
-                <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-                  <div className="flex justify-between text-gray-700">
-                    <span>Subtotal</span>
-                    <span className="font-medium">{formatPrice(order.totalAmount || 0)}</span>
-                  </div>
-                  <div className="flex justify-between text-lg font-bold text-[#3e4026] pt-3 border-t border-gray-200">
+                <div className="mt-auto pt-6 border-t border-gray-200">
+                  <div className="flex justify-between text-lg font-bold text-[#3e4026]">
                     <span>Total Amount</span>
                     <span className="flex items-center gap-1">
                       <IndianRupee size={20} />
@@ -309,9 +305,9 @@ export default function OrderDetails() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-white rounded-xl shadow-lg p-6 sticky top-24"
+                className="bg-white rounded-xl shadow-lg p-8 sticky top-24 flex flex-col"
               >
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-6">
                   <MapPin className="text-[#3e4026]" size={24} />
                   <h2 
                     className="text-xl text-[#3e4026] font-semibold"
@@ -322,30 +318,32 @@ export default function OrderDetails() {
                 </div>
 
                 {(order.deliveryAddress?.[0] || order.address) ? (
-                  <div className="space-y-2 text-sm">
-                    <p className="font-semibold text-gray-900">
+                  <div className="space-y-3 text-sm flex-1">
+                    <p className="font-semibold text-gray-900 text-base">
                       {(order.deliveryAddress?.[0] || order.address)?.fullName}
                     </p>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 leading-relaxed">
                       {(order.deliveryAddress?.[0] || order.address)?.house}
                     </p>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 leading-relaxed">
                       {(order.deliveryAddress?.[0] || order.address)?.street || (order.deliveryAddress?.[0] || order.address)?.streetAddress}
                     </p>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 leading-relaxed">
                       {(order.deliveryAddress?.[0] || order.address)?.city}, {(order.deliveryAddress?.[0] || order.address)?.state}
                     </p>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 leading-relaxed">
                       PIN: {(order.deliveryAddress?.[0] || order.address)?.pincode}
                     </p>
-                    <p className="text-gray-700 pt-2 border-t border-gray-200">
-                      Mobile: +91 {(order.deliveryAddress?.[0] || order.address)?.mobile}
-                    </p>
-                    {(order.deliveryAddress?.[0] || order.address)?.alternateMobile && (
+                    <div className="pt-3 border-t border-gray-200 space-y-2 mt-auto">
                       <p className="text-gray-700">
-                        Alternate: +91 {(order.deliveryAddress?.[0] || order.address)?.alternateMobile}
+                        Mobile: +91 {(order.deliveryAddress?.[0] || order.address)?.mobile}
                       </p>
-                    )}
+                      {(order.deliveryAddress?.[0] || order.address)?.alternateMobile && (
+                        <p className="text-gray-700">
+                          Alternate: +91 {(order.deliveryAddress?.[0] || order.address)?.alternateMobile}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <p className="text-gray-500 text-sm">No delivery address available</p>
