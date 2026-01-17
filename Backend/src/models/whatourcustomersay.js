@@ -1,6 +1,6 @@
-import user from "../models/user.model.js"
+import mongoose from "mongoose";
 
-const item=new mongoose.Schema({
+const item = new mongoose.Schema({
     testimonial: {
         type: String,
         required: true
@@ -11,7 +11,7 @@ const item=new mongoose.Schema({
         min: 1, 
         max: 5
     }
-},  { timestamps: true });
+}, { timestamps: true });
 
 const WhatOurCustomerSaySchema = new mongoose.Schema({
     user: {
@@ -21,7 +21,7 @@ const WhatOurCustomerSaySchema = new mongoose.Schema({
     },
     profile_picture: {
         type: String,
-        required: true
+        default: ""
     },
     name: { 
         type: String,

@@ -47,6 +47,9 @@ import orderRoutes from "./route/order.route.js"
 //  Apply order rate limiting
 app.use("/api/v1/order", orderRoutes)
 
+import testimonialRoutes from "./route/testimonial.route.js"
+app.use("/api/v1/testimonial", testimonialRoutes)
+
 // Global error handler - MUST be after all routes
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
