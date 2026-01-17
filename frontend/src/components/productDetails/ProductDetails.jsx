@@ -112,7 +112,7 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
                   >
                     {item.name}
                   </h3>
-                  <p className="text-lg font-light text-[#3e4026]">₹{item.price?.toLocaleString()}</p>
+                  <p className="text-lg font-light text-[#3e4026]">₹{item.pricing?.medium?.toLocaleString() || 0}</p>
                 </div>
               </div>
             ))}

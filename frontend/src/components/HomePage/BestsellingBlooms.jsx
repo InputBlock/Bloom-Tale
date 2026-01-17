@@ -59,10 +59,10 @@ export default function BestsellingBlooms() {
 
     if (result && result.success) {
       setModalState({ isOpen: true, message: "Product added to cart successfully!", type: "success" })
-      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 3000)
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
     } else if (result && !result.success) {
       setModalState({ isOpen: true, message: result.message || "Failed to add to cart", type: "error" })
-      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 3000)
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
     }
   }
 

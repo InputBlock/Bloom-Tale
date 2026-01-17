@@ -153,10 +153,10 @@ export default function Shop() {
 
     if (result?.success) {
       setModalState({ isOpen: true, message: "Added to cart!", type: "success" })
-      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 2000)
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
     } else {
       setModalState({ isOpen: true, message: result?.message || "Failed to add", type: "error" })
-      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 2000)
+      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
     }
   }
 

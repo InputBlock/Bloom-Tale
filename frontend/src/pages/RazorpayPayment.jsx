@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Loader2, CheckCircle2, XCircle } from "lucide-react"
 import { motion } from "framer-motion"
@@ -9,6 +9,7 @@ export default function RazorpayPayment() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const razorpayInstance = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
   const orderId = location.state?.orderId
@@ -61,9 +62,10 @@ export default function RazorpayPayment() {
           name: "Bloom Tale",
           description: "Order Payment",
           order_id: razorpayOrder.id,
-          handler: async function (response) {
-            // Payment successful
-            await verifyPayment(response)
+          handler: function (response) {
+            // Payment successful - Razorpay modal will close automatically
+            // Verify payment in background and redirect
+            verifyPayment(response)
           },
           prefill: {
             name: "",
@@ -85,17 +87,18 @@ export default function RazorpayPayment() {
           },
         }
 
-        const razorpay = new window.Razorpay(options)
+        razorpayInstance.current = new window.Razorpay(options)
         
         // Handle payment failure events
-        razorpay.on('payment.failed', async function (response) {
+        razorpayInstance.current.on('payment.failed', async function (response) {
           console.log("Payment failed:", response.error)
           await markPaymentFailed()
+          razorpayInstance.current.close()
           setLoading(false)
           setError(response.error.description || "Payment failed. Please try again.")
         })
         
-        razorpay.open()
+        razorpayInstance.current.open()
         setLoading(false)
       }
 
@@ -110,7 +113,6 @@ export default function RazorpayPayment() {
   }
 
   const verifyPayment = async (paymentResponse) => {
-    setLoading(true)
     try {
       const token = localStorage.getItem("token")
 
@@ -134,16 +136,15 @@ export default function RazorpayPayment() {
       if (!response.ok) {
         // Mark payment as failed in backend
         await markPaymentFailed()
-        throw new Error(data.message || "Payment verification failed")
+        setError(data.message || "Payment verification failed")
+        setLoading(false)
+        return
       }
-
-      setPaymentSuccess(true)
-      setTimeout(() => {
-        navigate("/orders")
-      }, 2000)
+      
+      // Payment verified successfully - redirect immediately
+      window.location.href = "/orders"
     } catch (err) {
       setError(err.message || "Payment verification failed")
-    } finally {
       setLoading(false)
     }
   }
