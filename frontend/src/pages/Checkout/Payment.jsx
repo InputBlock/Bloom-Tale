@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle2, Smartphone, Banknote, ChevronLeft, Loader2, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
-export default function Payment({ paymentMethod, setPaymentMethod, onBack, orderId }) {
+export default function Payment({ paymentMethod, setPaymentMethod, onBack, orderId, orderDetails }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const navigate = useNavigate()
+
+  const totalAmount = orderDetails?.totalAmount || 0
 
   const handlePlaceOrder = async () => {
     if (!orderId) {
@@ -60,8 +62,8 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
         // Show success modal for COD
         setShowSuccessModal(true)
       } else {
-        // Redirect to payment page for UPI
-        navigate("/payment")
+        // Redirect to Razorpay payment page for UPI
+        navigate("/razorpay-payment", { state: { orderId } })
       }
       
     } catch (err) {
@@ -99,7 +101,7 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
         {/* Payment Amount Card */}
       <div className="bg-gradient-to-r from-[#3e4026] to-[#5e6043] rounded-xl shadow-lg p-8 text-white">
         <p className="text-sm opacity-90 mb-2">Total Amount</p>
-        <h2 className="text-4xl font-bold mb-1">₹ 1,820</h2>
+        <h2 className="text-4xl font-bold mb-1">₹ {totalAmount.toLocaleString('en-IN')}</h2>
         <p className="text-sm opacity-80">Including all taxes and delivery charges</p>
       </div>
 
@@ -184,7 +186,7 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
               <span>PROCESSING...</span>
             </>
           ) : (
-            paymentMethod === "upi" ? "PROCEED TO PAY ₹ 1,820" : "PLACE ORDER"
+            paymentMethod === "upi" ? `PROCEED TO PAY ₹ ${totalAmount.toLocaleString('en-IN')}` : "PLACE ORDER"
           )}
         </motion.button>
 

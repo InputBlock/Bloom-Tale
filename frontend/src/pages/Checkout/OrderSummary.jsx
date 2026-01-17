@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 
-export default function OrderSummary({ formData, onBack, onNext }) {
+export default function OrderSummary({ formData, orderDetails, onBack, onNext }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -77,6 +77,28 @@ export default function OrderSummary({ formData, onBack, onNext }) {
           )}
         </div>
       </div>
+
+      {/* Order Items Summary */}
+      {orderDetails && orderDetails.items && orderDetails.items.length > 0 && (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Order Items</h3>
+          <div className="space-y-3">
+            {orderDetails.items.map((item, index) => (
+              <div key={index} className="flex justify-between items-center border-b pb-3">
+                <div>
+                  <p className="font-semibold text-gray-900">{item.product?.name || 'Product'}</p>
+                  <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                </div>
+                <p className="font-semibold text-gray-900">₹ {(item.price * item.quantity).toLocaleString('en-IN')}</p>
+              </div>
+            ))}
+            <div className="flex justify-between items-center pt-2">
+              <p className="text-lg font-bold text-gray-900">Total Amount</p>
+              <p className="text-xl font-bold text-[#3e4026]">₹ {orderDetails.totalAmount.toLocaleString('en-IN')}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Navigation Button */}
       <motion.button
