@@ -1,16 +1,12 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useSearchParams, Link } from "react-router-dom"
-import { motion, useInView } from "framer-motion"
-import { 
-  ChevronDown, 
-  ChevronUp,
-  ChevronRight,
-  Heart,
-} from "lucide-react"
+import { useInView } from "framer-motion"
+import { ChevronRight } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
 import { useCart } from "../context/CartContext"
 import SuccessModal from "../components/common/SuccessModal"
+import { ProductGrid, FilterSidebar } from "../components/shop"
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -158,22 +154,6 @@ export default function Shop() {
     setOpenFilters(prev => ({ ...prev, [name]: !prev[name] }))
   }
 
-  // Filter Section Component
-  const FilterSection = ({ title, name, children }) => (
-    <div className="border-b border-[#e8e6e3]">
-      <button
-        onClick={() => toggleFilter(name)}
-        className="w-full flex items-center justify-between py-4 group"
-      >
-        <span className="text-[12px] tracking-[0.15em] text-[#5c5c5c] group-hover:text-[#3e4026] transition-colors">{title}</span>
-        {openFilters[name] ? <ChevronUp size={14} className="text-[#8b8b8b]" /> : <ChevronDown size={14} className="text-[#8b8b8b]" />}
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ${openFilters[name] ? 'max-h-96 pb-5' : 'max-h-0'}`}>
-        {children}
-      </div>
-    </div>
-  )
-
   return (
     <div className="min-h-screen bg-[#faf9f7]">
       <Header />
@@ -210,60 +190,15 @@ export default function Shop() {
           <div className="flex gap-16">
             
             {/* Left Sidebar - Filters */}
-            <aside className="hidden lg:block w-52 flex-shrink-0">
-              <h2 className="text-[15px] tracking-[0.15em] text-[#3e4026] mb-8 font-medium">FILTER</h2>
-              
-              {/* Category Filter */}
-              <FilterSection title="CATEGORY" name="category">
-                <div className="space-y-3">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`block text-[12px] tracking-[0.1em] transition-colors ${
-                        selectedCategory === cat.id 
-                          ? 'text-[#3e4026] font-medium' 
-                          : 'text-[#3e4026]/50 hover:text-[#3e4026]'
-                      }`}
-                    >
-                      {cat.name.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </FilterSection>
-
-              {/* Colour Filter */}
-              <FilterSection title="COLOUR" name="colour">
-                <div className="space-y-2">
-                  {colours.map((c) => (
-                    <button
-                      key={c.id}
-                      className="flex items-center gap-2 text-[11px] tracking-wider text-[#3e4026]/50 hover:text-[#3e4026] transition-colors"
-                    >
-                      <span 
-                        className="w-4 h-4 rounded-full border border-[#ddd] shadow-sm"
-                        style={{ backgroundColor: c.hex }}
-                      />
-                      {c.name}
-                    </button>
-                  ))}
-                </div>
-              </FilterSection>
-
-              {/* Price Filter */}
-              <FilterSection title="PRICE" name="price">
-                <div className="space-y-3">
-                  {priceRanges.map((r) => (
-                    <button
-                      key={r.id}
-                      className="block text-[12px] tracking-[0.1em] text-[#8b8b8b] hover:text-[#3e4026] transition-colors"
-                    >
-                      {r.name}
-                    </button>
-                  ))}
-                </div>
-              </FilterSection>
-            </aside>
+            <FilterSidebar
+              categories={categories}
+              colours={colours}
+              priceRanges={priceRanges}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              openFilters={openFilters}
+              onToggleFilter={toggleFilter}
+            />
 
             {/* Right - Products */}
             <div className="flex-1" ref={sectionRef}>
@@ -273,116 +208,18 @@ export default function Shop() {
                   {products.length} PRODUCTS
                 </p>
               </div>
-              {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="aspect-[3/4] bg-[#f9f8f6] mb-4"></div>
-                    <div className="h-5 bg-[#eceae7] w-3/4 mb-2"></div>
-                    <div className="h-5 bg-[#eceae7] w-1/3 mb-2"></div>
-                    <div className="h-3 bg-[#eceae7] w-1/4"></div>
-                  </div>
-                ))}
-              </div>
-            ) : products.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-[#3e4026]/40 mb-4 text-sm">No products found</p>
-                <button
-                  onClick={() => setSelectedCategory('all')}
-                  className="text-[#3e4026] text-sm underline underline-offset-4 hover:no-underline"
-                >
-                  View all flowers
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product, index) => (
-                  <motion.div
-                    key={product._id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    onMouseEnter={() => setHoveredId(product._id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    onClick={() => handleProductClick(product.product_id)}
-                    className="group cursor-pointer"
-                  >
-                    {/* Product Image */}
-                    <div className="relative overflow-hidden mb-4 aspect-[3/4] bg-[#f9f8f6]">
-                      {product.images_uri?.[0] ? (
-                        <motion.img
-                          src={product.images_uri[0]}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                          animate={{
-                            scale: hoveredId === product._id ? 1.05 : 1,
-                          }}
-                          transition={{ duration: 0.6 }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <div className="text-gray-300">No Image</div>
-                        </div>
-                      )}
-
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-
-                      {/* Quick Add Button */}
-                      <motion.button
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{
-                          opacity: hoveredId === product._id ? 1 : 0,
-                          y: hoveredId === product._id ? 0 : 10,
-                        }}
-                        transition={{ duration: 0.3 }}
-                        onClick={(e) => handleAddToCart(e, product)}
-                        className="absolute bottom-4 left-4 right-4 bg-white py-3 text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white transition-colors duration-300"
-                      >
-                        Add to Cart
-                      </motion.button>
-
-                      {/* Arrow Icon */}
-                      <div className="absolute top-4 right-4 w-10 h-10 bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <Heart size={18} className="text-[#3e4026]" />
-                      </div>
-
-                      {/* Category Badge */}
-                      {product.category && (
-                        <div className="absolute top-4 left-4">
-                          <span className="text-[10px] tracking-widest uppercase bg-white px-3 py-1.5 text-[#3e4026]">
-                            {product.category}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div>
-                      <h3 
-                        className="text-lg text-[#3e4026] mb-1 group-hover:underline"
-                        style={{ fontFamily: 'Playfair Display, serif' }}
-                      >
-                        {product.name}
-                      </h3>
-                      <p className="text-lg font-light text-[#3e4026]">
-                        ₹{(product.pricing?.small || product.pricing?.medium || product.pricing?.large || product.price || 0).toLocaleString()}
-                      </p>
-                      
-                      {/* Stock Status */}
-                      {product.stock && product.stock > 0 ? (
-                        <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 bg-green-600"></span>
-                          In Stock
-                        </p>
-                      ) : (
-                        <p className="text-xs text-gray-400 mt-2">Out of Stock</p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
+              
+              <ProductGrid
+                products={products}
+                loading={loading}
+                isInView={isInView}
+                hoveredId={hoveredId}
+                onHover={setHoveredId}
+                onLeave={() => setHoveredId(null)}
+                onProductClick={handleProductClick}
+                onAddToCart={handleAddToCart}
+                onViewAll={() => setSelectedCategory('all')}
+              />
             </div>
           </div>
         </div>
