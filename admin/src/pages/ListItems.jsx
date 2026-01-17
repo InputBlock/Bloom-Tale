@@ -21,8 +21,8 @@ export default function ListItems() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const response = await axios.get("/api/v1/admin/showlist")
-      
+      const response = await axios.get("http://localhost:8000/api/v1/admin/showlist")
+
       // Transform backend data to match frontend format
       const transformedProducts = response.data.flowers.map(product => ({
         id: product.id,
@@ -54,34 +54,6 @@ export default function ListItems() {
     }
   }
 
-  const handleUpdateStock = async (id) => {
-    const newStock = prompt("Enter new stock quantity:")
-    if (newStock !== null && !isNaN(newStock)) {
-      const stockValue = parseInt(newStock)
-      try {
-        const token = localStorage.getItem("adminToken")
-        await axios.post(
-          "/api/v1/admin/update",
-          { 
-            id: id,
-            stock: stockValue
-          },
-          {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Content-Type": "application/json"
-            }
-          }
-        )
-        setProducts(products.map((p) => 
-          p.id === id ? { ...p, stock: stockValue, isListed: stockValue > 0 ? p.isListed : false } : p
-        ))
-      } catch (error) {
-        console.error("Error updating stock:", error)
-      }
-    }
-  }
-
   const openStatusModal = (id) => {
     const product = products.find(p => p.id === id)
     setStatusProduct(product)
@@ -102,10 +74,10 @@ export default function ListItems() {
 
     try {
       const token = localStorage.getItem("adminToken")
-      const endpoint = statusProduct.isListed 
-        ? "/api/v1/admin/unlist"
-        : "/api/v1/admin/list"
-      
+      const endpoint = statusProduct.isListed
+        ? "http://localhost:8000/api/v1/admin/unlist"
+        : "http://localhost:8000/api/v1/admin/list"
+
       await axios.post(
         endpoint,
         { id: statusProduct.id },
@@ -134,7 +106,7 @@ export default function ListItems() {
     try {
       const token = localStorage.getItem("adminToken")
       await axios.post(
-        "/api/v1/admin/update",
+        "http://localhost:8000/api/v1/admin/update",
         {
           id: updatedProduct.id,
           name: updatedProduct.name,
