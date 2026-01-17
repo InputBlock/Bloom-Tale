@@ -3,14 +3,18 @@ import Footer from "../../components/common/Footer"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowUp, X } from "lucide-react"
 import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 
 export default function Services() {
+  const [searchParams] = useSearchParams()
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [activeTab, setActiveTab] = useState("wedding")
   const [showAll, setShowAll] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const [showAllGallery, setShowAllGallery] = useState(false)
+  const [activeSlideIndexes, setActiveSlideIndexes] = useState({})
+  const [activeMainImageIndexes, setActiveMainImageIndexes] = useState({})
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,6 +31,14 @@ export default function Services() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    // Check URL parameters for tab
+    const tabParam = searchParams.get("tab")
+    if (tabParam && ["wedding", "social", "corporate"].includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     // Reset showAll when tab changes
@@ -253,7 +265,7 @@ export default function Services() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#fafafa] via-white to-[#f5f5f5]">
       <Header />
 
       {/* Scroll to Top Button */}
@@ -274,77 +286,58 @@ export default function Services() {
       </AnimatePresence>
 
       {/* Services Section */}
-      <section className="pt-20 md:pt-28 pb-12 md:pb-16 bg-[#f9f8f6]">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12 md:mb-16"
-          >
-            <h1 
-              className="text-3xl md:text-5xl text-[#3e4026] mb-4"
-              style={{ fontFamily: 'Playfair Display, serif' }}
-            >
-              Our Services
-            </h1>
-          </motion.div>
-
+      <section className="pt-20 md:pt-28 pb-16 md:pb-24 bg-transparent">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Tabs */}
-          <div className="flex justify-center mb-12 md:mb-16">
-            <div className="inline-flex gap-8 md:gap-12 border-b-2 border-gray-200">
+          <div className="flex justify-center mb-12">
+            <div className="inline-flex gap-12 md:gap-16">
               <button
                 onClick={() => setActiveTab("wedding")}
-                className={`pb-4 px-2 text-lg md:text-xl font-medium transition-all relative ${
+                className={`pb-2 px-1 text-base md:text-lg font-normal uppercase tracking-widest transition-all relative ${
                   activeTab === "wedding" 
                     ? "text-[#3e4026]" 
                     : "text-gray-400 hover:text-gray-600"
                 }`}
-                style={{ fontFamily: 'Playfair Display, serif' }}
               >
                 Wedding
                 {activeTab === "wedding" && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3e4026]"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#3e4026]"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
               </button>
               <button
                 onClick={() => setActiveTab("social")}
-                className={`pb-4 px-2 text-lg md:text-xl font-medium transition-all relative ${
+                className={`pb-2 px-1 text-base md:text-lg font-normal uppercase tracking-widest transition-all relative ${
                   activeTab === "social" 
                     ? "text-[#3e4026]" 
                     : "text-gray-400 hover:text-gray-600"
                 }`}
-                style={{ fontFamily: 'Playfair Display, serif' }}
               >
                 Social
                 {activeTab === "social" && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3e4026]"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#3e4026]"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
               </button>
               <button
                 onClick={() => setActiveTab("corporate")}
-                className={`pb-4 px-2 text-lg md:text-xl font-medium transition-all relative ${
+                className={`pb-2 px-1 text-base md:text-lg font-normal uppercase tracking-widest transition-all relative ${
                   activeTab === "corporate" 
                     ? "text-[#3e4026]" 
                     : "text-gray-400 hover:text-gray-600"
                 }`}
-                style={{ fontFamily: 'Playfair Display, serif' }}
               >
                 Corporate
                 {activeTab === "corporate" && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3e4026]"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#3e4026]"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
@@ -360,72 +353,178 @@ export default function Services() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
-              className="space-y-12"
+              className="space-y-24"
             >
-              {/* Service Overview */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="text-center max-w-3xl mx-auto mb-16"
-              >
-                <h2 
-                  className="text-3xl md:text-4xl text-[#3e4026] mb-4"
-                  style={{ fontFamily: 'Playfair Display, serif' }}
-                >
-                  {serviceOverviews[activeTab].title}
-                </h2>
-                <p className="text-gray-700 text-base md:text-lg leading-relaxed">
-                  {serviceOverviews[activeTab].description}
-                </p>
-              </motion.div>
+              {/* Subcategories with Numbered Sections */}
+              <div className="space-y-20">
+                {getActiveServices().slice(0, showAll ? undefined : 2).map((service, index) => {
+                  // Create unified gallery images array for this service
+                  const galleryImages = [1, 2, 3, 4, 5, 6, 7, 8]
+                  
+                  // Initialize and auto-advance the active image index
+                  useEffect(() => {
+                    if (activeMainImageIndexes[index] === undefined) {
+                      setActiveMainImageIndexes(prev => ({ ...prev, [index]: 0 }))
+                    }
+                    
+                    // Auto-advance to next image every 3.5 seconds
+                    const interval = setInterval(() => {
+                      setActiveMainImageIndexes(prev => ({
+                        ...prev,
+                        [index]: ((prev[index] || 0) + 1) % galleryImages.length
+                      }))
+                    }, 3500)
+                    
+                    return () => clearInterval(interval)
+                  }, [index])
+                  
+                  const currentImageIndex = activeMainImageIndexes[index] || 0
+                  
+                  // Calculate which thumbnails to show (4 at a time, centered around current image)
+                  const getThumbnailRange = () => {
+                    const startIdx = Math.max(0, Math.min(currentImageIndex - 1, galleryImages.length - 4))
+                    return galleryImages.slice(startIdx, startIdx + 4).map((img, idx) => ({
+                      imageNum: img,
+                      globalIndex: startIdx + idx
+                    }))
+                  }
+                  
+                  const visibleThumbnails = getThumbnailRange()
+                  
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      className="bg-white"
+                    >
+                      <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8 lg:gap-16 items-start`}>
+                        {/* Content Side */}
+                        <div className="w-full lg:w-1/2 space-y-6">
+                          {/* Numbered Header */}
+                          <div className="flex items-baseline gap-4">
+                            <span className="text-5xl md:text-6xl font-light text-gray-300">0{index + 1}</span>
+                            <h2 
+                              className="text-2xl md:text-3xl text-[#3e4026] uppercase tracking-wide font-normal"
+                              style={{ fontFamily: 'Playfair Display, serif' }}
+                            >
+                              {service.title}
+                            </h2>
+                          </div>
 
-              {/* Subcategories */}
-              <div className="space-y-8 md:space-y-12">
-                {getActiveServices().slice(0, showAll ? undefined : 2).map((service, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className={`group flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 md:gap-16 items-center cursor-pointer`}
-                    onClick={() => openModal(service)}
-                  >
-                    {/* Image */}
-                    <div className="relative w-full md:w-1/2 h-80 md:h-[500px] overflow-hidden">
-                      {/* ADD SERVICE IMAGES HERE */}
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f9f8f6] to-gray-100">
-                        <p className="text-gray-400 text-sm">{service.title}</p>
+                          {/* Description */}
+                          <p className="text-gray-700 leading-relaxed text-base md:text-lg">
+                            {service.description}
+                          </p>
+
+                          {/* CTA Button */}
+                          <button
+                            onClick={() => openModal(service)}
+                            className="px-8 py-3 bg-[#3e4026] hover:bg-[#2d2f1c] text-white font-medium rounded-md transition-colors duration-300"
+                          >
+                            Book Us for {service.title}
+                          </button>
+
+                          {/* Sliding Thumbnail Gallery */}
+                          <div className="pt-4">
+                            <div className="relative overflow-hidden">
+                              <div className="grid grid-cols-4 gap-3">
+                                <AnimatePresence mode="popLayout">
+                                  {visibleThumbnails.map((thumb) => (
+                                    <motion.div
+                                      key={thumb.globalIndex}
+                                      layout
+                                      initial={{ opacity: 0, scale: 0.8 }}
+                                      animate={{ opacity: 1, scale: 1 }}
+                                      exit={{ opacity: 0, scale: 0.8 }}
+                                      transition={{ duration: 0.4 }}
+                                      onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: thumb.globalIndex }))}
+                                      className={`aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded overflow-hidden transition-all cursor-pointer ${
+                                        currentImageIndex === thumb.globalIndex 
+                                          ? 'ring-2 ring-[#5da5a5] ring-offset-2 scale-95' 
+                                          : 'hover:opacity-80'
+                                      }`}
+                                    >
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <span className={`text-xs ${
+                                          currentImageIndex === thumb.globalIndex 
+                                            ? 'text-[#5da5a5] font-semibold' 
+                                            : 'text-gray-400'
+                                        }`}>
+                                          {thumb.imageNum}
+                                        </span>
+                                      </div>
+                                    </motion.div>
+                                  ))}
+                                </AnimatePresence>
+                              </div>
+                            </div>
+                            
+                            {/* Progress Indicator */}
+                            <div className="flex justify-center gap-1.5 mt-3">
+                              {galleryImages.map((_, imgIdx) => (
+                                <button
+                                  key={imgIdx}
+                                  onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: imgIdx }))}
+                                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                                    currentImageIndex === imgIdx 
+                                      ? 'bg-[#5da5a5] w-8' 
+                                      : 'bg-gray-300 hover:bg-gray-400 w-1.5'
+                                  }`}
+                                  aria-label={`Go to image ${imgIdx + 1}`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Image Side */}
+                        <div className="w-full lg:w-1/2 h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-lg relative">
+                          <AnimatePresence mode="wait">
+                            <motion.div
+                              key={`main-${index}-${currentImageIndex}`}
+                              initial={{ opacity: 0, scale: 1.05 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              transition={{ duration: 0.5, ease: "easeInOut" }}
+                              className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f3f0] to-gray-200"
+                            >
+                              <p className="text-gray-400 text-lg">{service.title} - {galleryImages[currentImageIndex]}</p>
+                            </motion.div>
+                          </AnimatePresence>
+                          
+                          {/* Navigation Arrows */}
+                          <button
+                            onClick={() => setActiveMainImageIndexes(prev => ({ 
+                              ...prev, 
+                              [index]: (prev[index] - 1 + galleryImages.length) % galleryImages.length 
+                            }))}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
+                            aria-label="Previous image"
+                          >
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 15l-5-5 5-5" stroke="#3e4026" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => setActiveMainImageIndexes(prev => ({ 
+                              ...prev, 
+                              [index]: (prev[index] + 1) % galleryImages.length 
+                            }))}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
+                            aria-label="Next image"
+                          >
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M8 15l5-5-5-5" stroke="#3e4026" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </button>
+                        </div>
                       </div>
-                      
-                      {/* Overlay on hover */}
-                      <div className="absolute inset-0 bg-[#3e4026]/0 group-hover:bg-[#3e4026]/5 transition-all duration-500" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="w-full md:w-1/2">
-                      <div className="w-16 h-0.5 bg-[#c4a574] mb-6" />
-                      <h3 
-                        className="text-3xl md:text-4xl lg:text-5xl text-[#3e4026] mb-6 group-hover:text-[#2d2f1c] transition-colors duration-300"
-                        style={{ fontFamily: 'Playfair Display, serif' }}
-                      >
-                        {service.title}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed text-base md:text-lg mb-8">
-                        {service.description}
-                      </p>
-                      <motion.div 
-                        className="inline-flex items-center gap-2 text-[#3e4026] font-medium border-b border-[#3e4026] pb-1 group-hover:gap-3 transition-all duration-300"
-                        whileHover={{ x: 5 }}
-                      >
-                        <span>Enquire now</span>
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M7.5 15l5-5-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  )
+                })}
               </div>
 
               {/* View More Button */}

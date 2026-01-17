@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/verifyJwt.middleware.js";
 
-import { createOrder, getOrderSummary, updatePaymentMethod } from "../controller/order.controller.js";
+import { createOrder, getMyAddresses, getOrderSummary, updatePaymentMethod } from "../controller/order.controller.js";
 import { createPaymentOrder } from "../utils/razorpay.js";
 import { verifyPayment } from "../utils/razorpay.js";
 import { razorpayWebhook } from "../utils/razorpay.js";
@@ -10,6 +10,8 @@ import { markPaymentFailed } from "../utils/razorpay.js";
 const router = Router()
 
 router.post("/checkout",verifyJWT,createOrder)
+router.post("/getaddress",verifyJWT,getMyAddresses)
+
 router.patch(
   "/:orderId/payment-method",
   verifyJWT,

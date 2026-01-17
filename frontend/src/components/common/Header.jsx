@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Search, User, ShoppingCart, LogOut, Menu, X } from "lucide-react"
+import { Search, User, ShoppingCart, LogOut, Menu, X, ChevronDown } from "lucide-react"
 import { useNavigate, Link, useLocation } from "react-router-dom"
 import { useCart } from "../../context/CartContext"
 import { motion, AnimatePresence } from "framer-motion"
@@ -15,7 +15,9 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [showServicesDropdown, setShowServicesDropdown] = useState(false)
   const logoutRef = useRef(null)
+  const servicesRef = useRef(null)
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -38,6 +40,9 @@ export default function Header() {
     const handleClickOutside = (event) => {
       if (logoutRef.current && !logoutRef.current.contains(event.target)) {
         setShowLogout(false)
+      }
+      if (servicesRef.current && !servicesRef.current.contains(event.target)) {
+        setShowServicesDropdown(false)
       }
     }
 
@@ -89,8 +94,14 @@ export default function Header() {
 
   const navLinks = [
     { name: "Home", path: "/home" },
-    { name: "About", path: "/about" },
+    { name: "Services", path: "/services", hasDropdown: true },
     { name: "Contact", path: "/contact" },
+  ]
+
+  const serviceCategories = [
+    { name: "Wedding", path: "/services?tab=wedding" },
+    { name: "Social", path: "/services?tab=social" },
+    { name: "Corporate", path: "/services?tab=corporate" },
   ]
 
   const isHomePage = location.pathname === "/" || location.pathname === "/home"
@@ -142,15 +153,68 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8 flex-shrink-0">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm tracking-wide ${textColor} hover:opacity-70 transition-all duration-300 ${
-                  location.pathname === link.path ? "border-b border-current pb-0.5" : ""
-                }`}
-              >
-                {link.name}
-              </Link>
+              link.hasDropdown ? (
+                <div 
+                  key={link.path}
+                  className="relative"
+                  ref={servicesRef}
+                  onMouseEnter={() => setShowServicesDropdown(true)}
+                  onMouseLeave={() => setShowServicesDropdown(false)}
+                >
+                  <Link
+                    to={link.path}
+                    className={`flex items-center gap-1 text-sm tracking-wide ${textColor} hover:opacity-70 transition-all duration-300 ${
+                      location.pathname === link.path ? "border-b border-current pb-0.5" : ""
+                    }`}
+                  >
+                    {link.name}
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${showServicesDropdown ? 'rotate-180' : ''}`} />
+                  </Link>
+                  
+                  {/* Services Dropdown */}
+                  <AnimatePresence>
+                    {showServicesDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-52 bg-black/30 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 overflow-hidden"
+                        style={{ backdropFilter: 'blur(20px)' }}
+                      >
+                        <div className="p-3">
+                          <div className="mb-2">
+                            <h4 className="text-[10px] font-semibold text-white/60 uppercase tracking-wider px-2">Our Services</h4>
+                          </div>
+                          <div className="space-y-0.5">
+                            {serviceCategories.map((service, index) => (
+                              <Link
+                                key={index}
+                                to={service.path}
+                                onClick={() => setShowServicesDropdown(false)}
+                                className="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-white hover:bg-white/20 hover:shadow-md transition-all duration-300 group"
+                              >
+                                <span>{service.name}</span>
+                                <ChevronDown size={14} className="-rotate-90 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`text-sm tracking-wide ${textColor} hover:opacity-70 transition-all duration-300 ${
+                    location.pathname === link.path ? "border-b border-current pb-0.5" : ""
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
           </nav>
 
