@@ -6,7 +6,6 @@ import AboutSection from "../components/HomePage/AboutSection"
 import WhyChooseUs from "../components/HomePage/WhyChooseUs"
 import CategoryShowcase from "../components/HomePage/SeasonalShowCase"
 import Testimonials from "../components/HomePage/Testimonials"
-import Newsletter from "../components/HomePage/Newsletter"
 import Footer from "../components/common/Footer"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowUp } from "lucide-react"
@@ -57,7 +56,6 @@ export default function HomePage() {
       <CategoryShowcase />
       <WhyChooseUs />
       <Testimonials />
-      <Newsletter />
       <Footer />
     </div>
   )
