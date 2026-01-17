@@ -12,6 +12,7 @@ import Checkout from './pages/Checkout'
 import Shop from './pages/Shop'
 import RazorpayPayment from './pages/RazorpayPayment'
 import Orders from './pages/Orders'
+import OrderDetails from './pages/OrderDetails'
 import { CartProvider } from './context/CartContext'
 import ToastContainer from './components/common/ToastContainer'
 import AuthCallback from './pages/AuthCallback'
@@ -38,6 +39,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/razorpay-payment" element={<RazorpayPayment />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:orderId" element={<OrderDetails />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
         </Routes>
       </Router>
