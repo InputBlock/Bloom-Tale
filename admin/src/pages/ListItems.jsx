@@ -53,7 +53,33 @@ export default function ListItems() {
       setProducts(products.filter((p) => p.id !== id))
     }
   }
-
+  const handleUpdateStock = async (id) => {
+    const newStock = prompt("Enter new stock quantity:")
+    if (newStock !== null && !isNaN(newStock)) {
+      const stockValue = parseInt(newStock)
+      try {
+        const token = localStorage.getItem("adminToken")
+        await axios.post(
+          "/api/v1/admin/update",
+          { 
+            id: id,
+            stock: stockValue
+          },
+          {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }
+        )
+        setProducts(products.map((p) => 
+          p.id === id ? { ...p, stock: stockValue, isListed: stockValue > 0 ? p.isListed : false } : p
+        ))
+      } catch (error) {
+        console.error("Error updating stock:", error)
+      }
+    }
+  }
   const openStatusModal = (id) => {
     const product = products.find(p => p.id === id)
     setStatusProduct(product)
