@@ -15,6 +15,8 @@ export default function Services() {
   const [showAllGallery, setShowAllGallery] = useState(false)
   const [activeSlideIndexes, setActiveSlideIndexes] = useState({})
   const [activeMainImageIndexes, setActiveMainImageIndexes] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,6 +48,38 @@ export default function Services() {
     setShowAllGallery(false)
   }, [activeTab])
 
+  // Auto-advance main images for all services
+  useEffect(() => {
+    const activeServices = getActiveServices()
+    const visibleCount = showAll ? activeServices.length : Math.min(2, activeServices.length)
+    const galleryLength = 8 // Number of images per service
+    
+    // Initialize indexes for all visible services
+    const newIndexes = {}
+    for (let i = 0; i < visibleCount; i++) {
+      if (activeMainImageIndexes[i] === undefined) {
+        newIndexes[i] = 0
+      }
+    }
+    if (Object.keys(newIndexes).length > 0) {
+      setActiveMainImageIndexes(prev => ({ ...prev, ...newIndexes }))
+    }
+    
+    // Set up intervals for auto-advancing
+    const intervals = []
+    for (let i = 0; i < visibleCount; i++) {
+      const interval = setInterval(() => {
+        setActiveMainImageIndexes(prev => ({
+          ...prev,
+          [i]: ((prev[i] || 0) + 1) % galleryLength
+        }))
+      }, 3500)
+      intervals.push(interval)
+    }
+    
+    return () => intervals.forEach(interval => clearInterval(interval))
+  }, [activeTab, showAll])
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -59,6 +93,8 @@ export default function Services() {
   const closeModal = () => {
     setIsModalOpen(false)
     setSelectedService(null)
+    setIsSuccess(false)
+    setIsSubmitting(false)
     document.body.style.overflow = 'auto'
   }
 
@@ -69,19 +105,53 @@ export default function Services() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log("Form submitted:", { ...formData, service: selectedService?.title })
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: ""
-    })
-    closeModal()
+    setIsSubmitting(true)
+    
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/enquiry/createEnquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
+          service: selectedService?.title
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setIsSubmitting(false)
+        setIsSuccess(true)
+        
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: ""
+        })
+        
+        // Auto-close after showing success message
+        setTimeout(() => {
+          closeModal()
+        }, 2500)
+      } else {
+        const errorData = await response.json()
+        console.error(errorData.message || "Failed to submit enquiry")
+        setIsSubmitting(false)
+      }
+    } catch (error) {
+      console.error("Error submitting enquiry:", error)
+      setIsSubmitting(false)
+    }
   }
 
   const serviceOverviews = {
@@ -104,6 +174,11 @@ export default function Services() {
       title: "Wedding Theme Designing & Setup",
       description: "Transform your vision into reality with our expert theme design and comprehensive setup services, ensuring every detail reflects your unique love story.",
       image: "/wedding-theme.jpg"
+    },
+    {
+      title: "Social Media Management",
+      description: "Share your love story beautifully with our comprehensive social media management service. We create a dedicated Instagram page for your wedding, curate stunning content from pre-wedding to post-wedding moments, and assist you throughout your journey. Let us capture and showcase every magical moment of your celebration.",
+      image: "/services/social-media.jpg"
     },
     {
       title: "Catering",
@@ -361,23 +436,6 @@ export default function Services() {
                   // Create unified gallery images array for this service
                   const galleryImages = [1, 2, 3, 4, 5, 6, 7, 8]
                   
-                  // Initialize and auto-advance the active image index
-                  useEffect(() => {
-                    if (activeMainImageIndexes[index] === undefined) {
-                      setActiveMainImageIndexes(prev => ({ ...prev, [index]: 0 }))
-                    }
-                    
-                    // Auto-advance to next image every 3.5 seconds
-                    const interval = setInterval(() => {
-                      setActiveMainImageIndexes(prev => ({
-                        ...prev,
-                        [index]: ((prev[index] || 0) + 1) % galleryImages.length
-                      }))
-                    }, 3500)
-                    
-                    return () => clearInterval(interval)
-                  }, [index])
-                  
                   const currentImageIndex = activeMainImageIndexes[index] || 0
                   
                   // Calculate which thumbnails to show (4 at a time, centered around current image)
@@ -443,14 +501,14 @@ export default function Services() {
                                       onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: thumb.globalIndex }))}
                                       className={`aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded overflow-hidden transition-all cursor-pointer ${
                                         currentImageIndex === thumb.globalIndex 
-                                          ? 'ring-2 ring-[#5da5a5] ring-offset-2 scale-95' 
+                                          ? 'ring-2 ring-[#3e4026] ring-offset-2 scale-95' 
                                           : 'hover:opacity-80'
                                       }`}
                                     >
                                       <div className="w-full h-full flex items-center justify-center">
                                         <span className={`text-xs ${
                                           currentImageIndex === thumb.globalIndex 
-                                            ? 'text-[#5da5a5] font-semibold' 
+                                            ? 'text-[#3e4026] font-semibold' 
                                             : 'text-gray-400'
                                         }`}>
                                           {thumb.imageNum}
@@ -470,7 +528,7 @@ export default function Services() {
                                   onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: imgIdx }))}
                                   className={`h-1.5 rounded-full transition-all duration-300 ${
                                     currentImageIndex === imgIdx 
-                                      ? 'bg-[#5da5a5] w-8' 
+                                      ? 'bg-[#3e4026] w-8' 
                                       : 'bg-gray-300 hover:bg-gray-400 w-1.5'
                                   }`}
                                   aria-label={`Go to image ${imgIdx + 1}`}
@@ -600,6 +658,48 @@ export default function Services() {
 
                 {/* Right Side - Form Content */}
                 <div className="p-8 md:p-10 bg-[#f5f0e8]">
+                  {isSuccess ? (
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                      className="flex flex-col items-center justify-center h-full min-h-[500px]"
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                        className="w-20 h-20 bg-[#3e4026] rounded-full flex items-center justify-center mb-6"
+                      >
+                        <motion.svg
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ delay: 0.5, duration: 0.5 }}
+                          className="w-12 h-12 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <motion.path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </motion.svg>
+                      </motion.div>
+                      <h2
+                        className="text-3xl md:text-4xl text-[#3e4026] mb-3 text-center"
+                        style={{ fontFamily: 'Playfair Display, serif' }}
+                      >
+                        Successfully Submitted!
+                      </h2>
+                      <p className="text-gray-600 text-center text-lg">
+                        Thank you for your enquiry. We'll get back to you soon.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <>
                   <h2 
                     className="text-2xl md:text-3xl text-[#a8b574] mb-2"
                     style={{ fontFamily: 'Playfair Display, serif' }}
@@ -677,13 +777,33 @@ export default function Services() {
                       </div>
                     )}
 
-                    <button
+                    <motion.button
                       type="submit"
-                      className="w-full bg-[#a8b574] text-white py-3 rounded-full font-medium hover:bg-[#96a165] transition-colors shadow-lg text-base mt-4"
+                      disabled={isSubmitting}
+                      whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                      whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                      className={`w-full py-3 rounded-full font-medium transition-all shadow-lg text-base mt-4 relative overflow-hidden ${
+                        isSubmitting 
+                          ? 'bg-[#3e4026] cursor-wait' 
+                          : 'bg-[#3e4026] hover:bg-[#2d2f1c] text-white'
+                      }`}
                     >
-                      SEND MESSAGE
-                    </button>
+                      {isSubmitting ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          />
+                          SENDING...
+                        </span>
+                      ) : (
+                        'SEND MESSAGE'
+                      )}
+                    </motion.button>
                   </form>
+                  </>
+                  )}
                 </div>
               </div>
             </motion.div>
