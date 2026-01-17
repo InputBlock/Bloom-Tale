@@ -1,7 +1,7 @@
 import rateLimit from "express-rate-limit";
 
 // General API Rate Limiter - 100 requests per 15 minutes
-export const generalLimiter = rateLimit({
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per window
   message: {
@@ -14,7 +14,7 @@ export const generalLimiter = rateLimit({
 });
 
 // Strict Auth Rate Limiter - For login/register (5 attempts per 15 min)
-export const authLimiter = rateLimit({
+const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Only 5 login attempts per 15 minutes per IP
   message: {
@@ -28,7 +28,7 @@ export const authLimiter = rateLimit({
 });
 
 // OTP Rate Limiter - For OTP requests (3 per 10 min)
-export const otpLimiter = rateLimit({
+ const otpLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 3, 
   message: {
@@ -41,7 +41,7 @@ export const otpLimiter = rateLimit({
 });
 
 // Cart Rate Limiter - 30 requests per minute
-export const cartLimiter = rateLimit({
+const cartLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 30,
   message: {
@@ -54,7 +54,7 @@ export const cartLimiter = rateLimit({
 });
 
 // Order/Payment Rate Limiter - 10 per minute
-export const orderLimiter = rateLimit({
+const orderLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 10,
   message: {

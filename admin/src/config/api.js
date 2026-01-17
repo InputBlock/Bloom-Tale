@@ -25,4 +25,10 @@ export const API_ENDPOINTS = {
   
   // Users
   GET_USERS: `${API_BASE_URL}/api/v1/admin/user_list`,
+  
+  // Hero Sections
+  GET_HERO_SECTIONS: `${API_BASE_URL}/api/v1/admin/hero`,
+  ADD_HERO_SECTION: `${API_BASE_URL}/api/v1/admin/hero`,
+  UPDATE_HERO_SECTION: (id) => `${API_BASE_URL}/api/v1/admin/hero/${id}`,
+  DELETE_HERO_SECTION: (id) => `${API_BASE_URL}/api/v1/admin/hero/${id}`,
 };
