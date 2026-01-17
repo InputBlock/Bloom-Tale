@@ -364,7 +364,7 @@ export default function Services() {
       <section className="pt-20 md:pt-28 pb-16 md:pb-24 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Tabs */}
-          <div className="flex justify-center mb-12">
+          <div className="flex justify-start mb-12">
             <div className="inline-flex gap-12 md:gap-16">
               <button
                 onClick={() => setActiveTab("wedding")}
@@ -462,13 +462,18 @@ export default function Services() {
                         {/* Content Side */}
                         <div className="w-full lg:w-1/2 space-y-6">
                           {/* Numbered Header */}
-                          <div className="flex items-baseline gap-4">
-                            <span className="text-5xl md:text-6xl font-light text-gray-300">0{index + 1}</span>
+                          <div className="flex items-baseline gap-3">
+                            <span className="text-6xl md:text-7xl lg:text-8xl font-extralight text-gray-200/80">0{index + 1}</span>
                             <h2 
-                              className="text-2xl md:text-3xl text-[#3e4026] uppercase tracking-wide font-normal"
+                              className="text-xl md:text-2xl lg:text-3xl text-[#3e4026] uppercase tracking-wider font-normal"
                               style={{ fontFamily: 'Playfair Display, serif' }}
                             >
-                              {service.title}
+                              {service.title.split('&').map((part, i, arr) => (
+                                <span key={i}>
+                                  {part}
+                                  {i < arr.length - 1 && <span className="italic text-[#c4a574]">&</span>}
+                                </span>
+                              ))}
                             </h2>
                           </div>
 
@@ -486,27 +491,27 @@ export default function Services() {
                           </button>
 
                           {/* Sliding Thumbnail Gallery */}
-                          <div className="pt-4">
+                          <div className="pt-6">
                             <div className="relative overflow-hidden">
-                              <div className="grid grid-cols-4 gap-3">
+                              <div className="grid grid-cols-4 gap-4">
                                 <AnimatePresence mode="popLayout">
                                   {visibleThumbnails.map((thumb) => (
                                     <motion.div
                                       key={thumb.globalIndex}
                                       layout
-                                      initial={{ opacity: 0, scale: 0.8 }}
+                                      initial={{ opacity: 0, scale: 0.9 }}
                                       animate={{ opacity: 1, scale: 1 }}
-                                      exit={{ opacity: 0, scale: 0.8 }}
-                                      transition={{ duration: 0.4 }}
+                                      exit={{ opacity: 0, scale: 0.9 }}
+                                      transition={{ duration: 0.3 }}
                                       onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: thumb.globalIndex }))}
-                                      className={`aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded overflow-hidden transition-all cursor-pointer ${
+                                      className={`aspect-square bg-[#f5f3f0] overflow-hidden transition-all cursor-pointer ${
                                         currentImageIndex === thumb.globalIndex 
-                                          ? 'ring-2 ring-[#3e4026] ring-offset-2 scale-95' 
-                                          : 'hover:opacity-80'
+                                          ? 'ring-2 ring-[#3e4026] ring-offset-2' 
+                                          : 'hover:ring-1 hover:ring-gray-300'
                                       }`}
                                     >
                                       <div className="w-full h-full flex items-center justify-center">
-                                        <span className={`text-xs ${
+                                        <span className={`text-sm ${
                                           currentImageIndex === thumb.globalIndex 
                                             ? 'text-[#3e4026] font-semibold' 
                                             : 'text-gray-400'
@@ -539,45 +544,60 @@ export default function Services() {
                         </div>
 
                         {/* Image Side */}
-                        <div className="w-full lg:w-1/2 h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-lg relative">
+                        <div className="w-full lg:w-1/2 h-[400px] lg:h-[520px] rounded-xl overflow-hidden relative bg-[#f5f3f0]">
                           <AnimatePresence mode="wait">
                             <motion.div
                               key={`main-${index}-${currentImageIndex}`}
-                              initial={{ opacity: 0, scale: 1.05 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.95 }}
-                              transition={{ duration: 0.5, ease: "easeInOut" }}
-                              className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f3f0] to-gray-200"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.4, ease: "easeInOut" }}
+                              className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f3f0] to-[#e8e6e2]"
                             >
-                              <p className="text-gray-400 text-lg">{service.title} - {galleryImages[currentImageIndex]}</p>
+                              {/* Placeholder - replace with actual images */}
+                              <div className="text-center">
+                                <p className="text-gray-400 text-base">{service.title} - {galleryImages[currentImageIndex]}</p>
+                              </div>
                             </motion.div>
                           </AnimatePresence>
                           
-                          {/* Navigation Arrows */}
-                          <button
-                            onClick={() => setActiveMainImageIndexes(prev => ({ 
-                              ...prev, 
-                              [index]: (prev[index] - 1 + galleryImages.length) % galleryImages.length 
-                            }))}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
-                            aria-label="Previous image"
-                          >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M12 15l-5-5 5-5" stroke="#3e4026" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => setActiveMainImageIndexes(prev => ({ 
-                              ...prev, 
-                              [index]: (prev[index] + 1) % galleryImages.length 
-                            }))}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
-                            aria-label="Next image"
-                          >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M8 15l5-5-5-5" stroke="#3e4026" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </button>
+                          {/* Bottom Navigation Bar */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm py-4 px-6">
+                            <div className="flex items-center justify-between">
+                              {/* Previous Arrow */}
+                              <button
+                                onClick={() => setActiveMainImageIndexes(prev => ({ 
+                                  ...prev, 
+                                  [index]: (prev[index] - 1 + galleryImages.length) % galleryImages.length 
+                                }))}
+                                className="w-10 h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all"
+                                aria-label="Previous image"
+                              >
+                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 15l-5-5 5-5" stroke="#3e4026" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </button>
+                              
+                              {/* Title with Image Number */}
+                              <span className="text-sm md:text-base text-[#3e4026] font-medium tracking-wide">
+                                {service.title} - {galleryImages[currentImageIndex]}
+                              </span>
+                              
+                              {/* Next Arrow */}
+                              <button
+                                onClick={() => setActiveMainImageIndexes(prev => ({ 
+                                  ...prev, 
+                                  [index]: (prev[index] + 1) % galleryImages.length 
+                                }))}
+                                className="w-10 h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all"
+                                aria-label="Next image"
+                              >
+                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M8 15l5-5-5-5" stroke="#3e4026" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -619,192 +639,167 @@ export default function Services() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             onClick={closeModal}
           >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             
             {/* Modal Content */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative bg-white rounded-lg shadow-2xl max-w-4xl w-full overflow-hidden"
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={closeModal}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
+                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors z-10"
                 aria-label="Close modal"
               >
-                <X size={24} />
+                <X size={18} className="text-gray-500" />
               </button>
 
-              {/* Modal Grid Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2">
-                {/* Left Side - Image */}
-                <div className="hidden md:block relative h-full min-h-[600px]">
-                  <img 
-                    src={selectedService?.image || "/services/wedding-default.jpg"} 
-                    alt={selectedService?.title || "Wedding Service"}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10" />
-                </div>
-
-                {/* Right Side - Form Content */}
-                <div className="p-8 md:p-10 bg-[#f5f0e8]">
-                  {isSuccess ? (
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className="flex flex-col items-center justify-center h-full min-h-[500px]"
-                    >
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                        className="w-20 h-20 bg-[#3e4026] rounded-full flex items-center justify-center mb-6"
-                      >
-                        <motion.svg
-                          initial={{ pathLength: 0 }}
-                          animate={{ pathLength: 1 }}
-                          transition={{ delay: 0.5, duration: 0.5 }}
-                          className="w-12 h-12 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <motion.path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </motion.svg>
-                      </motion.div>
-                      <h2
-                        className="text-3xl md:text-4xl text-[#3e4026] mb-3 text-center"
-                        style={{ fontFamily: 'Playfair Display, serif' }}
-                      >
-                        Successfully Submitted!
-                      </h2>
-                      <p className="text-gray-600 text-center text-lg">
-                        Thank you for your enquiry. We'll get back to you soon.
-                      </p>
-                    </motion.div>
-                  ) : (
-                    <>
-                  <h2 
-                    className="text-2xl md:text-3xl text-[#a8b574] mb-2"
-                    style={{ fontFamily: 'Playfair Display, serif' }}
+              {/* Form Content */}
+              <div className="p-8 md:p-10">
+                {isSuccess ? (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col items-center justify-center py-8"
                   >
-                    Making Your Special Day Memorable
-                  </h2>
-                  <p className="text-gray-500 text-sm mb-6">
-                    Fill the form below too get in touch with the best wedding planners around...
-                  </p>
-
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <div>
-                      <input
-                        type="text"
-                        name="name"
-                        placeholder="Name"
-                        value={formData.name}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        type="tel"
-                        name="phone"
-                        placeholder="Phone"
-                        value={formData.phone}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        type="text"
-                        name="subject"
-                        placeholder="Subject"
-                        value={formData.subject}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <textarea
-                        name="message"
-                        placeholder="Message"
-                        value={formData.message}
-                        onChange={handleFormChange}
-                        required
-                        rows="3"
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 resize-none text-sm"
-                      />
-                    </div>
-
-                    {selectedService && (
-                      <div className="text-xs text-gray-600 bg-white/50 p-2.5 rounded">
-                        <strong>Service:</strong> {selectedService.title}
-                      </div>
-                    )}
-
-                    <motion.button
-                      type="submit"
-                      disabled={isSubmitting}
-                      whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                      whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                      className={`w-full py-3 rounded-full font-medium transition-all shadow-lg text-base mt-4 relative overflow-hidden ${
-                        isSubmitting 
-                          ? 'bg-[#3e4026] cursor-wait' 
-                          : 'bg-[#3e4026] hover:bg-[#2d2f1c] text-white'
-                      }`}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      className="w-16 h-16 bg-[#3e4026] rounded-full flex items-center justify-center mb-5"
                     >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <motion.span
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      <motion.svg
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                        className="w-8 h-8 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <motion.path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </motion.svg>
+                    </motion.div>
+                    <h2
+                      className="text-2xl text-[#3e4026] mb-2 text-center font-semibold"
+                    >
+                      Request Submitted!
+                    </h2>
+                    <p className="text-gray-500 text-center text-sm">
+                      We'll get back to you within 24 hours.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <>
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                      <h2 className="text-2xl md:text-3xl text-[#3e4026] font-semibold mb-2">
+                        Book This Service
+                      </h2>
+                      <p className="text-gray-500 text-sm">
+                        Fill in your details and we'll reach out to you
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Name</label>
+                          <input
+                            type="text"
+                            name="name"
+                            placeholder="John Doe"
+                            value={formData.name}
+                            onChange={handleFormChange}
+                            className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 text-sm"
                           />
-                          SENDING...
-                        </span>
-                      ) : (
-                        'SEND MESSAGE'
-                      )}
-                    </motion.button>
-                  </form>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Phone *</label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            placeholder="+91 98765 43210"
+                            value={formData.phone}
+                            onChange={handleFormChange}
+                            required
+                            className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Email *</label>
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="you@example.com"
+                          value={formData.email}
+                          onChange={handleFormChange}
+                          required
+                          className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Message</label>
+                        <textarea
+                          name="message"
+                          placeholder="Tell us about your requirements..."
+                          value={formData.message}
+                          onChange={handleFormChange}
+                          rows="3"
+                          className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 resize-none text-sm"
+                        />
+                      </div>
+
+                      <motion.button
+                        type="submit"
+                        disabled={isSubmitting}
+                        whileHover={{ scale: isSubmitting ? 1 : 1.01 }}
+                        whileTap={{ scale: isSubmitting ? 1 : 0.99 }}
+                        className={`w-full py-3.5 rounded-lg font-medium transition-all text-sm mt-2 ${
+                          isSubmitting 
+                            ? 'bg-[#3e4026]/70 cursor-wait text-white' 
+                            : 'bg-[#3e4026] hover:bg-[#2d2f1c] text-white'
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <motion.span
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                            />
+                            Sending...
+                          </span>
+                        ) : (
+                          'Submit Request'
+                        )}
+                      </motion.button>
+
+                      <p className="text-center text-xs text-gray-400 mt-4">
+                        We respect your privacy. No spam, ever.
+                      </p>
+                    </form>
                   </>
-                  )}
-                </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

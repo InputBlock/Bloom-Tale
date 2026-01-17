@@ -7,7 +7,7 @@ export default function CorporateEvents() {
     const [isExpanded, setIsExpanded] = useState(false)
 
     const categories = [
-        "Employee engagement programs",
+        "Engagement programs",
         "Training & workshops",
         "Brand activations",
         "Product launches",
