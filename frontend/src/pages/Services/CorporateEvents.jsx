@@ -14,7 +14,8 @@ export default function CorporateEvents() {
         "Annual day",
         "Gala dinner",
         "Award nights",
-        "Corporate offsites"
+        "Corporate offsites",
+        "ATL & BTL events"
     ]
 
     return (
