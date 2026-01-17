@@ -7,6 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || ""
 export default function CategoryShowcase() {
   const sectionRef = useRef(null)
   const videoRef = useRef(null)
+  const videoContainerRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
   const [isPlaying, setIsPlaying] = useState(false)
   const [heroData, setHeroData] = useState(null)
@@ -23,9 +24,11 @@ export default function CategoryShowcase() {
     const fetchHeroData = async () => {
       try {
         const response = await fetch(`${API_URL}/api/v1/admin/hero`)
-        const data = await response.json()
-        if (data && data.length > 0) {
-          setHeroData(data[0]) // Get the first/latest hero section
+        const result = await response.json()
+        // Handle ApiResponse format: { statusCode, data, message }
+        const sections = result.data || result
+        if (sections && sections.length > 0) {
+          setHeroData(sections[0]) // Get the first/latest hero section
         }
       } catch (error) {
         console.error("Failed to fetch hero data:", error)
@@ -54,6 +57,38 @@ export default function CategoryShowcase() {
       video.removeEventListener('error', handleError)
     }
   }, [])
+
+  // Auto-play video when section comes into view
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || !heroData) return
+
+    // Create intersection observer for auto-play
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Play video when visible
+            video.play().catch((err) => {
+              console.log("Auto-play prevented:", err)
+            })
+          } else {
+            // Pause video when not visible
+            video.pause()
+          }
+        })
+      },
+      { threshold: 0.3 } // Trigger when 30% of video is visible
+    )
+
+    if (videoContainerRef.current) {
+      observer.observe(videoContainerRef.current)
+    }
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [heroData])
 
   const togglePlay = async () => {
     const video = videoRef.current
@@ -84,7 +119,7 @@ export default function CategoryShowcase() {
             transition={{ duration: 0.7 }}
             className="relative"
           >
-            <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[#eae8e4] relative">
+            <div ref={videoContainerRef} className="aspect-[4/3] rounded-xl overflow-hidden bg-[#eae8e4] relative">
               {/* Check if media is video or image */}
               {heroData?.media_uri?.match(/\.(mp4|webm|mov|avi)$/i) ? (
                 <>

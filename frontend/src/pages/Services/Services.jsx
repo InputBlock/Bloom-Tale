@@ -15,6 +15,8 @@ export default function Services() {
   const [showAllGallery, setShowAllGallery] = useState(false)
   const [activeSlideIndexes, setActiveSlideIndexes] = useState({})
   const [activeMainImageIndexes, setActiveMainImageIndexes] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,6 +48,38 @@ export default function Services() {
     setShowAllGallery(false)
   }, [activeTab])
 
+  // Auto-advance main images for all services
+  useEffect(() => {
+    const activeServices = getActiveServices()
+    const visibleCount = showAll ? activeServices.length : Math.min(2, activeServices.length)
+    const galleryLength = 8 // Number of images per service
+    
+    // Initialize indexes for all visible services
+    const newIndexes = {}
+    for (let i = 0; i < visibleCount; i++) {
+      if (activeMainImageIndexes[i] === undefined) {
+        newIndexes[i] = 0
+      }
+    }
+    if (Object.keys(newIndexes).length > 0) {
+      setActiveMainImageIndexes(prev => ({ ...prev, ...newIndexes }))
+    }
+    
+    // Set up intervals for auto-advancing
+    const intervals = []
+    for (let i = 0; i < visibleCount; i++) {
+      const interval = setInterval(() => {
+        setActiveMainImageIndexes(prev => ({
+          ...prev,
+          [i]: ((prev[i] || 0) + 1) % galleryLength
+        }))
+      }, 3500)
+      intervals.push(interval)
+    }
+    
+    return () => intervals.forEach(interval => clearInterval(interval))
+  }, [activeTab, showAll])
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -59,6 +93,8 @@ export default function Services() {
   const closeModal = () => {
     setIsModalOpen(false)
     setSelectedService(null)
+    setIsSuccess(false)
+    setIsSubmitting(false)
     document.body.style.overflow = 'auto'
   }
 
@@ -69,19 +105,53 @@ export default function Services() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log("Form submitted:", { ...formData, service: selectedService?.title })
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: ""
-    })
-    closeModal()
+    setIsSubmitting(true)
+    
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/enquiry/createEnquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
+          service: selectedService?.title
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setIsSubmitting(false)
+        setIsSuccess(true)
+        
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: ""
+        })
+        
+        // Auto-close after showing success message
+        setTimeout(() => {
+          closeModal()
+        }, 2500)
+      } else {
+        const errorData = await response.json()
+        console.error(errorData.message || "Failed to submit enquiry")
+        setIsSubmitting(false)
+      }
+    } catch (error) {
+      console.error("Error submitting enquiry:", error)
+      setIsSubmitting(false)
+    }
   }
 
   const serviceOverviews = {
@@ -104,6 +174,11 @@ export default function Services() {
       title: "Wedding Theme Designing & Setup",
       description: "Transform your vision into reality with our expert theme design and comprehensive setup services, ensuring every detail reflects your unique love story.",
       image: "/wedding-theme.jpg"
+    },
+    {
+      title: "Social Media Management",
+      description: "Share your love story beautifully with our comprehensive social media management service. We create a dedicated Instagram page for your wedding, curate stunning content from pre-wedding to post-wedding moments, and assist you throughout your journey. Let us capture and showcase every magical moment of your celebration.",
+      image: "/services/social-media.jpg"
     },
     {
       title: "Catering",
@@ -289,7 +364,7 @@ export default function Services() {
       <section className="pt-20 md:pt-28 pb-16 md:pb-24 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Tabs */}
-          <div className="flex justify-center mb-12">
+          <div className="flex justify-start mb-12">
             <div className="inline-flex gap-12 md:gap-16">
               <button
                 onClick={() => setActiveTab("wedding")}
@@ -361,23 +436,6 @@ export default function Services() {
                   // Create unified gallery images array for this service
                   const galleryImages = [1, 2, 3, 4, 5, 6, 7, 8]
                   
-                  // Initialize and auto-advance the active image index
-                  useEffect(() => {
-                    if (activeMainImageIndexes[index] === undefined) {
-                      setActiveMainImageIndexes(prev => ({ ...prev, [index]: 0 }))
-                    }
-                    
-                    // Auto-advance to next image every 3.5 seconds
-                    const interval = setInterval(() => {
-                      setActiveMainImageIndexes(prev => ({
-                        ...prev,
-                        [index]: ((prev[index] || 0) + 1) % galleryImages.length
-                      }))
-                    }, 3500)
-                    
-                    return () => clearInterval(interval)
-                  }, [index])
-                  
                   const currentImageIndex = activeMainImageIndexes[index] || 0
                   
                   // Calculate which thumbnails to show (4 at a time, centered around current image)
@@ -404,13 +462,18 @@ export default function Services() {
                         {/* Content Side */}
                         <div className="w-full lg:w-1/2 space-y-6">
                           {/* Numbered Header */}
-                          <div className="flex items-baseline gap-4">
-                            <span className="text-5xl md:text-6xl font-light text-gray-300">0{index + 1}</span>
+                          <div className="flex items-baseline gap-3">
+                            <span className="text-6xl md:text-7xl lg:text-8xl font-extralight text-gray-200/80">0{index + 1}</span>
                             <h2 
-                              className="text-2xl md:text-3xl text-[#3e4026] uppercase tracking-wide font-normal"
+                              className="text-xl md:text-2xl lg:text-3xl text-[#3e4026] uppercase tracking-wider font-normal"
                               style={{ fontFamily: 'Playfair Display, serif' }}
                             >
-                              {service.title}
+                              {service.title.split('&').map((part, i, arr) => (
+                                <span key={i}>
+                                  {part}
+                                  {i < arr.length - 1 && <span className="italic text-[#c4a574]">&</span>}
+                                </span>
+                              ))}
                             </h2>
                           </div>
 
@@ -428,29 +491,29 @@ export default function Services() {
                           </button>
 
                           {/* Sliding Thumbnail Gallery */}
-                          <div className="pt-4">
+                          <div className="pt-6">
                             <div className="relative overflow-hidden">
-                              <div className="grid grid-cols-4 gap-3">
+                              <div className="grid grid-cols-4 gap-4">
                                 <AnimatePresence mode="popLayout">
                                   {visibleThumbnails.map((thumb) => (
                                     <motion.div
                                       key={thumb.globalIndex}
                                       layout
-                                      initial={{ opacity: 0, scale: 0.8 }}
+                                      initial={{ opacity: 0, scale: 0.9 }}
                                       animate={{ opacity: 1, scale: 1 }}
-                                      exit={{ opacity: 0, scale: 0.8 }}
-                                      transition={{ duration: 0.4 }}
+                                      exit={{ opacity: 0, scale: 0.9 }}
+                                      transition={{ duration: 0.3 }}
                                       onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: thumb.globalIndex }))}
-                                      className={`aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded overflow-hidden transition-all cursor-pointer ${
+                                      className={`aspect-square bg-[#f5f3f0] overflow-hidden transition-all cursor-pointer ${
                                         currentImageIndex === thumb.globalIndex 
-                                          ? 'ring-2 ring-[#5da5a5] ring-offset-2 scale-95' 
-                                          : 'hover:opacity-80'
+                                          ? 'ring-2 ring-[#3e4026] ring-offset-2' 
+                                          : 'hover:ring-1 hover:ring-gray-300'
                                       }`}
                                     >
                                       <div className="w-full h-full flex items-center justify-center">
-                                        <span className={`text-xs ${
+                                        <span className={`text-sm ${
                                           currentImageIndex === thumb.globalIndex 
-                                            ? 'text-[#5da5a5] font-semibold' 
+                                            ? 'text-[#3e4026] font-semibold' 
                                             : 'text-gray-400'
                                         }`}>
                                           {thumb.imageNum}
@@ -470,7 +533,7 @@ export default function Services() {
                                   onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: imgIdx }))}
                                   className={`h-1.5 rounded-full transition-all duration-300 ${
                                     currentImageIndex === imgIdx 
-                                      ? 'bg-[#5da5a5] w-8' 
+                                      ? 'bg-[#3e4026] w-8' 
                                       : 'bg-gray-300 hover:bg-gray-400 w-1.5'
                                   }`}
                                   aria-label={`Go to image ${imgIdx + 1}`}
@@ -481,45 +544,60 @@ export default function Services() {
                         </div>
 
                         {/* Image Side */}
-                        <div className="w-full lg:w-1/2 h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-lg relative">
+                        <div className="w-full lg:w-1/2 h-[400px] lg:h-[520px] rounded-xl overflow-hidden relative bg-[#f5f3f0]">
                           <AnimatePresence mode="wait">
                             <motion.div
                               key={`main-${index}-${currentImageIndex}`}
-                              initial={{ opacity: 0, scale: 1.05 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.95 }}
-                              transition={{ duration: 0.5, ease: "easeInOut" }}
-                              className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f3f0] to-gray-200"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.4, ease: "easeInOut" }}
+                              className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f3f0] to-[#e8e6e2]"
                             >
-                              <p className="text-gray-400 text-lg">{service.title} - {galleryImages[currentImageIndex]}</p>
+                              {/* Placeholder - replace with actual images */}
+                              <div className="text-center">
+                                <p className="text-gray-400 text-base">{service.title} - {galleryImages[currentImageIndex]}</p>
+                              </div>
                             </motion.div>
                           </AnimatePresence>
                           
-                          {/* Navigation Arrows */}
-                          <button
-                            onClick={() => setActiveMainImageIndexes(prev => ({ 
-                              ...prev, 
-                              [index]: (prev[index] - 1 + galleryImages.length) % galleryImages.length 
-                            }))}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
-                            aria-label="Previous image"
-                          >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M12 15l-5-5 5-5" stroke="#3e4026" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => setActiveMainImageIndexes(prev => ({ 
-                              ...prev, 
-                              [index]: (prev[index] + 1) % galleryImages.length 
-                            }))}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
-                            aria-label="Next image"
-                          >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M8 15l5-5-5-5" stroke="#3e4026" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </button>
+                          {/* Bottom Navigation Bar */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm py-4 px-6">
+                            <div className="flex items-center justify-between">
+                              {/* Previous Arrow */}
+                              <button
+                                onClick={() => setActiveMainImageIndexes(prev => ({ 
+                                  ...prev, 
+                                  [index]: (prev[index] - 1 + galleryImages.length) % galleryImages.length 
+                                }))}
+                                className="w-10 h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all"
+                                aria-label="Previous image"
+                              >
+                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 15l-5-5 5-5" stroke="#3e4026" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </button>
+                              
+                              {/* Title with Image Number */}
+                              <span className="text-sm md:text-base text-[#3e4026] font-medium tracking-wide">
+                                {service.title} - {galleryImages[currentImageIndex]}
+                              </span>
+                              
+                              {/* Next Arrow */}
+                              <button
+                                onClick={() => setActiveMainImageIndexes(prev => ({ 
+                                  ...prev, 
+                                  [index]: (prev[index] + 1) % galleryImages.length 
+                                }))}
+                                className="w-10 h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all"
+                                aria-label="Next image"
+                              >
+                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M8 15l5-5-5-5" stroke="#3e4026" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -561,130 +639,167 @@ export default function Services() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             onClick={closeModal}
           >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             
             {/* Modal Content */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative bg-white rounded-lg shadow-2xl max-w-4xl w-full overflow-hidden"
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={closeModal}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
+                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors z-10"
                 aria-label="Close modal"
               >
-                <X size={24} />
+                <X size={18} className="text-gray-500" />
               </button>
 
-              {/* Modal Grid Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2">
-                {/* Left Side - Image */}
-                <div className="hidden md:block relative h-full min-h-[600px]">
-                  <img 
-                    src={selectedService?.image || "/services/wedding-default.jpg"} 
-                    alt={selectedService?.title || "Wedding Service"}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10" />
-                </div>
-
-                {/* Right Side - Form Content */}
-                <div className="p-8 md:p-10 bg-[#f5f0e8]">
-                  <h2 
-                    className="text-2xl md:text-3xl text-[#a8b574] mb-2"
-                    style={{ fontFamily: 'Playfair Display, serif' }}
+              {/* Form Content */}
+              <div className="p-8 md:p-10">
+                {isSuccess ? (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col items-center justify-center py-8"
                   >
-                    Making Your Special Day Memorable
-                  </h2>
-                  <p className="text-gray-500 text-sm mb-6">
-                    Fill the form below too get in touch with the best wedding planners around...
-                  </p>
-
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <div>
-                      <input
-                        type="text"
-                        name="name"
-                        placeholder="Name"
-                        value={formData.name}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        type="tel"
-                        name="phone"
-                        placeholder="Phone"
-                        value={formData.phone}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        type="text"
-                        name="subject"
-                        placeholder="Subject"
-                        value={formData.subject}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <textarea
-                        name="message"
-                        placeholder="Message"
-                        value={formData.message}
-                        onChange={handleFormChange}
-                        required
-                        rows="3"
-                        className="w-full px-4 py-2.5 bg-white/70 border-b-2 border-gray-300 focus:border-[#a8b574] outline-none transition-colors placeholder-gray-400 resize-none text-sm"
-                      />
-                    </div>
-
-                    {selectedService && (
-                      <div className="text-xs text-gray-600 bg-white/50 p-2.5 rounded">
-                        <strong>Service:</strong> {selectedService.title}
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      className="w-full bg-[#a8b574] text-white py-3 rounded-full font-medium hover:bg-[#96a165] transition-colors shadow-lg text-base mt-4"
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      className="w-16 h-16 bg-[#3e4026] rounded-full flex items-center justify-center mb-5"
                     >
-                      SEND MESSAGE
-                    </button>
-                  </form>
-                </div>
+                      <motion.svg
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                        className="w-8 h-8 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <motion.path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </motion.svg>
+                    </motion.div>
+                    <h2
+                      className="text-2xl text-[#3e4026] mb-2 text-center font-semibold"
+                    >
+                      Request Submitted!
+                    </h2>
+                    <p className="text-gray-500 text-center text-sm">
+                      We'll get back to you within 24 hours.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <>
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                      <h2 className="text-2xl md:text-3xl text-[#3e4026] font-semibold mb-2">
+                        Book This Service
+                      </h2>
+                      <p className="text-gray-500 text-sm">
+                        Fill in your details and we'll reach out to you
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Name</label>
+                          <input
+                            type="text"
+                            name="name"
+                            placeholder="John Doe"
+                            value={formData.name}
+                            onChange={handleFormChange}
+                            className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Phone *</label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            placeholder="+91 98765 43210"
+                            value={formData.phone}
+                            onChange={handleFormChange}
+                            required
+                            className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Email *</label>
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="you@example.com"
+                          value={formData.email}
+                          onChange={handleFormChange}
+                          required
+                          className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Message</label>
+                        <textarea
+                          name="message"
+                          placeholder="Tell us about your requirements..."
+                          value={formData.message}
+                          onChange={handleFormChange}
+                          rows="3"
+                          className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg focus:bg-gray-200 outline-none transition-all placeholder-gray-400 resize-none text-sm"
+                        />
+                      </div>
+
+                      <motion.button
+                        type="submit"
+                        disabled={isSubmitting}
+                        whileHover={{ scale: isSubmitting ? 1 : 1.01 }}
+                        whileTap={{ scale: isSubmitting ? 1 : 0.99 }}
+                        className={`w-full py-3.5 rounded-lg font-medium transition-all text-sm mt-2 ${
+                          isSubmitting 
+                            ? 'bg-[#3e4026]/70 cursor-wait text-white' 
+                            : 'bg-[#3e4026] hover:bg-[#2d2f1c] text-white'
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <motion.span
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                            />
+                            Sending...
+                          </span>
+                        ) : (
+                          'Submit Request'
+                        )}
+                      </motion.button>
+
+                      <p className="text-center text-xs text-gray-400 mt-4">
+                        We respect your privacy. No spam, ever.
+                      </p>
+                    </form>
+                  </>
+                )}
               </div>
             </motion.div>
           </motion.div>
@@ -769,37 +884,6 @@ export default function Services() {
               </button>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className="py-8 md:py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-6 md:px-12 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 
-              className="text-4xl md:text-5xl text-[#3e4026] mb-6"
-              style={{ fontFamily: 'Playfair Display, serif' }}
-            >
-              Ready to Plan Your
-              <br />
-              <span className="italic">Perfect Event?</span>
-            </h2>
-            <p className="text-gray-600 text-lg mb-8">
-              Let's discuss how we can make your next event truly exceptional
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-[#3e4026] text-white px-10 py-4 text-lg font-semibold hover:bg-[#2d2f1c] transition-colors shadow-lg"
-            >
-              Contact Us Today
-            </motion.button>
-          </motion.div>
         </div>
       </section>
 

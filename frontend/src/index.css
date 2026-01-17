@@ -154,6 +154,25 @@ img:focus:not(:focus-visible) {
   outline: none;
 }
 
+/* Override focus styles for search input */
+input[type="text"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: inherit !important;
+  border-radius: inherit !important;
+}
+
+input[type="text"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: inherit !important;
+}
+
+/* Ensure rounded-full stays on focus */
+.rounded-full:focus {
+  border-radius: 9999px !important;
+}
+
 /* Backdrop blur support */
 @supports (backdrop-filter: blur(10px)) {
   .backdrop-blur-sm {

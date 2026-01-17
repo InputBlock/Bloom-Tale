@@ -16,8 +16,12 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [showServicesDropdown, setShowServicesDropdown] = useState(false)
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false)
+  const [searchSuggestions, setSearchSuggestions] = useState([])
+  const [allProducts, setAllProducts] = useState([])
   const logoutRef = useRef(null)
   const servicesRef = useRef(null)
+  const searchRef = useRef(null)
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -37,12 +41,34 @@ export default function Header() {
   }, [])
 
   useEffect(() => {
+    // Fetch all products for search suggestions
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/v1/getProduct/list', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        })
+        const data = await response.json()
+        if (data.success && data.data) {
+          setAllProducts(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      }
+    }
+    fetchProducts()
+  }, [])
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (logoutRef.current && !logoutRef.current.contains(event.target)) {
         setShowLogout(false)
       }
       if (servicesRef.current && !servicesRef.current.contains(event.target)) {
         setShowServicesDropdown(false)
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchSuggestions(false)
       }
     }
 
@@ -87,9 +113,64 @@ export default function Header() {
   const handleSearch = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery)
-      // navigate(`/search?q=${searchQuery}`)
+      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`)
+      setShowSearchSuggestions(false)
+      setSearchQuery("")
     }
+  }
+
+  const handleSearchInputChange = (e) => {
+    const query = e.target.value
+    setSearchQuery(query)
+
+    if (query.trim().length > 0) {
+      // Generate suggestions
+      const suggestions = []
+      const queryLower = query.toLowerCase()
+
+      // Product name matches
+      const productMatches = allProducts
+        .filter(p => p.name?.toLowerCase().includes(queryLower))
+        .slice(0, 5)
+        .map(p => ({
+          type: 'product',
+          text: p.name,
+          category: p.category,
+          price: p.pricing?.small || p.pricing?.medium || p.pricing?.large,
+          image: p.images_uri?.[0]
+        }))
+
+      // Category suggestions
+      const categories = ['Birthday', 'Anniversary', 'Wedding', 'Corporate', 'Premium']
+      const categoryMatches = categories
+        .filter(c => c.toLowerCase().includes(queryLower))
+        .map(c => ({ type: 'category', text: c }))
+
+      // Price-based suggestions
+      const priceKeywords = ['under 500', 'under 1000', 'under 2000', 'above 2000']
+      const priceMatches = priceKeywords
+        .filter(p => p.includes(queryLower) || queryLower.includes('under') || queryLower.includes('below'))
+        .map(p => ({ type: 'price', text: `Flowers ${p}` }))
+
+      suggestions.push(...productMatches, ...categoryMatches.slice(0, 2), ...priceMatches.slice(0, 2))
+      setSearchSuggestions(suggestions.slice(0, 8))
+      setShowSearchSuggestions(true)
+    } else {
+      setShowSearchSuggestions(false)
+      setSearchSuggestions([])
+    }
+  }
+
+  const handleSuggestionClick = (suggestion) => {
+    if (suggestion.type === 'product') {
+      navigate(`/shop?search=${encodeURIComponent(suggestion.text)}`)
+    } else if (suggestion.type === 'category') {
+      navigate(`/shop?search=${encodeURIComponent(suggestion.text)}`)
+    } else if (suggestion.type === 'price') {
+      navigate(`/shop?search=${encodeURIComponent(suggestion.text)}`)
+    }
+    setShowSearchSuggestions(false)
+    setSearchQuery("")
   }
 
   const navLinks = [
@@ -123,18 +204,20 @@ export default function Header() {
           </Link>
 
           {/* Centered Search Bar - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-xl mx-4">
+          <div className="hidden md:flex flex-1 max-w-xl mx-4" ref={searchRef}>
             <form onSubmit={handleSearch} className="w-full relative">
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchInputChange}
+                onFocus={() => searchQuery.trim() && setShowSearchSuggestions(true)}
                 placeholder="Search flowers, arrangements, occasions..."
-                className={`w-full px-4 py-2.5 pr-12 rounded-full border transition-all duration-300 ${
+                className={`w-full px-4 py-2.5 pr-12 rounded-full border transition-colors duration-300 ${
                   scrolled || !isHomePage 
-                    ? "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-[#3e4026]" 
-                    : "bg-white/10 border-white/30 text-white placeholder-white/70 focus:bg-white/20 focus:border-white/50"
-                } focus:outline-none focus:ring-2 focus:ring-[#3e4026]/20`}
+                    ? "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 focus:border-gray-200" 
+                    : "bg-white/10 border-white/30 text-white placeholder-white/70 focus:border-white/30"
+                } focus:outline-none focus:ring-0 focus:shadow-none focus:rounded-full`}
+                style={{ boxShadow: 'none !important', outline: 'none !important', borderRadius: '9999px !important' }}
               />
               <button
                 type="submit"
@@ -147,6 +230,74 @@ export default function Header() {
               >
                 <Search size={18} strokeWidth={2} />
               </button>
+
+              {/* Search Suggestions Dropdown */}
+              <AnimatePresence>
+                {showSearchSuggestions && searchSuggestions.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-black/30 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden max-h-[400px] overflow-y-auto"
+                    style={{ backdropFilter: 'blur(20px)' }}
+                  >
+                    <div className="p-3">
+                      <div className="mb-2">
+                        <h4 className="text-[10px] font-semibold text-white/60 uppercase tracking-wider px-2">Search Results</h4>
+                      </div>
+                      {searchSuggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/20 hover:shadow-md transition-all duration-200 text-left group"
+                        >
+                          {suggestion.type === 'product' ? (
+                            <>
+                              <div className="w-10 h-10 bg-white/20 rounded-lg overflow-hidden flex-shrink-0">
+                                {suggestion.image ? (
+                                  <img src={suggestion.image} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-white/60">
+                                    <Search size={16} />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-white truncate">{suggestion.text}</p>
+                                <p className="text-xs text-white/60">{suggestion.category}</p>
+                              </div>
+                              {suggestion.price && (
+                                <span className="text-xs font-medium text-white">₹{suggestion.price}</span>
+                              )}
+                            </>
+                          ) : suggestion.type === 'category' ? (
+                            <>
+                              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <ChevronDown size={16} className="text-white -rotate-90" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-white">{suggestion.text}</p>
+                                <p className="text-xs text-white/60">Category</p>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span className="text-white font-bold text-xs">₹</span>
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-white">{suggestion.text}</p>
+                                <p className="text-xs text-white/60">Price range</p>
+                              </div>
+                            </>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </form>
           </div>
 
@@ -264,24 +415,25 @@ export default function Header() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden"
+                    className="absolute right-0 mt-2 w-64 bg-black/30 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 overflow-hidden"
+                    style={{ backdropFilter: 'blur(20px)' }}
                   >
-                    <div className="px-4 py-4 bg-[#f9f8f6] border-b border-gray-100">
-                      <p className="text-xs text-gray-500 mb-1">Signed in as</p>
-                      <p className="text-sm font-medium text-[#3e4026] truncate">{userEmail}</p>
+                    <div className="px-4 py-4 border-b border-white/10">
+                      <p className="text-xs text-white/60 mb-1">Signed in as</p>
+                      <p className="text-sm font-medium text-white truncate">{userEmail}</p>
                     </div>
                     <Link
                       to="/orders"
                       onClick={() => setShowLogout(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-white/20 transition-all duration-200"
                     >
-                      <ShoppingCart size={16} className="text-gray-400" />
+                      <ShoppingCart size={16} className="text-white/80" />
                       My Orders
                     </Link>
-                    <div className="border-t border-gray-100">
+                    <div className="border-t border-white/10">
                       <button
                         onClick={handleLogout}
-                        className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                        className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-white/20 flex items-center gap-3 transition-all duration-200"
                       >
                         <LogOut size={16} />
                         Logout
