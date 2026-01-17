@@ -62,10 +62,10 @@ export default function RazorpayPayment() {
           name: "Bloom Tale",
           description: "Order Payment",
           order_id: razorpayOrder.id,
-          handler: async function (response) {
-            // Payment successful - show verifying state
-            setLoading(true)
-            await verifyPayment(response)
+          handler: function (response) {
+            // Payment successful - Razorpay modal will close automatically
+            // Verify payment in background and redirect
+            verifyPayment(response)
           },
           prefill: {
             name: "",
@@ -113,9 +113,6 @@ export default function RazorpayPayment() {
   }
 
   const verifyPayment = async (paymentResponse) => {
-    setLoading(true)
-    setError("") // Clear any previous errors
-    
     try {
       const token = localStorage.getItem("token")
 
@@ -139,20 +136,13 @@ export default function RazorpayPayment() {
       if (!response.ok) {
         // Mark payment as failed in backend
         await markPaymentFailed()
-        if (razorpayInstance.current) {
-          razorpayInstance.current.close()
-        }
-        throw new Error(data.message || "Payment verification failed")
-      }
-
-      // Close Razorpay modal
-      if (razorpayInstance.current) {
-        razorpayInstance.current.close()
+        setError(data.message || "Payment verification failed")
+        setLoading(false)
+        return
       }
       
-      setPaymentSuccess(true)
-      // Immediate redirect without delay
-      navigate("/orders")
+      // Payment verified successfully - redirect immediately
+      window.location.href = "/orders"
     } catch (err) {
       setError(err.message || "Payment verification failed")
       setLoading(false)
