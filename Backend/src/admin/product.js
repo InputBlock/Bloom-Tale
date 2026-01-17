@@ -113,7 +113,7 @@ export async function getList() {
             description: item.description,
             category: item.category,
             subcategory: item.subcategory,
-            price: item.pricing,
+            pricing: item.pricing,
             sizes: item.sizes,
             stock: item.stock,
             images: item.images_uri || [],
@@ -125,12 +125,3 @@ export async function getList() {
         }))
     };
 }
-
-
-
-
-
-
-
-
-
