@@ -9,6 +9,7 @@ import ProductDetailsPage from './pages/productDetails'
 import Landing from './pages/Landing'
 import ProductCart from './pages/ProductCart/productCart'
 import Checkout from './pages/Checkout'
+import Shop from './pages/Shop'
 import { CartProvider } from './context/CartContext'
 import ToastContainer from './components/common/ToastContainer'
 import AuthCallback from './pages/AuthCallback'
@@ -28,6 +29,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/shop" element={<Shop />} />
           <Route path="/productDetails" element={<ProductDetailsPage />} />
           <Route path="/product/:productId" element={<ProductDetailsPage />} />
           <Route path="/cart" element={<ProductCart />} />

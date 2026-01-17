@@ -33,6 +33,10 @@ export const addToCart = asyncHandler(async (req, res) => {
       email: user.email,
       items: [],
     });
+  } else if (!cart.username || !cart.email) {
+    // Update existing cart with missing user info
+    cart.username = user.username;
+    cart.email = user.email;
   }
 
    // check if product already in cart

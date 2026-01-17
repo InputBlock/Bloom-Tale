@@ -114,9 +114,9 @@ export default function ProductDetailsPage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-12">
+      <main className="max-w-7xl mx-auto pl-0 pr-6 md:pl-0 md:pr-12 py-8 md:py-12">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-[#3e4026]/60 mb-8 md:mb-12">
+        <nav className="flex items-center gap-2 text-sm text-[#3e4026]/60 mb-8 md:mb-12 pl-6 md:pl-12">
           <Link to="/home" className="hover:text-[#3e4026] transition-colors">
             Home
           </Link>
@@ -136,7 +136,7 @@ export default function ProductDetailsPage() {
         </nav>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           <div className="lg:sticky lg:top-24 lg:self-start">
             <ProductImages product={product} />
           </div>

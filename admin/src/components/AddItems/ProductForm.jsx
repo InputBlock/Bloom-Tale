@@ -56,9 +56,13 @@ export default function ProductForm({ images, setImages }) {
       formDataToSend.append("stock", formData.inStock ? 100 : 0)
       formDataToSend.append("same_day_delivery", formData.sameDayDelivery)
       
-      // Append image file if exists
-      if (images.length > 0 && images[0].file) {
-        formDataToSend.append("image", images[0].file)
+      // Append all image files - first image will be the main image
+      if (images.length > 0) {
+        images.forEach((img) => {
+          if (img.file) {
+            formDataToSend.append("images", img.file)
+          }
+        })
       }
 
       await axios.post(
