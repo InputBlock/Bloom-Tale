@@ -40,6 +40,12 @@ const addressSchema = {
 
 const orderSchema = new Schema(
   {
+    order_id: {
+      type: String,
+      unique: true,
+      index: true,
+    },
+
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",

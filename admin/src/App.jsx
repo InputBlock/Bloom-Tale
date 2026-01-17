@@ -6,6 +6,7 @@ import AddItems from './pages/AddItems'
 import ListItems from './pages/ListItems'
 import Orders from './pages/Orders'
 import Users from './pages/Users'
+import EditContent from './pages/EditContent'
 import Login from './pages/Login'
 import './App.css'
 
@@ -48,6 +49,13 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<Users />} />
+        </Route>
+        <Route path="/edit-content" element={
+          <ProtectedRoute>
+            <Layout title="Edit Content" subtitle="Manage hero sections and landing page" />
+          </ProtectedRoute>
+        }>
+          <Route index element={<EditContent />} />
         </Route>
       </Routes>
     </Router>

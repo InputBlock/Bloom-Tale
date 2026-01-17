@@ -25,7 +25,8 @@ const add_item = async (req, res) => {
             image_public: image_public,
             stock: parseInt(req.body.stock) || 0,
             bestSeller: req.body.bestSeller === 'true' || req.body.bestSeller === true,
-            same_day_delivery: req.body.same_day_delivery === 'true' || req.body.same_day_delivery === true
+            same_day_delivery: req.body.same_day_delivery === 'true' || req.body.same_day_delivery === true,
+            is_active: req.body.is_active === 'true' || req.body.is_active === true || req.body.is_active === undefined
         };
 
         const p = await addItem(details);

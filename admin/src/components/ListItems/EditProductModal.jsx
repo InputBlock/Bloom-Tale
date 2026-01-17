@@ -85,7 +85,7 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
             
             {/* Small Price */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Small ($)</label>
+              <label className="block text-xs text-gray-500 mb-1">Small (₹)</label>
               <input
                 type="number"
                 step="0.01"
@@ -98,7 +98,7 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
 
             {/* Medium Price */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Medium ($)</label>
+              <label className="block text-xs text-gray-500 mb-1">Medium (₹)</label>
               <input
                 type="number"
                 step="0.01"
@@ -111,7 +111,7 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
 
             {/* Large Price */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Large ($)</label>
+              <label className="block text-xs text-gray-500 mb-1">Large (₹)</label>
               <input
                 type="number"
                 step="0.01"

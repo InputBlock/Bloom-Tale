@@ -1,4 +1,4 @@
-import {getUserInfo} from "../../admin/status.js"
+import {getUserInfo} from "../../admin/userstatus.js"
 
 const get_user_info=async(req , res)=>{
     try{

@@ -85,7 +85,7 @@ export default function ProductCard({
           {product.name}
         </h3>
         <p className="text-lg font-light text-[#3e4026]">
-          ₹{(product.pricing?.small || product.pricing?.medium || product.pricing?.large || product.price || 0).toLocaleString()}
+          ₹{(product.pricing?.medium || product.pricing?.small || product.pricing?.large || product.price || 0).toLocaleString()}
         </p>
         
         {/* Stock Status */}
