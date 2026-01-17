@@ -14,8 +14,10 @@ export default function EditContent() {
       const response = await fetch(API_ENDPOINTS.GET_HERO_SECTIONS, {
         credentials: "include",
       })
-      const data = await response.json()
-      setHeroSections(data)
+      const result = await response.json()
+      // Handle ApiResponse format: { statusCode, data, message }
+      const sections = result.data || result
+      setHeroSections(Array.isArray(sections) ? sections : [])
     } catch (error) {
       console.error("Failed to fetch hero sections:", error)
     } finally {
