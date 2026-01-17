@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "../constants.js";
+import User from "../models/user.model.js";
 
 const connectDB = async () => {
   try {
+    mongoose.set("autoIndex", false);
     const connectionInstance = await mongoose.connect(
       `${process.env.MONGODB_URI}/${DB_NAME}`,
       {
@@ -17,6 +19,12 @@ const connectDB = async () => {
       `MongoDB connected! Host: ${connectionInstance.connection.host}`
     );
     console.log("DB Name:", mongoose.connection.name);
+
+    // Sync indexes for User model
+    // await User.syncIndexes();
+    await User.createIndexes();
+
+    console.log("✅ User indexes synced");
 
   } catch (error) {
     console.error("MongoDB connection FAILED ❌", error);

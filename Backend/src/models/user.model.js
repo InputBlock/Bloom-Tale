@@ -100,4 +100,12 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
+
+// INDEXES
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ refreshToken: 1 });
+userSchema.index({ emailOtp: 1, emailOtpExpiry: 1 });
+userSchema.index({ createdAt: -1 });
+
+
 export default mongoose.model("User", userSchema);
