@@ -71,19 +71,29 @@ export default function Shop() {
     return category ? category.name.toUpperCase() : 'LUXURY FLOWER DELIVERY'
   }
 
+  // Helper function to get product price consistently
+  const getProductPrice = (product) => {
+    // Check in the same order as displayed: medium -> small -> large -> price
+    return product.pricing?.medium || product.pricing?.small || product.pricing?.large || product.price || 0
+  }
+
   // Smart search filter function
   const filterBySearch = (products, query) => {
     if (!query) return products
 
-    const queryLower = query.toLowerCase()
+    const queryLower = query.toLowerCase().trim()
     let filtered = products
 
-    // Extract price from query (e.g., "under 500", "below 1000")
-    const priceMatch = queryLower.match(/(under|below|less than)\s*(\d+)/)
-    const maxPrice = priceMatch ? parseInt(priceMatch[2]) : null
+    // Extract price from query (e.g., "under 500", "below 1000", "under 1500")
+    const priceMatch = queryLower.match(/(under|below|less than|above|over|more than)\s*[₹rs.]?\s*(\d+)/)
+    const priceOperator = priceMatch ? priceMatch[1] : null
+    const priceValue = priceMatch ? parseInt(priceMatch[2]) : null
 
     // Filter products
     filtered = products.filter(product => {
+      // Get product price using the consistent helper function
+      const productPrice = getProductPrice(product)
+      
       // Name match
       const nameMatch = product.name?.toLowerCase().includes(queryLower)
       
@@ -94,9 +104,38 @@ export default function Shop() {
       const categoryMatch = product.category?.toLowerCase().includes(queryLower)
       
       // Price filter if specified
-      if (maxPrice) {
-        const productPrice = product.pricing?.small || product.pricing?.medium || product.pricing?.large || 0
-        return (nameMatch || descMatch || categoryMatch) && productPrice <= maxPrice
+      if (priceValue !== null) {
+        // Generic terms that should be ignored when combined with price
+        const genericTerms = /^(flower|flowers|bouquet|bouquets|arrangement|arrangements|gift|gifts|product|products)?\s*(under|below|less than|above|over|more than)\s*[₹rs.]?\s*\d+$/i
+        
+        // Check if it's purely price-based (with or without generic terms)
+        const isPurelyPriceQuery = genericTerms.test(queryLower)
+        
+        if (isPurelyPriceQuery) {
+          // Only apply price filter
+          if (priceOperator === 'under' || priceOperator === 'below' || priceOperator === 'less than') {
+            return productPrice < priceValue
+          } else if (priceOperator === 'above' || priceOperator === 'over' || priceOperator === 'more than') {
+            return productPrice > priceValue
+          }
+        } else {
+          // Remove the price part from query to get the actual search text
+          const textQuery = queryLower.replace(/(under|below|less than|above|over|more than)\s*[₹rs.]?\s*\d+/, '').trim()
+          
+          // Check if remaining text matches product details
+          const textMatch = textQuery ? (
+            product.name?.toLowerCase().includes(textQuery) ||
+            product.description?.toLowerCase().includes(textQuery) ||
+            product.category?.toLowerCase().includes(textQuery)
+          ) : true
+          
+          // Apply both text and price filters
+          if (priceOperator === 'under' || priceOperator === 'below' || priceOperator === 'less than') {
+            return textMatch && productPrice < priceValue
+          } else if (priceOperator === 'above' || priceOperator === 'over' || priceOperator === 'more than') {
+            return textMatch && productPrice > priceValue
+          }
+        }
       }
       
       return nameMatch || descMatch || categoryMatch
@@ -149,14 +188,14 @@ export default function Shop() {
           // Client-side sorting
           if (sortBy === 'price-low') {
             sortedProducts.sort((a, b) => {
-              const priceA = a.pricing?.small || a.pricing?.medium || a.pricing?.large || 0
-              const priceB = b.pricing?.small || b.pricing?.medium || b.pricing?.large || 0
+              const priceA = getProductPrice(a)
+              const priceB = getProductPrice(b)
               return priceA - priceB
             })
           } else if (sortBy === 'price-high') {
             sortedProducts.sort((a, b) => {
-              const priceA = a.pricing?.small || a.pricing?.medium || a.pricing?.large || 0
-              const priceB = b.pricing?.small || b.pricing?.medium || b.pricing?.large || 0
+              const priceA = getProductPrice(a)
+              const priceB = getProductPrice(b)
               return priceB - priceA
             })
           } else if (sortBy === 'newest') {
