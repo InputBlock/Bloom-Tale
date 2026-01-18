@@ -65,6 +65,19 @@ const orderSchema = new Schema(
       // required: true,
       default:null
     },
+    
+    order_status:{
+      type:String,
+        enum: [
+        "PLACED",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELLED",
+        "RETURNED",
+        "CREATED"
+      ],
+      default: "CREATED",
+    },
 
     status: {
       type: String,
