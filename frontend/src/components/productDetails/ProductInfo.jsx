@@ -12,6 +12,9 @@ export default function ProductInfo({ product }) {
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [selectedDeliveryType, setSelectedDeliveryType] = useState("fixed")
   const [activeTab, setActiveTab] = useState("description")
+  const [pincode, setPincode] = useState("")
+  const [pincodeStatus, setPincodeStatus] = useState(null) // null, 'checking', 'available', 'unavailable'
+  const [showPincodeWarning, setShowPincodeWarning] = useState(false)
   const { addToCart, isLoggedIn } = useCart()
   const navigate = useNavigate()
 
@@ -32,8 +35,49 @@ export default function ProductInfo({ product }) {
     }
   }
 
+  const handlePincodeChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "") // Only allow digits
+    if (value.length <= 6) {
+      setPincode(value)
+      setPincodeStatus(null)
+      setShowPincodeWarning(false)
+    }
+  }
+
+  const checkPincodeAvailability = async () => {
+    if (pincode.length !== 6) {
+      setPincodeStatus('unavailable')
+      return
+    }
+
+    setPincodeStatus('checking')
+    
+    // Check if pincode is in the 50000+ range (not serviceable)
+    setTimeout(() => {
+      const pincodeNum = parseInt(pincode)
+      if (pincodeNum >= 500000) {
+        setPincodeStatus('unavailable')
+      } else {
+        setPincodeStatus('available')
+      }
+    }, 500)
+  }
+
   const handleAddToCart = async () => {
     if (!product) return
+
+    // Check if pincode is verified
+    if (pincodeStatus !== 'available') {
+      setShowPincodeWarning(true)
+      // Focus the pincode input
+      document.querySelector('input[type="text"][placeholder="Enter Pincode"]')?.focus()
+      // Scroll to pincode section
+      document.querySelector('input[type="text"][placeholder="Enter Pincode"]')?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      })
+      return
+    }
 
     if (!isLoggedIn()) {
       navigate("/login", { state: { from: `/product/${product.product_id}` } })
@@ -64,6 +108,19 @@ export default function ProductInfo({ product }) {
 
   const handleBuyNow = async () => {
     if (!product) return
+
+    // Check if pincode is verified
+    if (pincodeStatus !== 'available') {
+      setShowPincodeWarning(true)
+      // Focus the pincode input
+      document.querySelector('input[type="text"][placeholder="Enter Pincode"]')?.focus()
+      // Scroll to pincode section
+      document.querySelector('input[type="text"][placeholder="Enter Pincode"]')?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      })
+      return
+    }
 
     if (!isLoggedIn()) {
       navigate("/login", { state: { from: `/product/${product.product_id}` } })
@@ -177,9 +234,83 @@ export default function ProductInfo({ product }) {
         </div>
       </div>
 
+      {/* Pincode Availability Check */}
+      <div>
+        <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-3 font-medium">Check Delivery Availability</p>
+        <div className="flex gap-3 items-start">
+          <div className="flex-1">
+            <input
+              type="text"
+              value={pincode}
+              onChange={handlePincodeChange}
+              placeholder="Enter Pincode"
+              maxLength="6"
+              className={`w-full border px-4 py-3 text-sm focus:outline-none transition-colors ${
+                showPincodeWarning && pincodeStatus !== 'available'
+                  ? 'border-amber-500 focus:border-amber-600'
+                  : 'border-gray-300 focus:border-[#3e4026]'
+              }`}
+            />
+          </div>
+          <button
+            onClick={checkPincodeAvailability}
+            disabled={pincode.length !== 6 || pincodeStatus === 'checking'}
+            className="bg-[#3e4026] text-white px-6 py-3 text-sm font-medium hover:bg-[#2d2f1c] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            {pincodeStatus === 'checking' ? 'Checking...' : 'Check'}
+          </button>
+        </div>
+        {showPincodeWarning && pincodeStatus !== 'available' && (
+          <div className="flex items-start gap-2 mt-3 p-3 bg-amber-50 border border-amber-300 rounded">
+            <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p className="text-sm font-medium text-amber-800">
+              Please enter your pincode and check delivery availability to proceed
+            </p>
+          </div>
+        )}
+        {pincodeStatus === 'available' && (
+          <div className="flex items-center gap-2 mt-3 p-3 bg-green-50 border border-green-200 rounded">
+            <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-green-800">Delivery Available</p>
+              <p className="text-xs text-green-600 mt-0.5">We deliver to your location</p>
+            </div>
+          </div>
+        )}
+        {pincodeStatus === 'unavailable' && (
+          <div className="mt-3 p-4 bg-red-50 border border-red-200 rounded">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-red-800 mb-1">Delivery Not Available</p>
+                <p className="text-xs text-red-600 leading-relaxed">
+                  We currently don't deliver to pincode {pincode}. We're working to expand our delivery network.
+                </p>
+                <button
+                  onClick={() => {
+                    setPincode("")
+                    setPincodeStatus(null)
+                    setShowPincodeWarning(false)
+                  }}
+                  className="mt-2 text-xs font-medium text-red-700 hover:text-red-800 underline"
+                >
+                  Try another pincode
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Delivery Information - Conditional based on same_day_delivery */}
       {product.same_day_delivery ? (
-        <div className="space-y-4 pt-2">
+        <div className={`space-y-4 pt-2 ${pincodeStatus === 'unavailable' ? 'opacity-40 pointer-events-none' : ''}`}>
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold text-[#3e4026]">
               Pick the Best Time and Way to Deliver!
@@ -192,11 +323,12 @@ export default function ProductInfo({ product }) {
             </div>
           </div>
 
-          {/* Delivery Type Options - Only Fixed Time and Midnight */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Delivery Type Options - Fixed Time, Midnight, and Express */}
+          <div className="grid grid-cols-3 gap-3">
             {/* Fixed Time Delivery */}
             <button
               onClick={() => setSelectedDeliveryType("fixed")}
+              disabled={pincodeStatus === 'unavailable'}
               className={`p-4 text-left border transition-all ${
                 selectedDeliveryType === "fixed"
                   ? "border-[#3e4026] bg-[#f9f8f6]"
@@ -215,6 +347,7 @@ export default function ProductInfo({ product }) {
             {/* Midnight Delivery */}
             <button
               onClick={() => setSelectedDeliveryType("midnight")}
+              disabled={pincodeStatus === 'unavailable'}
               className={`p-4 text-left border transition-all ${
                 selectedDeliveryType === "midnight"
                   ? "border-[#3e4026] bg-[#f9f8f6]"
@@ -226,14 +359,36 @@ export default function ProductInfo({ product }) {
                 <span className="text-sm font-medium text-[#3e4026]">₹ 175</span>
               </div>
               <p className="text-xs text-[#3e4026]/70 leading-relaxed">
-                Delivery between 11:00 PM - 11:59 PM
+                Delivery between 11:00 PM - 2:00 AM
+              </p>
+            </button>
+
+            {/* Express Delivery */}
+            <button
+              onClick={() => setSelectedDeliveryType("express")}
+              disabled={pincodeStatus === 'unavailable'}
+              className={`p-4 text-left border transition-all ${
+                selectedDeliveryType === "express"
+                  ? "border-[#3e4026] bg-[#f9f8f6]"
+                  : "border-gray-200 bg-white hover:border-[#3e4026]"
+              }`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="text-sm font-semibold text-[#3e4026]">Express</h4>
+                <span className="text-sm font-medium text-[#3e4026]">₹ 349</span>
+              </div>
+              <p className="text-xs text-[#3e4026]/70 leading-relaxed">
+                Fast delivery within 2-3 hours
               </p>
             </button>
           </div>
 
           {/* Time Slot Selector (shown for Fixed Time) */}
           {selectedDeliveryType === "fixed" && (
-            <select className="w-full border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-[#3e4026]">
+            <select 
+              disabled={pincodeStatus === 'unavailable'}
+              className="w-full border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-[#3e4026] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <option>Select Time Slot</option>
               <option>9:00 AM - 11:00 AM</option>
               <option>11:00 AM - 1:00 PM</option>
@@ -288,7 +443,7 @@ export default function ProductInfo({ product }) {
       <div className="grid grid-cols-2 gap-4 pt-2">
         <button 
           onClick={handleAddToCart}
-          disabled={!product.stock || product.stock === 0}
+          disabled={!product.stock || product.stock === 0 || pincodeStatus === 'unavailable'}
           className="bg-[#3e4026] text-white py-4 px-6 text-sm font-semibold hover:bg-[#2d2f1c] transition-all uppercase tracking-wider flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           <span>Add to Cart</span>
@@ -298,7 +453,7 @@ export default function ProductInfo({ product }) {
         </button>
         <button 
           onClick={handleBuyNow}
-          disabled={!product.stock || product.stock === 0}
+          disabled={!product.stock || product.stock === 0 || pincodeStatus === 'unavailable'}
           className="bg-white border-2 border-[#3e4026] text-[#3e4026] py-4 px-6 text-sm font-semibold hover:bg-[#3e4026] hover:text-white transition-all uppercase tracking-wider disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-white"
         >
           Buy Now
