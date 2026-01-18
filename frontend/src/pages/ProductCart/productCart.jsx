@@ -52,7 +52,7 @@ export default function ProductCart() {
             <h2 className="text-2xl font-serif text-gray-900 mb-4">Your Cart is Empty</h2>
             <p className="text-gray-600 mb-6 font-['Poppins']">Add some beautiful blooms to your cart!</p>
             <button
-              onClick={() => navigate("/home")}
+              onClick={() => navigate("/shop")}
               className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-8 rounded-md transition font-['Poppins']"
             >
               Continue Shopping
