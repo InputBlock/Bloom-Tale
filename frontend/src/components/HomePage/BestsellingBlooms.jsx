@@ -75,21 +75,20 @@ export default function BestsellingBlooms() {
   }
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section ref={sectionRef} className="py-12 sm:py-16 md:py-20 lg:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between mb-12"
-        >
+          className="flex flex-col md:flex-row md:items-end md:justify-between mb-8 sm:mb-10 md:mb-12">
           <div>
-            <p className="text-[11px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-4">
+            <p className="text-[10px] sm:text-[11px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-[#3e4026]/60 mb-3 sm:mb-4">
               Most Loved
             </p>
             <h2 
-              className="text-4xl md:text-5xl text-[#3e4026]"
+              className="text-3xl sm:text-4xl md:text-5xl text-[#3e4026]"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               Bestselling
@@ -97,21 +96,21 @@ export default function BestsellingBlooms() {
               <span className="italic">Blooms</span>
             </h2>
           </div>
-          <div className="flex items-center gap-4 mt-6 md:mt-0">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mt-5 sm:mt-6 md:mt-0">
             {/* Navigation Arrows */}
             <button
               onClick={handlePrev}
-              className="w-12 h-12 border border-gray-200 flex items-center justify-center hover:bg-[#3e4026] hover:text-white hover:border-[#3e4026] transition-all duration-300"
+              className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 border border-gray-200 rounded-sm flex items-center justify-center hover:bg-[#3e4026] hover:text-white hover:border-[#3e4026] active:scale-95 transition-all duration-300"
               aria-label="Previous products"
             >
-              <ArrowLeft size={18} />
+              <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
             <button
               onClick={handleNext}
-              className="w-12 h-12 border border-gray-200 flex items-center justify-center hover:bg-[#3e4026] hover:text-white hover:border-[#3e4026] transition-all duration-300"
+              className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 border border-gray-200 rounded-sm flex items-center justify-center hover:bg-[#3e4026] hover:text-white hover:border-[#3e4026] active:scale-95 transition-all duration-300"
               aria-label="Next products"
             >
-              <ArrowRight size={18} />
+              <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
           </div>
         </motion.div>
@@ -125,7 +124,7 @@ export default function BestsellingBlooms() {
 
         {/* Products Grid */}
         {!loading && products.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {products.map((product, index) => (
               <motion.div
                 key={product._id}
@@ -138,12 +137,12 @@ export default function BestsellingBlooms() {
                 className="group cursor-pointer"
               >
                 {/* Product Image */}
-                <div className="relative overflow-hidden mb-4 aspect-[3/4] bg-[#f9f8f6]">
+                <div className="relative overflow-hidden mb-3 sm:mb-4 aspect-[3/4] bg-[#f9f8f6] rounded-sm">
                   {product.images_uri && product.images_uri.length > 0 ? (
                     <motion.img
                       src={product.images_uri[0]}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
                       animate={{
                         scale: hoveredId === product._id ? 1.05 : 1,
                       }}
@@ -167,19 +166,19 @@ export default function BestsellingBlooms() {
                     }}
                     transition={{ duration: 0.3 }}
                     onClick={(e) => handleAddToCart(e, product)}
-                    className="absolute bottom-4 left-4 right-4 bg-white py-3 text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white transition-colors duration-300"
+                    className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 bg-white py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white active:scale-95 transition-all duration-300 rounded-sm"
                   >
                     Add to Cart
                   </motion.button>
 
                   {/* Arrow Icon */}
-                  <div className="absolute top-4 right-4 w-10 h-10 bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <ArrowUpRight size={18} className="text-[#3e4026]" />
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-white rounded-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <ArrowUpRight size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] text-[#3e4026]" />
                   </div>
 
                   {/* Category Badge */}
-                  <div className="absolute top-4 left-4">
-                    <span className="text-[10px] tracking-widest uppercase bg-white px-3 py-1.5 text-[#3e4026]">
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4">
+                    <span className="text-[9px] sm:text-[10px] tracking-widest uppercase bg-white rounded-sm px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 text-[#3e4026]">
                       {product.category}
                     </span>
                   </div>
@@ -188,21 +187,21 @@ export default function BestsellingBlooms() {
                 {/* Product Info */}
                 <div>
                   <h3 
-                    className="text-lg text-[#3e4026] mb-1 group-hover:underline"
+                    className="text-sm sm:text-base md:text-lg text-[#3e4026] mb-1 group-hover:underline line-clamp-2"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     {product.name}
                   </h3>
-                  <p className="text-lg font-light text-[#3e4026]">₹{product.pricing?.medium || product.price || 0}</p>
+                  <p className="text-sm sm:text-base md:text-lg font-light text-[#3e4026]">₹{product.pricing?.medium || product.price || 0}</p>
                   
                   {/* Stock Status */}
                   {product.stock && product.stock > 0 ? (
-                    <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-green-600"></span>
+                    <p className="text-[10px] sm:text-xs text-green-600 mt-1.5 sm:mt-2 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
                       In Stock
                     </p>
                   ) : (
-                    <p className="text-xs text-gray-400 mt-2">Out of Stock</p>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1.5 sm:mt-2">Out of Stock</p>
                   )}
                 </div>
               </motion.div>
@@ -216,14 +215,14 @@ export default function BestsellingBlooms() {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="text-center mt-12"
+            className="text-center mt-8 sm:mt-10 md:mt-12"
           >
             <button
               onClick={() => navigate('/shop')}
-              className="inline-flex items-center gap-2 text-[#3e4026] font-medium border-b border-[#3e4026] pb-1 hover:gap-3 transition-all duration-300"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#3e4026] font-medium border-b border-[#3e4026] pb-1 hover:gap-3 active:scale-95 transition-all duration-300"
             >
               View All Products
-              <ArrowUpRight size={16} />
+              <ArrowUpRight size={14} className="sm:w-4 sm:h-4" />
             </button>
           </motion.div>
         )}

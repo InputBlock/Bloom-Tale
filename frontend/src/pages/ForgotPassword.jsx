@@ -122,17 +122,17 @@ export default function ForgotPassword() {
       <Header />
       
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <nav className="flex items-center gap-2 text-sm text-gray-600">
-          <Link to="/" className="hover:text-gray-900">Home</Link>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <nav className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+          <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
           <span>›</span>
-          <Link to="/login" className="hover:text-gray-900">Login</Link>
+          <Link to="/login" className="hover:text-gray-900 transition-colors">Login</Link>
           <span>›</span>
           <span className="text-gray-900">Forgot Password</span>
         </nav>
       </div>
 
-      <div className="flex items-center justify-center min-h-[calc(100vh-250px)] py-12 px-4">
+      <div className="flex items-center justify-center min-h-[calc(100vh-250px)] py-8 sm:py-12 px-4 sm:px-6">
         <div className="w-full max-w-md">
           {step === "email" && <F_email onNext={handleEmailNext} />}
           {step === "otp" && (
@@ -146,16 +146,16 @@ export default function ForgotPassword() {
             <F_newPassword onSubmit={handlePasswordSubmit} />
           )}
           {step === "done" && (
-            <div className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-full max-w-md mx-auto bg-white rounded-sm shadow-lg p-6 sm:p-8 text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-serif text-gray-800 mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+              <h2 className="text-xl sm:text-2xl font-serif text-gray-800 mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
                 Password Reset Successful!
               </h2>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Your password has been successfully reset. Redirecting to login...
               </p>
             </div>

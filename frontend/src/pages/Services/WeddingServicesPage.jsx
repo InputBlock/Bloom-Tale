@@ -50,13 +50,13 @@ export default function WeddingServicesPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-24 md:pt-32 pb-12 bg-gradient-to-br from-pink-50 to-rose-100">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
+      <section className="pt-24 sm:pt-28 md:pt-32 pb-8 sm:pb-10 md:pb-12 bg-gradient-to-br from-pink-50 to-rose-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           <button
             onClick={() => navigate('/services')}
-            className="flex items-center gap-2 text-[#3e4026] hover:text-[#2d2f1c] mb-8 transition-colors"
+            className="flex items-center gap-2 text-[#3e4026] hover:text-[#2d2f1c] mb-6 sm:mb-8 transition-colors text-sm sm:text-base active:scale-95"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
             <span>Back to Services</span>
           </button>
 
@@ -66,12 +66,12 @@ export default function WeddingServicesPage() {
             transition={{ duration: 0.6 }}
           >
             <h1 
-              className="text-4xl md:text-6xl text-[#3e4026] mb-4"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#3e4026] mb-3 sm:mb-4"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               Wedding Services
             </h1>
-            <p className="text-lg md:text-xl text-gray-700 max-w-3xl">
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-3xl">
               Elegant ceremonies crafted with perfection. From intimate gatherings to grand celebrations, 
               we bring your dream wedding to life with our comprehensive planning and execution services.
             </p>
@@ -80,9 +80,9 @@ export default function WeddingServicesPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12">
             {services.map((service, index) => (
               <motion.div
                 key={index}
@@ -93,7 +93,7 @@ export default function WeddingServicesPage() {
                 className="group"
               >
                 {/* Image */}
-                <div className="relative h-64 md:h-80 bg-gradient-to-br from-pink-50 to-rose-100 rounded-xl overflow-hidden mb-6">
+                <div className="relative h-56 sm:h-64 md:h-72 lg:h-80 bg-gradient-to-br from-pink-50 to-rose-100 rounded-sm overflow-hidden mb-4 sm:mb-5 md:mb-6">
                   {/* ADD SERVICE IMAGES HERE */}
                   {/* Image will be at {service.image} */}
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -107,12 +107,12 @@ export default function WeddingServicesPage() {
                 {/* Content */}
                 <div>
                   <h3 
-                    className="text-2xl md:text-3xl text-[#3e4026] mb-3 group-hover:text-[#2d2f1c] transition-colors"
+                    className="text-xl sm:text-2xl md:text-3xl text-[#3e4026] mb-2 sm:mb-3 group-hover:text-[#2d2f1c] transition-colors"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     {service.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                     {service.description}
                   </p>
                 </div>
@@ -123,8 +123,8 @@ export default function WeddingServicesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-20 bg-[#f9f8f6]">
-        <div className="max-w-4xl mx-auto px-6 md:px-12 text-center">
+      <section className="py-12 sm:py-16 md:py-20 bg-[#f9f8f6]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -132,15 +132,15 @@ export default function WeddingServicesPage() {
             transition={{ duration: 0.6 }}
           >
             <h2 
-              className="text-3xl md:text-4xl text-[#3e4026] mb-4"
+              className="text-2xl sm:text-3xl md:text-4xl text-[#3e4026] mb-3 sm:mb-4"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               Ready to Plan Your Dream Wedding?
             </h2>
-            <p className="text-gray-600 mb-8 text-lg">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8">
               Let's create an unforgettable celebration together
             </p>
-            <button className="bg-[#3e4026] text-white px-8 py-4 text-lg font-semibold hover:bg-[#2d2f1c] transition-colors">
+            <button className="bg-[#3e4026] text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold hover:bg-[#2d2f1c] transition-all rounded-sm active:scale-95">
               Get a Quote
             </button>
           </motion.div>

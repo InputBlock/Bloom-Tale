@@ -108,15 +108,15 @@ export default function OrderDetails() {
         <Header />
         <div className="pt-32 pb-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12">
-            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-              <Package className="mx-auto mb-4 text-gray-300" size={64} />
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">Order Not Found</h2>
-              <p className="text-gray-600 mb-6">{error || "The order you're looking for doesn't exist."}</p>
+            <div className="bg-white rounded-sm shadow-lg p-8 sm:p-10 md:p-12 text-center">
+              <Package className="mx-auto mb-4 text-gray-300" size={48} />
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">Order Not Found</h2>
+              <p className="text-sm sm:text-base text-gray-600 mb-6">{error || "The order you're looking for doesn't exist."}</p>
               <button
                 onClick={() => navigate("/orders")}
-                className="inline-flex items-center gap-2 px-8 py-3 bg-[#3e4026] text-white font-semibold rounded-lg hover:bg-[#5e6043] transition-colors"
+                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-[#3e4026] text-white text-sm sm:text-base font-semibold rounded-sm hover:bg-[#5e6043] transition-all active:scale-95"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
                 Back to Orders
               </button>
             </div>
@@ -138,9 +138,9 @@ export default function OrderDetails() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={() => navigate("/orders")}
-            className="flex items-center gap-2 text-[#3e4026] hover:text-[#5e6043] font-medium mb-6 transition-colors"
+            className="flex items-center gap-2 text-sm sm:text-base text-[#3e4026] hover:text-[#5e6043] font-medium mb-6 transition-all active:scale-95"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
             <span>Back to Orders</span>
           </motion.button>
 
@@ -149,44 +149,44 @@ export default function OrderDetails() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden mb-6"
+            className="bg-white rounded-sm shadow-lg overflow-hidden mb-6"
           >
-            <div className="bg-gradient-to-r from-[#3e4026]/5 to-[#c4a574]/5 p-6 md:p-8 border-b border-gray-200">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div className="bg-gradient-to-r from-[#3e4026]/5 to-[#c4a574]/5 p-4 sm:p-6 md:p-8 border-b border-gray-200">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 mb-4">
                 <div>
                   <h1 
-                    className="text-3xl md:text-4xl text-[#3e4026] mb-2 font-bold"
+                    className="text-2xl sm:text-3xl md:text-4xl text-[#3e4026] mb-2 font-bold"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     Order Details
                   </h1>
-                  <p className="text-gray-600">Order #{order._id?.slice(-8) || 'N/A'}</p>
+                  <p className="text-sm sm:text-base text-gray-600">Order #{order._id?.slice(-8) || 'N/A'}</p>
                 </div>
-                <span className={`px-4 py-2 text-sm font-semibold rounded-full border w-fit ${getStatusColor(order.status)}`}>
+                <span className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-full border w-fit ${getStatusColor(order.status)}`}>
                   {order.status || 'Pending'}
                 </span>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                <div className="flex items-center gap-3">
-                  <Calendar className="text-[#3e4026]" size={20} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mt-4 sm:mt-6">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Calendar className="text-[#3e4026]" size={18} />
                   <div>
-                    <p className="text-xs text-gray-500">Order Date</p>
-                    <p className="text-sm font-medium text-gray-800">{formatDate(order.createdAt)}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500">Order Date</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-800">{formatDate(order.createdAt)}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <IndianRupee className="text-[#3e4026]" size={20} />
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <IndianRupee className="text-[#3e4026]" size={18} />
                   <div>
-                    <p className="text-xs text-gray-500">Total Amount</p>
-                    <p className="text-lg font-bold text-[#3e4026]">{formatPrice(order.totalAmount || 0)}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500">Total Amount</p>
+                    <p className="text-base sm:text-lg font-bold text-[#3e4026]">{formatPrice(order.totalAmount || 0)}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Truck className="text-[#3e4026]" size={20} />
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Truck className="text-[#3e4026]" size={18} />
                   <div>
-                    <p className="text-xs text-gray-500">Payment Method</p>
-                    <p className="text-sm font-medium text-gray-800 capitalize">{order.paymentMethod || 'N/A'}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500">Payment Method</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-800 capitalize">{order.paymentMethod || 'N/A'}</p>
                   </div>
                 </div>
               </div>
@@ -201,30 +201,30 @@ export default function OrderDetails() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-white rounded-xl shadow-lg p-8 flex flex-col"
+                className="bg-white rounded-sm shadow-lg p-5 sm:p-6 md:p-8 flex flex-col"
               >
-                <div className="flex items-center gap-2 mb-6">
-                  <ShoppingBag className="text-[#3e4026]" size={24} />
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <ShoppingBag className="text-[#3e4026]" size={20} className="sm:w-6 sm:h-6" />
                   <h2 
-                    className="text-xl text-[#3e4026] font-semibold"
+                    className="text-lg sm:text-xl text-[#3e4026] font-semibold"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     Order Items ({order.items?.length || 0})
                   </h2>
                 </div>
 
-                <div className="space-y-4 flex-1">
+                <div className="space-y-3 sm:space-y-4 flex-1">
                   {order.items && order.items.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-[#3e4026]/30 transition-colors"
+                      className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border border-gray-200 rounded-sm hover:border-[#3e4026]/30 transition-colors"
                     >
-                      <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-sm flex-shrink-0 overflow-hidden">
                         {item.productImage || item.product?.images_uri?.[0] ? (
                           <img 
                             src={item.productImage || item.product?.images_uri?.[0]} 
                             alt={item.productName || item.product?.name || 'Product'}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover object-center"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -233,19 +233,19 @@ export default function OrderDetails() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 mb-1">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1">
                           {item.productName || item.product?.name || 'Product'}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2">
                           Quantity: <span className="font-medium">{item.quantity || 1}</span>
                         </p>
                         <div className="flex items-baseline gap-2">
-                          <p className="text-lg font-bold text-[#3e4026] flex items-center gap-1">
-                            <IndianRupee size={16} />
+                          <p className="text-base sm:text-lg font-bold text-[#3e4026] flex items-center gap-0.5 sm:gap-1">
+                            <IndianRupee size={14} className="sm:w-4 sm:h-4" />
                             {formatPrice(item.price || 0).replace('₹', '')}
                           </p>
                           {item.quantity > 1 && (
-                            <p className="text-xs text-gray-500">
+                            <p className="text-[10px] sm:text-xs text-gray-500">
                               ({formatPrice(item.price / item.quantity)} each)
                             </p>
                           )}
@@ -256,11 +256,11 @@ export default function OrderDetails() {
                 </div>
 
                 {/* Order Summary */}
-                <div className="mt-auto pt-6 border-t border-gray-200">
-                  <div class>
+                <div className="mt-auto pt-4 sm:pt-6 border-t border-gray-200">
+                  <div className="flex items-center justify-between text-base sm:text-lg font-bold text-gray-900">
                     <span>Total Amount</span>
-                    <span className="flex items-center gap-1">
-                      <IndianRupee size={20} />
+                    <span className="flex items-center gap-0.5 sm:gap-1">
+                      <IndianRupee size={18} className="sm:w-5 sm:h-5" />
                       {formatPrice(order.totalAmount || 0).replace('₹', '')}
                     </span>
                   </div>
@@ -273,15 +273,15 @@ export default function OrderDetails() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
-                  className="bg-white rounded-xl shadow-lg p-6"
+                  className="bg-white rounded-sm shadow-lg p-5 sm:p-6"
                 >
                   <h2 
-                    className="text-xl text-[#3e4026] font-semibold mb-4"
+                    className="text-lg sm:text-xl text-[#3e4026] font-semibold mb-3 sm:mb-4"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     Payment Information
                   </h2>
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                     {order.paymentInfo.paymentId && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Payment ID:</span>
@@ -305,12 +305,12 @@ export default function OrderDetails() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-white rounded-xl shadow-lg p-8 sticky top-24 flex flex-col"
+                className="bg-white rounded-sm shadow-lg p-5 sm:p-6 md:p-8 lg:sticky lg:top-24 flex flex-col"
               >
-                <div className="flex items-center gap-2 mb-6">
-                  <MapPin className="text-[#3e4026]" size={24} />
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <MapPin className="text-[#3e4026]" size={20} className="sm:w-6 sm:h-6" />
                   <h2 
-                    className="text-xl text-[#3e4026] font-semibold"
+                    className="text-lg sm:text-xl text-[#3e4026] font-semibold"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     Delivery Address
@@ -318,8 +318,8 @@ export default function OrderDetails() {
                 </div>
 
                 {(order.deliveryAddress?.[0] || order.address) ? (
-                  <div className="space-y-3 text-sm flex-1">
-                    <p className="font-semibold text-gray-900 text-base">
+                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm flex-1">
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base">
                       {(order.deliveryAddress?.[0] || order.address)?.fullName}
                     </p>
                     <p className="text-gray-700 leading-relaxed">

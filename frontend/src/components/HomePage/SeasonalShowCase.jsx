@@ -108,9 +108,9 @@ export default function CategoryShowcase() {
   }
 
   return (
-    <section ref={sectionRef} className="py-16 md:py-24 bg-[#f9f8f6]">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+    <section ref={sectionRef} className="py-12 sm:py-14 md:py-16 lg:py-24 bg-[#f9f8f6]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center">
           
           {/* Left Side - Video/Image with Play Button */}
           <motion.div
@@ -119,7 +119,7 @@ export default function CategoryShowcase() {
             transition={{ duration: 0.7 }}
             className="relative"
           >
-            <div ref={videoContainerRef} className="aspect-[4/3] rounded-xl overflow-hidden bg-[#eae8e4] relative">
+            <div ref={videoContainerRef} className="aspect-[4/3] rounded-lg sm:rounded-xl overflow-hidden bg-[#eae8e4] relative">
               {/* Check if media is video or image */}
               {heroData?.media_uri?.match(/\.(mp4|webm|mov|avi)$/i) ? (
                 <>
@@ -139,11 +139,11 @@ export default function CategoryShowcase() {
                     aria-label={isPlaying ? "Pause video" : "Play video"}
                     className="absolute inset-0 flex items-center justify-center group cursor-pointer"
                   >
-                    <div className={`w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg transition-all ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-full flex items-center justify-center shadow-lg transition-all ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
                       {isPlaying ? (
-                        <Pause size={22} className="text-[#3e4026]" />
+                        <Pause size={18} className="sm:w-[22px] sm:h-[22px] text-[#3e4026]" />
                       ) : (
-                        <Play size={22} className="text-[#3e4026] ml-1" />
+                        <Play size={18} className="sm:w-[22px] sm:h-[22px] text-[#3e4026] ml-1" />
                       )}
                     </div>
                   </button>
@@ -186,10 +186,10 @@ export default function CategoryShowcase() {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="space-y-5"
+            className="space-y-4 sm:space-y-5"
           >
             <h2 
-              className="text-3xl md:text-4xl lg:text-5xl text-[#3e4026] leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#3e4026] leading-tight"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               {(() => {
@@ -204,25 +204,25 @@ export default function CategoryShowcase() {
               })()}
             </h2>
 
-            <p className="text-lg md:text-xl text-[#3e4026] font-medium">
+            <p className="text-base sm:text-lg md:text-xl text-[#3e4026] font-medium">
               {heroData?.sub_text || "Let us arrange a smile."}
             </p>
 
-            <p className="text-[#3e4026]/60 text-sm leading-relaxed">
+            <p className="text-[#3e4026]/60 text-xs sm:text-sm leading-relaxed">
               {heroData?.description || "At Everbelle, we believe every bouquet tells a unique story. Our passion for flowers ensures each arrangement is crafted with meticulous care and heartfelt intention, designed to bring unparalleled joy and beauty to your most cherished moments. We hand-select the freshest blooms to create stunning displays that truly speak from the heart, making every occasion unforgettable."}
             </p>
 
-            <div className="space-y-3 pt-3">
+            <div className="space-y-2.5 sm:space-y-3 pt-2 sm:pt-3">
               {features.map((feature, index) => (
                 <motion.div 
                   key={index} 
                   initial={{ opacity:  0, x: -10 }}
                   animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
                   transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-2.5 sm:gap-3"
                 >
-                  <feature.icon size={16} className="text-[#d4a5a5]" />
-                  <span className="text-[#3e4026]/80 text-sm">{feature.text}</span>
+                  <feature.icon size={14} className="sm:w-4 sm:h-4 text-[#d4a5a5] flex-shrink-0" />
+                  <span className="text-[#3e4026]/80 text-xs sm:text-sm">{feature.text}</span>
                 </motion.div>
               ))}
             </div>

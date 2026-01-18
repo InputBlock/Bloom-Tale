@@ -105,15 +105,15 @@ export default function SearchBar({ scrolled, isHomePage }) {
   }
 
   return (
-    <div className="hidden md:flex flex-1 max-w-xl mx-4" ref={searchRef}>
+    <div className="flex flex-1 max-w-xl mx-2 sm:mx-4" ref={searchRef}>
       <form onSubmit={handleSearch} className="w-full relative">
         <input
           type="text"
           value={searchQuery}
           onChange={handleSearchInputChange}
           onFocus={() => searchQuery.trim() && setShowSearchSuggestions(true)}
-          placeholder="Search flowers, arrangements, occasions..."
-          className={`w-full px-4 py-2.5 pr-12 !rounded-full border transition-colors duration-300 focus:outline-none focus:ring-0 focus:!rounded-full active:!rounded-full ${
+          placeholder="Search flowers..."
+          className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base !rounded-full border transition-colors duration-300 focus:outline-none focus:ring-0 focus:!rounded-full active:!rounded-full ${
             scrolled || !isHomePage 
               ? "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 focus:border-gray-200" 
               : "bg-white/10 border-white/30 text-white placeholder-white/70 focus:border-white/30"
@@ -124,14 +124,14 @@ export default function SearchBar({ scrolled, isHomePage }) {
         />
         <button
           type="submit"
-          className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-300 ${
+          className={`absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 rounded-full transition-all duration-300 ${
             scrolled || !isHomePage 
               ? "text-gray-600 hover:bg-gray-100" 
               : "text-white hover:bg-white/10"
           }`}
           aria-label="Search"
         >
-          <Search size={18} strokeWidth={2} />
+          <Search size={18} className="sm:w-[18px] sm:h-[18px]" strokeWidth={2} />
         </button>
 
         {/* Search Suggestions Dropdown */}

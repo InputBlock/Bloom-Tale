@@ -126,7 +126,7 @@ const WelcomeAnimation = () => {
       </div>
 
       {/* Text Container */}
-      <div className="relative text-center px-8 z-10">
+      <div className="relative text-center px-4 sm:px-6 md:px-8 z-10">
         {/* Welcome */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -139,7 +139,7 @@ const WelcomeAnimation = () => {
             className="block"
             style={{ 
               fontFamily: "'Pacifico', cursive",
-              fontSize: "clamp(2.5rem, 5vw, 4rem)",
+              fontSize: "clamp(2rem, 5vw, 4rem)",
               color: "#e8909c",
               textShadow: "2px 2px 0px rgba(180, 100, 120, 0.25), 4px 4px 0px rgba(150, 80, 100, 0.1)",
               letterSpacing: "1px"
@@ -159,7 +159,7 @@ const WelcomeAnimation = () => {
             className="block mt-1"
             style={{ 
               fontFamily: "'Pacifico', cursive",
-              fontSize: "clamp(2rem, 4vw, 3.2rem)",
+              fontSize: "clamp(1.5rem, 4vw, 3.2rem)",
               color: "#e8909c",
               textShadow: "2px 2px 0px rgba(180, 100, 120, 0.25), 4px 4px 0px rgba(150, 80, 100, 0.1)",
               letterSpacing: "1px"
@@ -179,7 +179,7 @@ const WelcomeAnimation = () => {
             className="block mt-1"
             style={{ 
               fontFamily: "'Pacifico', cursive",
-              fontSize: "clamp(2.8rem, 5.5vw, 4.5rem)",
+              fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)",
               color: "#e8909c",
               textShadow: "2px 2px 0px rgba(180, 100, 120, 0.25), 4px 4px 0px rgba(150, 80, 100, 0.1)",
               letterSpacing: "1px"
@@ -346,7 +346,7 @@ export default function FlowerLogin() {
 
       {/* Right Side - Login Form OR Welcome Animation */}
       <motion.div 
-        className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 sm:p-12 relative overflow-hidden"
+        className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12 relative overflow-hidden"
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -375,18 +375,18 @@ export default function FlowerLogin() {
             >
           {/* Title */}
           <motion.div 
-            className="text-center mb-10"
+            className="text-center mb-6 sm:mb-8 md:mb-10"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
             <h1 
-              className="text-3xl font-serif text-gray-800 mb-2"
+              className="text-2xl sm:text-3xl font-serif text-gray-800 mb-2"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               Welcome back!
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500">
               Please enter your details
             </p>
           </motion.div>
@@ -394,7 +394,7 @@ export default function FlowerLogin() {
           {/* Form */}
           <motion.form 
             onSubmit={handleSubmit} 
-            className="space-y-5"
+            className="space-y-4 sm:space-y-5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -411,7 +411,7 @@ export default function FlowerLogin() {
 
             {/* Email Field */}
             <div>
-              <label className="block text-gray-700 text-sm font-medium mb-2">
+              <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
                 Email
               </label>
               <div className="relative">
@@ -422,7 +422,7 @@ export default function FlowerLogin() {
                   onFocus={handleEmailFocus}
                   onBlur={handleEmailBlur}
                   placeholder="Enter your email"
-                  className={`w-full px-4 py-3.5 bg-white border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm ${
+                  className={`w-full px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-base bg-white border rounded-sm focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm ${
                     emailError 
                       ? 'border-red-300 focus:ring-red-100 focus:border-red-400' 
                       : 'border-gray-200 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59]'
@@ -445,7 +445,7 @@ export default function FlowerLogin() {
 
             {/* Password Field */}
             <div>
-              <label className="block text-gray-700 text-sm font-medium mb-2">
+              <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
                 Password
               </label>
               <div className="relative">
@@ -456,26 +456,26 @@ export default function FlowerLogin() {
                   onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59] transition-all duration-300 pr-12 shadow-sm"
+                  className="w-full px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-base bg-white border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59] transition-all duration-300 pr-11 sm:pr-12 shadow-sm"
                   required
                   disabled={loading || loginState === "success"}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 active:scale-95"
                   disabled={loading}
                 >
-                  {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                  {showPassword ? <Eye size={18} className="sm:w-5 sm:h-5" /> : <EyeOff size={18} className="sm:w-5 sm:h-5" />}
                 </button>
               </div>
             </div>
 
             {/* Forgot Password */}
-            <div className="flex justify-end text-sm">
+            <div className="flex justify-end text-xs sm:text-sm">
               <Link 
                 to="/forgot-password" 
-                className="text-[#6B7C59] hover:text-[#5a6a4a] hover:underline font-medium transition-colors"
+                className="text-[#6B7C59] hover:text-[#5a6a4a] hover:underline font-medium transition-colors active:scale-95"
               >
                 Forgot password?
               </Link>
@@ -484,7 +484,7 @@ export default function FlowerLogin() {
             {/* Login Button */}
             <motion.button
               type="submit"
-              className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm sm:text-base font-medium py-3 sm:py-3.5 rounded-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md active:scale-95"
               disabled={loading || loginState === "success"}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
@@ -509,12 +509,12 @@ export default function FlowerLogin() {
             <motion.button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium py-3.5 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+              className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 text-sm sm:text-base font-medium py-3 sm:py-3.5 rounded-sm transition-all duration-300 shadow-sm hover:shadow-md active:scale-95"
               disabled={loading || loginState === "success"}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -538,7 +538,7 @@ export default function FlowerLogin() {
 
           {/* Sign Up Link */}
           <motion.p 
-            className="text-center text-sm text-gray-500 mt-8"
+            className="text-center text-xs sm:text-sm text-gray-500 mt-6 sm:mt-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -546,7 +546,7 @@ export default function FlowerLogin() {
             Don't have an account?{" "}
             <Link 
               to="/register" 
-              className="text-[#6B7C59] hover:underline font-semibold"
+              className="text-[#6B7C59] hover:underline font-semibold active:scale-95"
             >
               Sign up
             </Link>

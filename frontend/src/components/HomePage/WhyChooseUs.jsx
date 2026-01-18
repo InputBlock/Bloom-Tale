@@ -30,44 +30,44 @@ export default function WhyChooseUs() {
   ]
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-28 bg-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section ref={sectionRef} className="py-12 sm:py-16 md:py-20 lg:py-28 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Section Heading */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
           transition={{ duration: 0.6 }}
-          className="mb-12"
+          className="mb-8 sm:mb-10 md:mb-12"
         >
-          <p className="text-[11px] tracking-[0.3em] uppercase text-[#3e4026]/60 mb-4">
+          <p className="text-[10px] sm:text-[11px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-[#3e4026]/60 mb-3 sm:mb-4">
             Why Choose Us
           </p>
         </motion.div>
 
         {/* Feature Grid - 4 cards in one line */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="p-6 bg-[#f9f8f6] hover:bg-[#f4f3f0] transition-colors duration-300 group"
+              className="p-5 sm:p-6 bg-[#f9f8f6] hover:bg-[#f4f3f0] transition-colors duration-300 group rounded-sm"
             >
-              <div className="w-12 h-12 bg-white flex items-center justify-center mb-4 group-hover:bg-[#3e4026] transition-colors duration-300">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white rounded-sm flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-[#3e4026] transition-colors duration-300">
                 <feature.icon 
-                  size={22} 
-                  className="text-[#3e4026] group-hover:text-white transition-colors duration-300" 
+                  size={18} 
+                  className="sm:w-5 sm:h-5 md:w-[22px] md:h-[22px] text-[#3e4026] group-hover:text-white transition-colors duration-300" 
                   strokeWidth={1.5}
                 />
               </div>
               <h3 
-                className="text-lg text-[#3e4026] mb-2"
+                className="text-base sm:text-lg text-[#3e4026] mb-2"
                 style={{ fontFamily: 'Playfair Display, serif' }}
               >
                 {feature.title}
               </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

@@ -159,7 +159,7 @@ const WelcomeAnimation = () => {
       </div>
 
       {/* Text Container */}
-      <div className="relative text-center px-8 z-10">
+      <div className="relative text-center px-4 sm:px-6 md:px-8 z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -479,7 +479,7 @@ export default function FlowerRegister() {
 
       {/* Right Side - Form OR Welcome Animation */}
       <motion.div 
-        className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 sm:p-12 relative overflow-hidden"
+        className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12 relative overflow-hidden"
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -508,18 +508,18 @@ export default function FlowerRegister() {
             >
               {/* Title */}
               <motion.div 
-                className="text-center mb-10"
+                className="text-center mb-6 sm:mb-8 md:mb-10"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <h1 
-                  className="text-3xl font-serif text-gray-800 mb-2"
+                  className="text-2xl sm:text-3xl font-serif text-gray-800 mb-2"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   Create Account
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   Join BloomTale today
                 </p>
               </motion.div>
@@ -527,7 +527,7 @@ export default function FlowerRegister() {
               {/* Form */}
               <motion.form 
                 onSubmit={handleCredentialsSubmit} 
-                className="space-y-5"
+                className="space-y-4 sm:space-y-5"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
@@ -544,7 +544,7 @@ export default function FlowerRegister() {
 
                 {/* Email Field */}
                 <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-2">
+                  <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
                     Email
                   </label>
                   <div className="relative">
@@ -555,7 +555,7 @@ export default function FlowerRegister() {
                       onFocus={handleEmailFocus}
                       onBlur={handleEmailBlur}
                       placeholder="Enter your email"
-                      className={`w-full px-4 py-3.5 bg-white border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm ${
+                      className={`w-full px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-base bg-white border rounded-sm focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm ${
                         emailError 
                           ? 'border-red-300 focus:ring-red-100 focus:border-red-400' 
                           : 'border-gray-200 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59]'
@@ -578,7 +578,7 @@ export default function FlowerRegister() {
 
                 {/* Password Field */}
                 <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-2">
+                  <label className="block text-gray-700 text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">
                     Password
                   </label>
                   <div className="relative">
@@ -589,7 +589,7 @@ export default function FlowerRegister() {
                       onFocus={() => setFocusedField("password")}
                       onBlur={() => setFocusedField(null)}
                       placeholder="••••••••"
-                      className={`w-full px-4 py-3.5 bg-white border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 pr-12 shadow-sm ${
+                      className={`w-full px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-base bg-white border rounded-sm focus:outline-none focus:ring-2 transition-all duration-300 pr-11 sm:pr-12 shadow-sm ${
                         passwordError 
                           ? 'border-red-300 focus:ring-red-100 focus:border-red-400' 
                           : 'border-gray-200 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59]'
@@ -600,10 +600,10 @@ export default function FlowerRegister() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 active:scale-95"
                       disabled={loading}
                     >
-                      {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                      {showPassword ? <Eye size={18} className="sm:w-5 sm:h-5" /> : <EyeOff size={18} className="sm:w-5 sm:h-5" />}
                     </button>
                   </div>
                   {passwordError && (
@@ -631,7 +631,7 @@ export default function FlowerRegister() {
                 {/* Send OTP Button */}
                 <motion.button
                   type="submit"
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm sm:text-base font-medium py-3 sm:py-3.5 rounded-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md active:scale-95"
                   disabled={loading}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
@@ -654,12 +654,12 @@ export default function FlowerRegister() {
                 <motion.button
                   type="button"
                   onClick={handleGoogleSignup}
-                  className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium py-3.5 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                  className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 text-sm sm:text-base font-medium py-3 sm:py-3.5 rounded-sm transition-all duration-300 shadow-sm hover:shadow-md active:scale-95"
                   disabled={loading}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -683,7 +683,7 @@ export default function FlowerRegister() {
 
               {/* Login Link */}
               <motion.p 
-                className="text-center text-sm text-gray-500 mt-8"
+                className="text-center text-xs sm:text-sm text-gray-500 mt-6 sm:mt-8"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
@@ -691,7 +691,7 @@ export default function FlowerRegister() {
                 Already have an account?{" "}
                 <Link 
                   to="/login" 
-                  className="text-[#6B7C59] hover:underline font-semibold"
+                  className="text-[#6B7C59] hover:underline font-semibold active:scale-95"
                 >
                   Log in
                 </Link>
@@ -709,18 +709,18 @@ export default function FlowerRegister() {
             >
               {/* Title */}
               <motion.div 
-                className="text-center mb-10"
+                className="text-center mb-6 sm:mb-8 md:mb-10"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
                 <h1 
-                  className="text-3xl font-serif text-gray-800 mb-2"
+                  className="text-2xl sm:text-3xl font-serif text-gray-800 mb-2"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   Verify Your Email
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   We've sent a verification code to<br />
                   <span className="font-medium text-gray-700">{email}</span>
                 </p>
@@ -729,7 +729,7 @@ export default function FlowerRegister() {
               {/* OTP Form */}
               <motion.form 
                 onSubmit={handleOtpSubmit} 
-                className="space-y-6"
+                className="space-y-5 sm:space-y-6"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -745,7 +745,7 @@ export default function FlowerRegister() {
                 </AnimatePresence>
 
                 {/* OTP Input Boxes */}
-                <div className="flex gap-3 justify-center">
+                <div className="flex gap-2 sm:gap-3 justify-center">
                   {otp.map((digit, index) => (
                     <motion.input
                       key={index}
@@ -757,7 +757,7 @@ export default function FlowerRegister() {
                       onKeyDown={(e) => handleOtpKeyDown(index, e)}
                       onFocus={() => setFocusedField("otp")}
                       onBlur={() => setFocusedField(null)}
-                      className="w-12 h-14 text-center text-xl font-semibold bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59] transition-all duration-300 shadow-sm"
+                      className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-semibold bg-white border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#6B7C59]/20 focus:border-[#6B7C59] transition-all duration-300 shadow-sm"
                       disabled={loading}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -768,11 +768,11 @@ export default function FlowerRegister() {
 
                 {/* Resend OTP */}
                 <div className="text-center">
-                  <span className="text-gray-500 text-sm">Didn't receive the code? </span>
+                  <span className="text-gray-500 text-xs sm:text-sm">Didn't receive the code? </span>
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    className="text-[#6B7C59] font-semibold text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-[#6B7C59] font-semibold text-xs sm:text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                     disabled={resending || loading}
                   >
                     {resending ? "Sending..." : "Resend OTP"}
@@ -782,7 +782,7 @@ export default function FlowerRegister() {
                 {/* Verify Button */}
                 <motion.button
                   type="submit"
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm sm:text-base font-medium py-3 sm:py-3.5 rounded-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md active:scale-95"
                   disabled={loading || otp.join("").length !== 6}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
@@ -809,7 +809,7 @@ export default function FlowerRegister() {
                     setOtp(["", "", "", "", "", ""]);
                     setError("");
                   }}
-                  className="w-full text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors"
+                  className="w-full text-gray-500 hover:text-gray-700 text-xs sm:text-sm font-medium transition-colors active:scale-95"
                   disabled={loading}
                 >
                   ← Back to registration

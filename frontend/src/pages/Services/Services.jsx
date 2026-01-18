@@ -352,23 +352,23 @@ export default function Services() {
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3 }}
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-[#3e4026] hover:bg-[#2d2f1c] flex items-center justify-center shadow-lg transition-colors duration-300"
+            className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 w-11 h-11 sm:w-12 sm:h-12 bg-[#3e4026] hover:bg-[#2d2f1c] rounded-sm flex items-center justify-center shadow-lg transition-all active:scale-95"
             aria-label="Scroll to top"
           >
-            <ArrowUp size={20} className="text-white" />
+            <ArrowUp size={18} className="sm:w-5 sm:h-5 text-white" />
           </motion.button>
         )}
       </AnimatePresence>
 
       {/* Services Section */}
-      <section className="pt-20 md:pt-28 pb-16 md:pb-24 bg-transparent">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <section className="pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 bg-transparent">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
           {/* Tabs */}
-          <div className="flex justify-start mb-12">
-            <div className="inline-flex gap-12 md:gap-16">
+          <div className="flex justify-start mb-8 sm:mb-10 md:mb-12 overflow-x-auto">
+            <div className="inline-flex gap-8 sm:gap-10 md:gap-12 lg:gap-16">
               <button
                 onClick={() => setActiveTab("wedding")}
-                className={`pb-2 px-1 text-base md:text-lg font-normal uppercase tracking-widest transition-all relative ${
+                className={`pb-2 px-1 text-sm sm:text-base md:text-lg font-normal uppercase tracking-widest transition-all active:scale-95 relative flex-shrink-0 ${
                   activeTab === "wedding" 
                     ? "text-[#3e4026]" 
                     : "text-gray-400 hover:text-gray-600"
@@ -385,7 +385,7 @@ export default function Services() {
               </button>
               <button
                 onClick={() => setActiveTab("social")}
-                className={`pb-2 px-1 text-base md:text-lg font-normal uppercase tracking-widest transition-all relative ${
+                className={`pb-2 px-1 text-sm sm:text-base md:text-lg font-normal uppercase tracking-widest transition-all active:scale-95 relative flex-shrink-0 ${
                   activeTab === "social" 
                     ? "text-[#3e4026]" 
                     : "text-gray-400 hover:text-gray-600"
@@ -402,7 +402,7 @@ export default function Services() {
               </button>
               <button
                 onClick={() => setActiveTab("corporate")}
-                className={`pb-2 px-1 text-base md:text-lg font-normal uppercase tracking-widest transition-all relative ${
+                className={`pb-2 px-1 text-sm sm:text-base md:text-lg font-normal uppercase tracking-widest transition-all active:scale-95 relative flex-shrink-0 ${
                   activeTab === "corporate" 
                     ? "text-[#3e4026]" 
                     : "text-gray-400 hover:text-gray-600"
@@ -428,10 +428,10 @@ export default function Services() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
-              className="space-y-24"
-            >
+              className="space-y-16 sm:space-y-20 md:space-y-24">
+            
               {/* Subcategories with Numbered Sections */}
-              <div className="space-y-20">
+              <div className="space-y-14 sm:space-y-16 md:space-y-20">
                 {getActiveServices().slice(0, showAll ? undefined : 2).map((service, index) => {
                   // Create unified gallery images array for this service
                   const galleryImages = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -458,14 +458,14 @@ export default function Services() {
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                       className="bg-white"
                     >
-                      <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8 lg:gap-16 items-start`}>
+                      <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-6 sm:gap-8 lg:gap-16 items-start`}>
                         {/* Content Side */}
-                        <div className="w-full lg:w-1/2 space-y-6">
+                        <div className="w-full lg:w-1/2 space-y-4 sm:space-y-6">
                           {/* Numbered Header */}
-                          <div className="flex items-baseline gap-3">
-                            <span className="text-6xl md:text-7xl lg:text-8xl font-extralight text-gray-200/80">0{index + 1}</span>
+                          <div className="flex items-baseline gap-2 sm:gap-3">
+                            <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight text-gray-200/80">0{index + 1}</span>
                             <h2 
-                              className="text-xl md:text-2xl lg:text-3xl text-[#3e4026] uppercase tracking-wider font-normal"
+                              className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-[#3e4026] uppercase tracking-wider font-normal"
                               style={{ fontFamily: 'Playfair Display, serif' }}
                             >
                               {service.title.split('&').map((part, i, arr) => (
@@ -478,22 +478,22 @@ export default function Services() {
                           </div>
 
                           {/* Description */}
-                          <p className="text-gray-700 leading-relaxed text-base md:text-lg">
+                          <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
                             {service.description}
                           </p>
 
                           {/* CTA Button */}
                           <button
                             onClick={() => openModal(service)}
-                            className="px-8 py-3 bg-[#3e4026] hover:bg-[#2d2f1c] text-white font-medium rounded-md transition-colors duration-300"
+                            className="px-6 sm:px-8 py-2.5 sm:py-3 bg-[#3e4026] hover:bg-[#2d2f1c] text-white text-sm sm:text-base font-medium rounded-sm transition-all active:scale-95"
                           >
                             Book Us for {service.title}
                           </button>
 
                           {/* Sliding Thumbnail Gallery */}
-                          <div className="pt-6">
+                          <div className="pt-4 sm:pt-6">
                             <div className="relative overflow-hidden">
-                              <div className="grid grid-cols-4 gap-4">
+                              <div className="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4">
                                 <AnimatePresence mode="popLayout">
                                   {visibleThumbnails.map((thumb) => (
                                     <motion.div
@@ -504,14 +504,14 @@ export default function Services() {
                                       exit={{ opacity: 0, scale: 0.9 }}
                                       transition={{ duration: 0.3 }}
                                       onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: thumb.globalIndex }))}
-                                      className={`aspect-square bg-[#f5f3f0] overflow-hidden transition-all cursor-pointer ${
+                                      className={`aspect-square bg-[#f5f3f0] rounded-sm overflow-hidden transition-all cursor-pointer active:scale-95 ${
                                         currentImageIndex === thumb.globalIndex 
                                           ? 'ring-2 ring-[#3e4026] ring-offset-2' 
                                           : 'hover:ring-1 hover:ring-gray-300'
                                       }`}
                                     >
                                       <div className="w-full h-full flex items-center justify-center">
-                                        <span className={`text-sm ${
+                                        <span className={`text-xs sm:text-sm ${
                                           currentImageIndex === thumb.globalIndex 
                                             ? 'text-[#3e4026] font-semibold' 
                                             : 'text-gray-400'
@@ -526,15 +526,15 @@ export default function Services() {
                             </div>
                             
                             {/* Progress Indicator */}
-                            <div className="flex justify-center gap-1.5 mt-3">
+                            <div className="flex justify-center gap-1.5 mt-2 sm:mt-3">
                               {galleryImages.map((_, imgIdx) => (
                                 <button
                                   key={imgIdx}
                                   onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: imgIdx }))}
-                                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                                  className={`h-1 sm:h-1.5 rounded-full transition-all duration-300 active:scale-95 ${
                                     currentImageIndex === imgIdx 
-                                      ? 'bg-[#3e4026] w-8' 
-                                      : 'bg-gray-300 hover:bg-gray-400 w-1.5'
+                                      ? 'bg-[#3e4026] w-6 sm:w-8' 
+                                      : 'bg-gray-300 hover:bg-gray-400 w-1 sm:w-1.5'
                                   }`}
                                   aria-label={`Go to image ${imgIdx + 1}`}
                                 />
@@ -544,7 +544,7 @@ export default function Services() {
                         </div>
 
                         {/* Image Side */}
-                        <div className="w-full lg:w-1/2 h-[400px] lg:h-[520px] rounded-xl overflow-hidden relative bg-[#f5f3f0]">
+                        <div className="w-full lg:w-1/2 h-[300px] sm:h-[350px] md:h-[400px] lg:h-[520px] rounded-sm overflow-hidden relative bg-[#f5f3f0]">
                           <AnimatePresence mode="wait">
                             <motion.div
                               key={`main-${index}-${currentImageIndex}`}
@@ -562,24 +562,24 @@ export default function Services() {
                           </AnimatePresence>
                           
                           {/* Bottom Navigation Bar */}
-                          <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm py-4 px-6">
-                            <div className="flex items-center justify-between">
+                          <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm py-3 sm:py-4 px-4 sm:px-6">
+                            <div className="flex items-center justify-between gap-2">
                               {/* Previous Arrow */}
                               <button
                                 onClick={() => setActiveMainImageIndexes(prev => ({ 
                                   ...prev, 
                                   [index]: (prev[index] - 1 + galleryImages.length) % galleryImages.length 
                                 }))}
-                                className="w-10 h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all"
+                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
                                 aria-label="Previous image"
                               >
-                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-[18px] sm:h-[18px]">
                                   <path d="M12 15l-5-5 5-5" stroke="#3e4026" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </button>
                               
                               {/* Title with Image Number */}
-                              <span className="text-sm md:text-base text-[#3e4026] font-medium tracking-wide">
+                              <span className="text-xs sm:text-sm md:text-base text-[#3e4026] font-medium tracking-wide truncate">
                                 {service.title} - {galleryImages[currentImageIndex]}
                               </span>
                               
@@ -589,10 +589,10 @@ export default function Services() {
                                   ...prev, 
                                   [index]: (prev[index] + 1) % galleryImages.length 
                                 }))}
-                                className="w-10 h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all"
+                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
                                 aria-label="Next image"
                               >
-                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-[18px] sm:h-[18px]">
                                   <path d="M8 15l5-5-5-5" stroke="#3e4026" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </button>

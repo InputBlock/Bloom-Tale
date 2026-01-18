@@ -25,10 +25,10 @@ export default function SocialEvents() {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => setIsExpanded(true)}
-                className="relative group cursor-pointer overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="relative group cursor-pointer overflow-hidden rounded-sm shadow-lg hover:shadow-2xl transition-all duration-500"
             >
                 {/* Image */}
-                <div className="relative h-80 bg-gradient-to-br from-purple-50 to-indigo-100">
+                <div className="relative h-64 sm:h-72 md:h-80 bg-gradient-to-br from-purple-50 to-indigo-100">
                     <div className="absolute inset-0">
                         <img
                             src="/social-event-services.jpg"
@@ -38,15 +38,15 @@ export default function SocialEvents() {
                     </div>
 
                     {/* Badge */}
-                    <div className="absolute top-4 left-4 bg-[#3e4026] text-white px-3 py-1 text-xs font-medium">
+                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-[#3e4026] text-white px-2.5 py-1 sm:px-3 text-xs font-medium">
                         Celebrations
                     </div>
                 </div>
 
                 {/* Title Section */}
-                <div className="bg-white p-6">
+                <div className="bg-white p-4 sm:p-5 md:p-6">
                     <h3
-                        className="text-2xl text-[#3e4026] mb-2 flex items-center justify-between"
+                        className="text-xl sm:text-2xl text-[#3e4026] mb-1.5 sm:mb-2 flex items-center justify-between"
                         style={{ fontFamily: 'Playfair Display, serif' }}
                     >
                         Social
