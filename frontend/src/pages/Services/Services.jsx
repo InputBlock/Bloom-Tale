@@ -176,7 +176,7 @@ export default function Services() {
       image: "/wedding-theme.jpg"
     },
     {
-      title: "Social Media Management",
+      title: "Let Us Manage Your Wedding Moments",
       description: "Share your love story beautifully with our comprehensive social media management service. We create a dedicated Instagram page for your wedding, curate stunning content from pre-wedding to post-wedding moments, and assist you throughout your journey. Let us capture and showcase every magical moment of your celebration.",
       image: "/services/social-media.jpg"
     },
