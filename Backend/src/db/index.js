@@ -24,10 +24,10 @@ const connectDB = async () => {
     // await User.syncIndexes();
     await User.createIndexes();
 
-    console.log("✅ User indexes synced");
+    console.log(" User indexes synced");
 
   } catch (error) {
-    console.error("MongoDB connection FAILED ❌", error);
+    console.error("MongoDB connection FAILED ", error);
     process.exit(1); // crash app if DB fails
   }
 };
