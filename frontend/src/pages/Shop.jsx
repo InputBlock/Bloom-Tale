@@ -49,7 +49,7 @@ export default function Shop() {
     { id: 'birthday', name: 'Birthday' },
     { id: 'anniversary', name: 'Anniversary' },
     { id: 'forever-flowers', name: 'Forever Flowers' },
-    { id: 'fragrances', name: 'Fragrances' },
+    { id: 'candles', name: 'Candles' },
     { id: 'premium', name: 'Premium' },
     { id: 'corporate', name: 'Corporate' },
     { id: 'combos', name: 'Combos' },

@@ -10,10 +10,13 @@ const productSchema = new mongoose.Schema(
     },
     category: { type: String, required: true,
     },
+    // Single price for products without sizes (Candles, Combos)
+    price: { type: Number, default: null },
+    // Size-based pricing for products with sizes
     pricing: {
-      small : {type : Number},
-      medium : {type :Number},
-      large : {type : Number}
+      small : {type : Number, default: null},
+      medium : {type :Number, default: null},
+      large : {type : Number, default: null}
     },
     sizes: [String],
     bestSeller: { type: Boolean,default: false,
