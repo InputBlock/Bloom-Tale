@@ -70,7 +70,6 @@ const orderSchema = new Schema(
       type:String,
         enum: [
         "CONFIRMED",
-        "PROCESSING",
         "SHIPPED",
         "DELIVERED",
         "CANCELLED",
