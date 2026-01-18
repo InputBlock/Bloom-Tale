@@ -33,7 +33,7 @@ export default function ProductForm({ images, setImages }) {
     "Birthday",
     "Anniversary",
     "Forever Flowers",
-    "Fragrances",
+    "Candles",
     "Premium",
     "Corporate",
     "Combos"
@@ -222,8 +222,8 @@ export default function ProductForm({ images, setImages }) {
       </div>
 
       <div>
-        {(formData.type === "Fragrances" || formData.type === "Combos") ? (
-          // Single Price for Fragrances and Combos
+        {(formData.type === "Candles" || formData.type === "Combos") ? (
+          // Single Price for Candles and Combos
           <>
             <label className="block text-gray-900 font-medium mb-3">Price</label>
             <div className="relative max-w-md">

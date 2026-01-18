@@ -52,6 +52,14 @@ const orderSchema = new Schema(
       required: true,
     },
 
+    customerName: {
+      type: String,
+    },
+
+    customerEmail: {
+      type: String,
+    },
+
     items: [orderItemSchema],
 
     deliveryAddress: [addressSchema],

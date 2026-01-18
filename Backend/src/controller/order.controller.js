@@ -46,6 +46,8 @@ export const createOrder = asyncHandler(async (req, res) => {
   const order = await Order.create({
     order_id: generateOrderId(),
     user: userId,
+    customerName: user.fullName || address.fullName || "N/A",
+    customerEmail: user.email || address.email || "N/A",
     items: cart.items.map((item) => ({
       product: item.product,
       product_id: item.product_id,

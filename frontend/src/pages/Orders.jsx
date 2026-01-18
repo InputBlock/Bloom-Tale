@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { Package, Loader2, ChevronRight, MapPin, Calendar, IndianRupee, ShoppingBag } from "lucide-react"
+import { Package, Loader2, ChevronRight, ChevronDown, ChevronUp, MapPin, Calendar, IndianRupee, ShoppingBag, CheckCircle2, Circle } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
 
@@ -11,6 +11,7 @@ export default function Orders() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [expandedOrder, setExpandedOrder] = useState(null)
 
   useEffect(() => {
     fetchOrders()
@@ -59,6 +60,77 @@ export default function Orders() {
       cancelled: "bg-red-100 text-red-800 border-red-200",
     }
     return statusColors[status?.toLowerCase()] || "bg-gray-100 text-gray-800 border-gray-200"
+  }
+
+  // Get order status steps for timeline - clean minimal design
+  const getOrderStatusSteps = (currentStatus) => {
+    const allSteps = [
+      { key: "CREATED", label: "Created" },
+      { key: "PLACED", label: "Confirmed" },
+      { key: "SHIPPED", label: "Shipped" },
+      { key: "DELIVERED", label: "Delivered" },
+    ]
+    
+    const statusOrder = ["CREATED", "PLACED", "SHIPPED", "DELIVERED"]
+    const currentIndex = statusOrder.indexOf(currentStatus?.toUpperCase())
+    
+    if (currentStatus?.toUpperCase() === "CANCELLED") {
+      const steps = allSteps.slice(0, Math.max(currentIndex, 1))
+      steps.push({ key: "CANCELLED", label: "Cancelled", isCancelled: true })
+      return steps.map((step, index) => ({
+        ...step,
+        isCompleted: index < steps.length - 1 || step.isCancelled,
+      }))
+    }
+    if (currentStatus?.toUpperCase() === "RETURNED") {
+      return [...allSteps, { key: "RETURNED", label: "Returned", isReturned: true }].map((step, index, arr) => ({
+        ...step,
+        isCompleted: true,
+      }))
+    }
+    
+    return allSteps.map((step, index) => ({
+      ...step,
+      isCompleted: index <= currentIndex,
+      isCurrent: index === currentIndex,
+    }))
+  }
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      CREATED: "Created",
+      PLACED: "Confirmed", 
+      SHIPPED: "Shipped",
+      DELIVERED: "Delivered",
+      CANCELLED: "Cancelled",
+      RETURNED: "Returned",
+    }
+    return labels[status?.toUpperCase()] || status || "Created"
+  }
+
+  const toggleOrderExpand = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId)
+  }
+
+  // Get delivery address from order (handles both array and object)
+  const getDeliveryAddress = (order) => {
+    if (order.deliveryAddress && order.deliveryAddress.length > 0) {
+      return order.deliveryAddress[0]
+    }
+    if (order.address) {
+      return order.address
+    }
+    return null
+  }
+
+  const getPaymentStatusLabel = (status) => {
+    const labels = {
+      PENDING: "Payment Pending",
+      PAID: "Paid",
+      PAYMENT_FAILED: "Payment Failed",
+      CANCELLED: "Cancelled",
+    }
+    return labels[status?.toUpperCase()] || status || "Pending"
   }
 
   const formatDate = (dateString) => {
@@ -167,15 +239,15 @@ export default function Orders() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-3">
                             <h3 className="text-lg md:text-xl font-semibold text-[#3e4026]">
-                              Order #{order._id?.slice(-8) || 'N/A'}
+                              #{order.order_id || order._id?.slice(-8).toUpperCase() || 'N/A'}
                             </h3>
-                            <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(order.status)}`}>
-                              {order.status || 'Pending'}
+                            <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+                              {getStatusLabel(order.order_status)}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar size={16} />
-                            <span>Placed on {formatDate(order.createdAt)}</span>
+                            <span>{formatDate(order.createdAt)}</span>
                           </div>
                         </div>
                         <div className="text-left sm:text-right">
@@ -190,30 +262,6 @@ export default function Orders() {
 
                     {/* Order Content */}
                     <div className="p-4 md:p-6">
-                      {/* Delivery Address */}
-                      {order.address && (
-                        <div className="mb-6">
-                          <div className="flex items-start gap-3">
-                            <MapPin className="text-[#3e4026] mt-1 flex-shrink-0" size={20} />
-                            <div>
-                              <p className="font-semibold text-gray-800 mb-1">Delivery Address</p>
-                              <p className="text-sm text-gray-600">
-                                {order.address.fullName}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {order.address.house}, {order.address.street}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {order.address.city}, {order.address.state} - {order.address.pincode}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                Mobile: +91 {order.address.mobile}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
                       {/* Order Items */}
                       {order.items && order.items.length > 0 && (
                         <div>
@@ -271,26 +319,91 @@ export default function Orders() {
                         </div>
                       )}
 
-                      {/* Payment Method */}
-                      {order.paymentMethod && (
-                        <div className="mt-6 pt-6 border-t border-gray-200">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Payment Method:</span>
-                            <span className="font-semibold text-gray-800 capitalize">
-                              {order.paymentMethod}
+                      {/* Payment Info */}
+                      <div className="mt-6 pt-6 border-t border-gray-200">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Payment:</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-800">
+                              {order.paymentMethod || 'N/A'}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              order.status === 'PAID' 
+                                ? 'bg-green-100 text-green-700' 
+                                : order.status === 'PAYMENT_FAILED'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {getPaymentStatusLabel(order.status)}
                             </span>
                           </div>
                         </div>
-                      )}
+                      </div>
 
-                      {/* View Details Button */}
+                      {/* Order Status Toggle Button */}
                       <button
-                        onClick={() => navigate(`/orders/${order._id}`)}
-                        className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 text-[#3e4026] hover:bg-[#3e4026]/5 rounded-lg transition-colors font-medium"
+                        onClick={() => toggleOrderExpand(order._id)}
+                        className="mt-4 w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                       >
-                        <span>View Details</span>
-                        <ChevronRight size={20} />
+                        <span className="text-sm font-medium text-gray-700">Order Status</span>
+                        {expandedOrder === order._id ? (
+                          <ChevronUp size={20} className="text-gray-500" />
+                        ) : (
+                          <ChevronDown size={20} className="text-gray-500" />
+                        )}
                       </button>
+
+                      {/* Order Status Timeline - Expandable at Bottom */}
+                      <AnimatePresence>
+                        {expandedOrder === order._id && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pt-4 pb-2">
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-4">ORDER PROGRESS</p>
+                              <div className="flex items-center justify-between">
+                                {getOrderStatusSteps(order.order_status).map((step, stepIndex, arr) => (
+                                  <div key={step.key} className="flex items-center flex-1">
+                                    <div className="flex flex-col items-center">
+                                      <div
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                                          step.isCompleted
+                                            ? "bg-[#3e4026] text-white"
+                                            : "bg-gray-200 text-gray-400"
+                                        }`}
+                                      >
+                                        {step.isCompleted ? (
+                                          <CheckCircle2 size={16} />
+                                        ) : (
+                                          <Circle size={16} />
+                                        )}
+                                      </div>
+                                      <span className={`text-xs mt-2 font-medium ${
+                                        step.isCompleted
+                                          ? "text-[#3e4026]"
+                                          : "text-gray-400"
+                                      }`}>
+                                        {step.label}
+                                      </span>
+                                    </div>
+                                    {stepIndex < arr.length - 1 && (
+                                      <div className={`flex-1 h-0.5 mx-2 ${
+                                        step.isCompleted && arr[stepIndex + 1]?.isCompleted
+                                          ? "bg-[#3e4026]"
+                                          : "bg-gray-200"
+                                      }`} />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </motion.div>
                 ))}

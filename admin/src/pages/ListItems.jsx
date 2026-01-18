@@ -3,6 +3,8 @@ import { Search, Edit2, Trash2 } from "lucide-react"
 import EditProductModal from "../components/ListItems/EditProductModal"
 import axios from "axios"
 
+const API_URL = "/api/v1/admin"
+
 export default function ListItems() {
   const [searchTerm, setSearchTerm] = useState("")
   const [products, setProducts] = useState([])
@@ -18,10 +20,15 @@ export default function ListItems() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const response = await axios.get("http://localhost:8000/api/v1/admin/showlist")
+      const response = await axios.get(`${API_URL}/showlist`, {
+        withCredentials: true
+      })
 
+      // Backend returns ApiResponse with data wrapped in response.data.data
+      const productsData = response.data?.data?.flowers || response.data?.flowers || []
+      
       // Transform backend data to match frontend format
-      const transformedProducts = response.data.flowers.map(product => ({
+      const transformedProducts = productsData.map(product => ({
         id: product.id,
         name: product.name,
         category: product.category,
@@ -57,7 +64,7 @@ export default function ListItems() {
       try {
         const token = localStorage.getItem("adminToken")
         await axios.post(
-          "/api/v1/admin/update",
+          `${API_URL}/update`,
           { 
             id: id,
             stock: stockValue
@@ -66,7 +73,8 @@ export default function ListItems() {
             headers: {
               "Authorization": `Bearer ${token}`,
               "Content-Type": "application/json"
-            }
+            },
+            withCredentials: true
           }
         )
         setProducts(products.map((p) => 
@@ -81,8 +89,8 @@ export default function ListItems() {
     try {
       const token = localStorage.getItem("adminToken")
       const endpoint = currentStatus
-        ? "http://localhost:8000/api/v1/admin/unlist"
-        : "http://localhost:8000/api/v1/admin/list"
+        ? `${API_URL}/unlist`
+        : `${API_URL}/list`
 
       await axios.post(
         endpoint,
@@ -91,7 +99,8 @@ export default function ListItems() {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
-          }
+          },
+          withCredentials: true
         }
       )
 
@@ -112,7 +121,7 @@ export default function ListItems() {
     try {
       const token = localStorage.getItem("adminToken")
       await axios.post(
-        "http://localhost:8000/api/v1/admin/update",
+        `${API_URL}/update`,
         {
           id: updatedProduct.id,
           name: updatedProduct.name,
@@ -124,7 +133,8 @@ export default function ListItems() {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
-          }
+          },
+          withCredentials: true
         }
       )
 

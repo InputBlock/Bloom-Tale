@@ -1,115 +1,96 @@
 import { motion } from "framer-motion"
+import { ChevronLeft, MapPin, Phone, User } from "lucide-react"
 
 export default function OrderSummary({ formData, orderDetails, onBack, onNext }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="space-y-4"
     >
-      {/* Previous Button */}
-      <button
-        type="button"
-        onClick={onBack}
-        className="flex items-center gap-2 text-[#3e4026] hover:text-[#5e6043] font-medium transition-colors"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        Back to Delivery Details
-      </button>
-
-      {/* Delivery Details Summary */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-800">Delivery Details Summary</h3>
+      {/* Delivery Summary Card */}
+      <div className="bg-white border border-gray-200">
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="font-medium text-gray-900">Delivery Details</h3>
           <button
             type="button"
             onClick={onBack}
-            className="text-[#3e4026] hover:text-[#5e6043] text-sm font-medium underline"
+            className="text-sm text-gray-500 hover:text-gray-900"
           >
             Edit
           </button>
         </div>
 
-        <div className="space-y-4 text-gray-700">
-          <div className="border-b pb-3">
-            <p className="text-sm text-gray-500 mb-1">Recipient Name</p>
-            <p className="font-semibold">{formData.title} {formData.recipientName}</p>
-          </div>
-
-          <div className="border-b pb-3">
-            <p className="text-sm text-gray-500 mb-1">Delivery Address</p>
-            <p>{formData.apartment}</p>
-            <p>{formData.streetAddress}</p>
-            <p>{formData.city}, {formData.state} - {formData.pincode}</p>
-            <p>{formData.country}</p>
-          </div>
-
-          <div className="border-b pb-3">
-            <p className="text-sm text-gray-500 mb-1">Contact Number</p>
-            <p className="font-medium">+91 {formData.mobileNumber}</p>
-            {formData.alternateMobile && (
-              <p className="text-sm text-gray-600">Alt: +91 {formData.alternateMobile}</p>
-            )}
-          </div>
-
-          {formData.email && (
-            <div className="border-b pb-3">
-              <p className="text-sm text-gray-500 mb-1">Email</p>
-              <p>{formData.email}</p>
-            </div>
-          )}
-
-          {formData.what3words && (
-            <div className="border-b pb-3">
-              <p className="text-sm text-gray-500 mb-1">What3words</p>
-              <p className="text-sm">{formData.what3words}</p>
-            </div>
-          )}
-
-          {formData.addressTag && (
+        <div className="p-4 space-y-3">
+          {/* Recipient */}
+          <div className="flex items-start gap-3">
+            <User size={16} className="text-gray-400 mt-0.5" />
             <div>
-              <p className="text-sm text-gray-500 mb-1">Address Tag</p>
-              <p className="font-medium">{formData.addressTag}</p>
+              <p className="text-sm font-medium text-gray-900">{formData.title} {formData.recipientName}</p>
             </div>
-          )}
+          </div>
+
+          {/* Address */}
+          <div className="flex items-start gap-3">
+            <MapPin size={16} className="text-gray-400 mt-0.5" />
+            <div className="text-sm text-gray-600">
+              <p>{formData.apartment}</p>
+              <p>{formData.streetAddress}</p>
+              <p>{formData.city}, {formData.state} - {formData.pincode}</p>
+              <p>{formData.country}</p>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div className="flex items-start gap-3">
+            <Phone size={16} className="text-gray-400 mt-0.5" />
+            <p className="text-sm text-gray-600">+91 {formData.mobileNumber}</p>
+          </div>
         </div>
       </div>
 
-      {/* Order Items Summary */}
+      {/* Order Items */}
       {orderDetails && orderDetails.items && orderDetails.items.length > 0 && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Order Items</h3>
-          <div className="space-y-3">
+        <div className="bg-white border border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="font-medium text-gray-900">Order Items ({orderDetails.items.length})</h3>
+          </div>
+          <div className="divide-y divide-gray-100">
             {orderDetails.items.map((item, index) => (
-              <div key={index} className="flex justify-between items-center border-b pb-3">
-                <div>
-                  <p className="font-semibold text-gray-900">{item.product?.name || 'Product'}</p>
-                  <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+              <div key={index} className="p-4 flex items-center gap-4">
+                <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                  {item.productImage || item.product?.images_uri?.[0] ? (
+                    <img 
+                      src={item.productImage || item.product?.images_uri?.[0]} 
+                      alt={item.productName || item.product?.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200" />
+                  )}
                 </div>
-                <p className="font-semibold text-gray-900">₹ {(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">{item.productName || item.product?.name}</p>
+                  <p className="text-xs text-gray-500 mt-1">Qty: {item.quantity}</p>
+                </div>
+                <p className="text-sm font-semibold text-gray-900">
+                  ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                </p>
               </div>
             ))}
-            <div className="flex justify-between items-center pt-2">
-              <p className="text-lg font-bold text-gray-900">Total Amount</p>
-              <p className="text-xl font-bold text-[#3e4026]">₹ {orderDetails.totalAmount.toLocaleString('en-IN')}</p>
-            </div>
           </div>
         </div>
       )}
 
-      {/* Navigation Button */}
-      <motion.button
+      {/* Proceed Button */}
+      <button
         type="button"
         onClick={onNext}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full bg-[#3e4026] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#5e6043] transition-colors"
+        className="w-full py-3 bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors"
       >
-        MAKE PAYMENT
-      </motion.button>
+        PROCEED TO PAYMENT
+      </button>
     </motion.div>
   )
 }
