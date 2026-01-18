@@ -76,7 +76,7 @@ export default function Checkout() {
   const cartTotal = getCartTotal ? getCartTotal() : 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-[#FAF8F5]">
       <Header />
       
       <div className="pt-24 pb-16">
@@ -84,8 +84,8 @@ export default function Checkout() {
           
           {/* Page Title */}
           <div className="mb-8">
-            <h1 className="text-2xl font-light text-gray-900 tracking-tight">Checkout</h1>
-            <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+            <h1 className="text-2xl font-light text-[#3e4026] tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>Checkout</h1>
+            <div className="flex items-center gap-2 mt-2 text-sm text-[#5e6043]">
               <Lock size={14} />
               <span>Secure checkout</span>
             </div>
@@ -115,10 +115,10 @@ export default function Checkout() {
                         >
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                             isCompleted 
-                              ? "bg-green-600 text-white shadow-lg shadow-green-600/20" 
+                              ? "bg-[#3e4026] text-white shadow-lg shadow-[#3e4026]/20" 
                               : isCurrent 
-                              ? "bg-gray-900 text-white shadow-lg shadow-gray-900/20" 
-                              : "bg-gray-100 text-gray-400"
+                              ? "bg-[#3e4026] text-white shadow-lg shadow-[#3e4026]/20" 
+                              : "bg-[#EDE8E0] text-[#5e6043]"
                           }`}>
                             {isCompleted ? (
                               <CheckCircle2 size={22} />
@@ -127,7 +127,7 @@ export default function Checkout() {
                             )}
                           </div>
                           <span className={`text-xs font-medium tracking-wide transition-colors ${
-                            isCurrent ? "text-gray-900" : isCompleted ? "text-green-600" : "text-gray-400"
+                            isCurrent ? "text-[#3e4026]" : isCompleted ? "text-[#3e4026]" : "text-[#5e6043]/60"
                           }`}>
                             {step.name}
                           </span>
@@ -136,7 +136,7 @@ export default function Checkout() {
                         {index < steps.length - 1 && (
                           <div className="flex-1 h-[2px] mx-4 mt-[-20px]">
                             <div className={`h-full transition-all duration-500 ${
-                              isCompleted ? "bg-green-600" : "bg-gray-200"
+                              isCompleted ? "bg-[#3e4026]" : "bg-[#EDE8E0]"
                             }`} />
                           </div>
                         )}
@@ -179,11 +179,11 @@ export default function Checkout() {
 
             {/* Right Column - Order Summary Sidebar */}
             <div className="lg:w-[400px] shrink-0">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 sticky top-24 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-sm border border-[#EDE8E0] sticky top-24 overflow-hidden">
                 {/* Header */}
-                <div className="px-6 py-5 bg-gradient-to-r from-gray-900 to-gray-800">
+                <div className="px-6 py-5 bg-gradient-to-r from-[#3e4026] to-[#5e6043]">
                   <h3 className="font-medium text-white tracking-wide">Your Order</h3>
-                  <p className="text-gray-300 text-sm mt-1">{(orderDetails?.items || cartItems || []).length} item(s)</p>
+                  <p className="text-white/70 text-sm mt-1">{(orderDetails?.items || cartItems || []).length} item(s)</p>
                 </div>
 
                 {/* Cart Items */}
@@ -202,20 +202,20 @@ export default function Checkout() {
                         transition={{ delay: index * 0.05 }}
                         className="flex gap-4 mb-4 pb-4 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0"
                       >
-                        <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0 ring-1 ring-gray-100">
+                        <div className="w-20 h-20 bg-[#EDE8E0] rounded-xl overflow-hidden shrink-0">
                           {imageUrl ? (
                             <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <Package size={24} className="text-gray-300" />
+                              <Package size={24} className="text-[#5e6043]" />
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0 py-1">
-                          <p className="text-sm font-medium text-gray-900 line-clamp-2 leading-snug">{name}</p>
+                          <p className="text-sm font-medium text-[#3e4026] line-clamp-2 leading-snug">{name}</p>
                           <div className="flex items-center justify-between mt-2">
-                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Qty: {quantity}</span>
-                            <p className="text-sm font-semibold text-gray-900">
+                            <span className="text-xs text-[#5e6043] bg-[#EDE8E0] px-2 py-0.5 rounded">Qty: {quantity}</span>
+                            <p className="text-sm font-semibold text-[#3e4026]">
                               ₹{price.toLocaleString('en-IN')}
                             </p>
                           </div>
@@ -226,28 +226,28 @@ export default function Checkout() {
                 </div>
 
                 {/* Billing Summary */}
-                <div className="p-5 border-t border-gray-100 bg-gray-50/50">
+                <div className="p-5 border-t border-[#EDE8E0] bg-[#FAF8F5]">
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Subtotal</span>
-                      <span className="text-gray-900 font-medium">
+                      <span className="text-[#5e6043]">Subtotal</span>
+                      <span className="text-[#3e4026] font-medium">
                         ₹{(orderDetails?.totalAmount || cartTotal).toLocaleString('en-IN')}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Shipping</span>
-                      <span className="text-green-600 font-medium">Free</span>
+                      <span className="text-[#5e6043]">Shipping</span>
+                      <span className="text-[#3e4026] font-medium">Free</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Tax</span>
-                      <span className="text-gray-500">Included</span>
+                      <span className="text-[#5e6043]">Tax</span>
+                      <span className="text-[#5e6043]">Included</span>
                     </div>
                   </div>
                   
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-4 pt-4 border-t border-[#EDE8E0]">
                     <div className="flex justify-between items-center">
-                      <span className="text-base font-semibold text-gray-900">Total</span>
-                      <span className="text-xl font-bold text-gray-900">
+                      <span className="text-base font-semibold text-[#3e4026]">Total</span>
+                      <span className="text-xl font-bold text-[#3e4026]">
                         ₹{(orderDetails?.totalAmount || cartTotal).toLocaleString('en-IN')}
                       </span>
                     </div>
@@ -255,7 +255,7 @@ export default function Checkout() {
                 </div>
                 
                 {/* Trust Badges */}
-                <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-center gap-6 text-xs text-gray-400">
+                <div className="px-5 py-4 border-t border-[#EDE8E0] flex items-center justify-center gap-6 text-xs text-[#5e6043]">
                   <div className="flex items-center gap-1.5">
                     <Lock size={12} />
                     <span>SSL Secured</span>
