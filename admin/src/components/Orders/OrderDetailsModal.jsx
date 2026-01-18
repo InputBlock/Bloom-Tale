@@ -62,18 +62,18 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                   <User size={18} />
                   Customer Information
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Name</p>
-                    <p className="text-gray-900 font-medium">{order.customerName || "N/A"}</p>
+                    <p className="text-gray-900 font-medium">{order.customerName}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Email</p>
-                    <p className="text-gray-900 font-medium text-sm break-all">{order.email || "N/A"}</p>
+                    <p className="text-gray-900 font-medium text-sm">{order.email}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Phone</p>
-                    <p className="text-gray-900 font-medium">{order.phone || "N/A"}</p>
+                    <p className="text-gray-900 font-medium">{order.phone}</p>
                   </div>
                 </div>
               </div>
@@ -101,11 +101,11 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                       key={idx}
                       className="flex justify-between items-center pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div className="flex-1">
+                      <div>
                         <p className="font-medium text-gray-900">{item.name}</p>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity || 1}</p>
+                        <p className="text-sm text-gray-500">{item.description}</p>
                       </div>
-                      <p className="font-semibold text-gray-900">₹{((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
+                      <p className="font-semibold text-gray-900">₹{item.price?.toFixed(2) || "0.00"}</p>
                     </div>
                   ))}
                 </div>

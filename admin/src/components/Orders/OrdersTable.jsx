@@ -172,30 +172,23 @@ export default function OrdersTable() {
                           <button
                             onClick={() => {
                               const addr = order.deliveryAddress?.[0]
-                              const addressParts = []
-                              if (addr?.house) addressParts.push(addr.house)
-                              if (addr?.streetAddress || addr?.street) addressParts.push(addr.streetAddress || addr.street)
-                              if (addr?.city) addressParts.push(addr.city)
-                              if (addr?.state) addressParts.push(addr.state)
-                              const addressMain = addressParts.join(", ")
-                              const addressStr = addr?.pincode 
-                                ? `${addressMain} - ${addr.pincode}${addr?.country ? `, ${addr.country}` : ""}`
-                                : `${addressMain}${addr?.country ? `, ${addr.country}` : ""}`
-                              
+                              const addressStr = addr 
+                                ? `${addr.house || ""}, ${addr.city || ""}, ${addr.state || ""} - ${addr.pincode || ""}`
+                                : "N/A"
                               setSelectedOrder({
                                 ...order,
                                 id: order.order_id || order._id.slice(-8).toUpperCase(),
-                                customerName: order.customerName || order.user?.username || addr?.fullName || "N/A",
-                                email: order.customerEmail || order.user?.email || addr?.email || "N/A",
-                                phone: addr?.mobile || order.user?.mobile || "N/A",
+                                customerName: order.user?.fullName || addr?.fullName || "N/A",
+                                email: order.user?.email || addr?.email || "N/A",
+                                phone: order.user?.mobile || addr?.mobile || "N/A",
                                 created: formatDate(order.createdAt),
                                 order_status: order.order_status || "CREATED",
                                 orderStatusColor: getOrderStatusColor(order.order_status || "CREATED"),
                                 paymentStatusColor: getPaymentStatusColor(order.status),
-                                deliveryAddress: addressStr || "N/A",
+                                deliveryAddress: addressStr,
                                 items: order.items?.map(item => ({
                                   name: item.productName || item.product?.name || "Product",
-                                  quantity: item.quantity || 1,
+                                  description: "",
                                   price: item.price || 0
                                 })) || [],
                                 subtotal: order.totalAmount || 0,

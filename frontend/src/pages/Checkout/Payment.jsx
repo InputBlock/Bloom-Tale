@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle2, Smartphone, Banknote, ChevronLeft, Loader2, X } from "lucide-react"
+import { CheckCircle2, Smartphone, Banknote, ChevronLeft, Loader2, X, Shield } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export default function Payment({ paymentMethod, setPaymentMethod, onBack, orderId, orderDetails }) {
@@ -77,128 +77,101 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: 20 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
         className="space-y-6"
       >
-        {/* Previous Button */}
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex items-center gap-2 text-[#3e4026] hover:text-[#5e6043] font-medium transition-colors"
-        >
-          <ChevronLeft size={20} />
-          Back to Order Summary
-        </button>
-
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm font-medium">{error}</p>
+          <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
 
-        {/* Payment Amount Card */}
-      <div className="bg-gradient-to-r from-[#3e4026] to-[#5e6043] rounded-xl shadow-lg p-8 text-white">
-        <p className="text-sm opacity-90 mb-2">Total Amount</p>
-        <h2 className="text-4xl font-bold mb-1">₹ {totalAmount.toLocaleString('en-IN')}</h2>
-        <p className="text-sm opacity-80">Including all taxes and delivery charges</p>
-      </div>
-
-      {/* Payment Methods */}
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        <h3 className="text-xl font-bold text-gray-800 mb-6">Select Payment Method</h3>
-        
+        {/* Payment Methods */}
         <div className="space-y-4">
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">Select Payment Method</h3>
+          
           {/* UPI Option */}
-          <motion.button
+          <button
             type="button"
             onClick={() => setPaymentMethod("upi")}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`w-full p-6 rounded-lg border-2 transition-all flex items-center gap-4 ${
+            className={`w-full p-4 border rounded-lg transition-all flex items-center gap-4 text-left ${
               paymentMethod === "upi"
-                ? "border-[#3e4026] bg-[#EDE8E0]"
-                : "border-gray-300 hover:border-[#5e6043]"
+                ? "border-gray-900 bg-gray-50"
+                : "border-gray-200 hover:border-gray-400"
             }`}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-              paymentMethod === "upi" ? "bg-[#3e4026] text-white" : "bg-gray-100 text-gray-600"
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              paymentMethod === "upi" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
             }`}>
-              <Smartphone size={24} />
+              <Smartphone size={20} />
             </div>
-            <div className="flex-1 text-left">
-              <h4 className="font-semibold text-gray-900 text-lg">UPI Payment</h4>
-              <p className="text-sm text-gray-600">Pay using Google Pay, PhonePe, Paytm & more</p>
+            <div className="flex-1">
+              <h4 className="font-medium text-gray-900">UPI Payment</h4>
+              <p className="text-sm text-gray-500">Google Pay, PhonePe, Paytm & more</p>
             </div>
-            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-              paymentMethod === "upi" ? "border-[#3e4026]" : "border-gray-300"
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              paymentMethod === "upi" ? "border-gray-900" : "border-gray-300"
             }`}>
               {paymentMethod === "upi" && (
-                <div className="w-3 h-3 bg-[#3e4026] rounded-full" />
+                <div className="w-2.5 h-2.5 bg-gray-900 rounded-full" />
               )}
             </div>
-          </motion.button>
+          </button>
 
           {/* Cash on Delivery Option */}
-          <motion.button
+          <button
             type="button"
             onClick={() => setPaymentMethod("cod")}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`w-full p-6 rounded-lg border-2 transition-all flex items-center gap-4 ${
+            className={`w-full p-4 border rounded-lg transition-all flex items-center gap-4 text-left ${
               paymentMethod === "cod"
-                ? "border-[#3e4026] bg-[#EDE8E0]"
-                : "border-gray-300 hover:border-[#5e6043]"
+                ? "border-gray-900 bg-gray-50"
+                : "border-gray-200 hover:border-gray-400"
             }`}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-              paymentMethod === "cod" ? "bg-[#3e4026] text-white" : "bg-gray-100 text-gray-600"
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              paymentMethod === "cod" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
             }`}>
-              <Banknote size={24} />
+              <Banknote size={20} />
             </div>
-            <div className="flex-1 text-left">
-              <h4 className="font-semibold text-gray-900 text-lg">Cash on Delivery</h4>
-              <p className="text-sm text-gray-600">Pay when you receive the order</p>
+            <div className="flex-1">
+              <h4 className="font-medium text-gray-900">Cash on Delivery</h4>
+              <p className="text-sm text-gray-500">Pay when you receive the order</p>
             </div>
-            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-              paymentMethod === "cod" ? "border-[#3e4026]" : "border-gray-300"
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              paymentMethod === "cod" ? "border-gray-900" : "border-gray-300"
             }`}>
               {paymentMethod === "cod" && (
-                <div className="w-3 h-3 bg-[#3e4026] rounded-full" />
+                <div className="w-2.5 h-2.5 bg-gray-900 rounded-full" />
               )}
             </div>
-          </motion.button>
+          </button>
         </div>
 
         {/* Place Order Button */}
-        <motion.button
+        <button
           type="button"
           onClick={handlePlaceOrder}
           disabled={loading}
-          whileHover={{ scale: loading ? 1 : 1.02 }}
-          whileTap={{ scale: loading ? 1 : 0.98 }}
-          className="w-full mt-8 bg-[#3e4026] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#5e6043] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full mt-6 bg-gray-900 text-white py-3.5 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
-              <Loader2 className="animate-spin" size={20} />
+              <Loader2 className="animate-spin" size={18} />
               <span>PROCESSING...</span>
             </>
           ) : (
-            paymentMethod === "upi" ? `PROCEED TO PAY ₹ ${totalAmount.toLocaleString('en-IN')}` : "PLACE ORDER"
+            paymentMethod === "upi" ? `PROCEED TO PAY ₹${totalAmount.toLocaleString('en-IN')}` : "PLACE ORDER"
           )}
-        </motion.button>
+        </button>
 
-        {/* Payment Info */}
-        <div className="mt-6 flex items-start gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <CheckCircle2 size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-gray-700">
-            <strong>Safe & Secure:</strong> Your payment information is protected with industry-standard encryption.
-          </p>
+        {/* Security Note */}
+        <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
+          <Shield size={14} />
+          <span>Secure payment powered by industry-standard encryption</span>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
 
     {/* Success Modal for COD */}
     <AnimatePresence>
@@ -207,60 +180,60 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={() => setShowSuccessModal(false)}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
 
             {/* Success Icon */}
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle2 size={48} className="text-green-600" />
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center">
+                <CheckCircle2 size={36} className="text-green-600" />
               </div>
             </div>
 
             {/* Success Message */}
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-3">
-              Order Placed Successfully!
+            <h2 className="text-xl font-semibold text-gray-900 text-center mb-2">
+              Order Placed!
             </h2>
-            <p className="text-gray-600 text-center mb-6">
-              Your order has been placed successfully. You will receive a confirmation email shortly.
+            <p className="text-gray-500 text-center text-sm mb-4">
+              You will receive a confirmation email shortly.
             </p>
 
             {/* Order ID */}
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-500 text-center mb-1">Order ID</p>
-              <p className="text-lg font-semibold text-gray-900 text-center font-mono">
+            <div className="bg-gray-50 rounded-lg p-3 mb-5">
+              <p className="text-xs text-gray-400 text-center mb-1">Order ID</p>
+              <p className="text-sm font-medium text-gray-900 text-center font-mono">
                 {orderId}
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <button
                 onClick={() => navigate("/")}
-                className="w-full bg-[#3e4026] text-white py-3 rounded-lg font-semibold hover:bg-[#5e6043] transition-colors"
+                className="w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors text-sm"
               >
-                Continue Shopping
+                CONTINUE SHOPPING
               </button>
               <button
                 onClick={() => navigate("/orders")}
-                className="w-full border-2 border-[#3e4026] text-[#3e4026] py-3 rounded-lg font-semibold hover:bg-[#EDE8E0] transition-colors"
+                className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
               >
-                View Orders
+                VIEW ORDERS
               </button>
             </div>
           </motion.div>

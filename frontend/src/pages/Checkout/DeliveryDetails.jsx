@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, Loader2, MapPin, Edit2 } from "lucide-react"
+import { Loader2, Home, Plus, Phone } from "lucide-react"
 
 export default function DeliveryDetails({ formData, handleInputChange, onSubmit }) {
   const [loading, setLoading] = useState(false)
@@ -138,128 +138,94 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
 
   if (loadingAddresses) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center min-h-[400px]"
-      >
+      <div className="bg-white border border-gray-200 p-8 flex items-center justify-center min-h-[300px]">
         <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4 text-[#3e4026]" size={40} />
-          <p className="text-gray-600">Loading saved addresses...</p>
+          <Loader2 className="animate-spin mx-auto mb-3 text-gray-400" size={32} />
+          <p className="text-gray-500 text-sm">Loading addresses...</p>
         </div>
-      </motion.div>
+      </div>
     )
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="space-y-4"
     >
-      {/* Back to Cart Button */}
-      <button
-        type="button"
-        onClick={() => window.history.back()}
-        className="flex items-center gap-2 text-gray-600 hover:text-[#3e4026] font-medium mb-4 sm:mb-6 transition-colors text-sm sm:text-base"
-      >
-        <ChevronLeft size={20} className="sm:w-5 sm:h-5 w-4 h-4" />
-        <span>Back to Cart</span>
-      </button>
-
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 text-sm font-medium">{error}</p>
+        <div className="p-3 bg-red-50 border border-red-100 rounded text-red-600 text-sm">
+          {error}
         </div>
       )}
 
-      {/* Saved Addresses Section */}
+      {/* Saved Addresses */}
       {savedAddresses.length > 0 && !showNewAddressForm && (
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl sm:text-2xl font-semibold text-[#3e4026]">
-              Select Delivery Address
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
+        <div className="bg-white border border-gray-200">
+          <div className="divide-y divide-gray-100">
             {savedAddresses.map((address) => (
-              <motion.div
+              <div
                 key={address._id}
-                whileHover={{ scale: 1.02 }}
-                onClick={() => handleAddressSelect(address)}
-                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                  selectedAddressId === address._id
-                    ? 'border-[#3e4026] bg-[#3e4026]/5'
-                    : 'border-gray-200 hover:border-[#3e4026]/50'
-                }`}
+                className={`p-4 ${selectedAddressId === address._id ? 'bg-gray-50' : ''}`}
               >
                 <div className="flex items-start gap-3">
-                  <MapPin className={`mt-1 flex-shrink-0 ${
-                    selectedAddressId === address._id ? 'text-[#3e4026]' : 'text-gray-400'
-                  }`} size={20} />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-semibold text-gray-900">{address.fullName}</span>
+                  <Home size={18} className="text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-gray-900">{address.title} {address.fullName}</span>
                       {address.addressTag && (
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                        <span className="px-2 py-0.5 bg-gray-900 text-white text-[10px] font-medium rounded">
                           {address.addressTag}
                         </span>
                       )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleAddressSelect(address)
+                          setShowNewAddressForm(true)
+                        }}
+                        className="text-gray-500 hover:text-gray-900 text-sm ml-2"
+                      >
+                        Edit
+                      </button>
                     </div>
-                    <p className="text-sm text-gray-600 mb-1">
-                      {address.house}, {address.street}
+                    <p className="text-sm text-gray-600">
+                      {[address.house, address.street, address.pincode, address.city + '-' + address.state].filter(Boolean).join(', ')}
                     </p>
-                    <p className="text-sm text-gray-600 mb-1">
-                      {address.city}, {address.state} - {address.pincode}
-                    </p>
-                    <p className="text-sm text-gray-600 font-medium">
-                      Mobile: +91 {address.mobile}
-                    </p>
+                    <div className="flex items-center gap-1 mt-1 text-sm text-gray-600">
+                      <Phone size={12} />
+                      <span>+91-{address.mobile}</span>
+                    </div>
                   </div>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
+                    onClick={() => {
                       handleAddressSelect(address)
-                      setShowNewAddressForm(true)
+                      handleFormSubmit({ preventDefault: () => {} })
                     }}
-                    className="text-[#3e4026] hover:text-[#5e6043] transition-colors p-2 hover:bg-gray-100 rounded"
-                    aria-label="Edit address"
+                    disabled={loading}
+                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
                   >
-                    <Edit2 size={18} />
+                    {loading && selectedAddressId === address._id ? 'PROCESSING...' : 'DELIVER HERE'}
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-
-          {selectedAddressId && (
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                handleFormSubmit(e)
-              }}
-              disabled={loading}
-              whileHover={{ scale: loading ? 1 : 1.02 }}
-              whileTap={{ scale: loading ? 1 : 0.98 }}
-              className="w-full mt-6 bg-[#3e4026] text-white py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-[#5e6043] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin" size={20} />
-                  <span>PROCESSING...</span>
-                </>
-              ) : (
-                "DELIVER TO THIS ADDRESS"
-              )}
-            </motion.button>
-          )}
         </div>
+      )}
+
+      {/* Add New Address Button */}
+      {savedAddresses.length > 0 && !showNewAddressForm && (
+        <button
+          type="button"
+          onClick={() => setShowNewAddressForm(true)}
+          className="w-full p-4 border border-gray-300 border-dashed bg-white flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:border-gray-400 transition-colors"
+        >
+          <Plus size={18} />
+          <span className="font-medium">ADD NEW ADDRESS</span>
+        </button>
       )}
 
       {/* New Address Form */}
@@ -269,223 +235,189 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
+            className="bg-white border border-gray-200"
           >
             {savedAddresses.length > 0 && (
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl sm:text-2xl font-semibold text-[#3e4026]">
-                  Add New Address
-                </h2>
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <span className="font-medium text-gray-900">Add New Address</span>
                 <button
                   type="button"
                   onClick={() => setShowNewAddressForm(false)}
-                  className="text-gray-600 hover:text-[#3e4026] font-medium text-sm sm:text-base transition-colors"
+                  className="text-gray-500 hover:text-gray-900 text-sm"
                 >
                   Cancel
                 </button>
               </div>
             )}
 
-      <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
-        {/* Title and Name */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-              Title <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-              required
-            >
-              <option>Mr.</option>
-              <option>Mrs.</option>
-              <option>Ms.</option>
-              <option>Dr.</option>
-            </select>
-          </div>
-          <div className="sm:col-span-3">
-            <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-              Recipient Full Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.recipientName}
-              onChange={(e) => handleInputChange('recipientName', e.target.value)}
-              placeholder="First Name & Last Name"
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1 text-right">(0/60)</p>
-          </div>
-        </div>
-
-        {/* Mobile Numbers */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-              Recipient Mobile No <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-2">
-              <div className="w-16 sm:w-20 px-2 sm:px-3 py-2 sm:py-3 bg-gray-100 border border-gray-300 rounded-lg text-center text-sm sm:text-base">
-                + 91
-              </div>
-              <input
-                type="tel"
-                value={formData.mobileNumber}
-                onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
-                placeholder="Mobile Number"
-                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-                required
-              />
+            {/* Save Address Checkbox */}
+            <div className="p-4 border-b border-gray-100">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.saveAddress}
+                  onChange={(e) => handleInputChange('saveAddress', e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                />
+                <span className="text-sm text-gray-700 flex items-center gap-1">
+                  <Home size={14} /> Save this address as <strong>'My Home'</strong>
+                </span>
+              </label>
             </div>
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-              Recipient Alternate Number
-            </label>
-            <div className="flex gap-2">
-              <div className="w-16 sm:w-20 px-2 sm:px-3 py-2 sm:py-3 bg-gray-100 border border-gray-300 rounded-lg text-center text-sm sm:text-base">
-                + 91
+
+            <form onSubmit={handleFormSubmit} className="p-4 space-y-4">
+              {/* Title and Name */}
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">
+                    Title <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    required
+                  >
+                    <option>Mr.</option>
+                    <option>Mrs.</option>
+                    <option>Ms.</option>
+                    <option>Dr.</option>
+                  </select>
+                </div>
+                <div className="col-span-3">
+                  <label className="block text-sm text-gray-700 mb-1">
+                    Recipient Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.recipientName}
+                    onChange={(e) => handleInputChange('recipientName', e.target.value)}
+                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    required
+                  />
+                  <p className="text-[10px] text-gray-400 mt-1 text-right">({formData.recipientName?.length || 0}/60)</p>
+                </div>
               </div>
-              <input
-                type="tel"
-                value={formData.alternateMobile}
-                onChange={(e) => handleInputChange('alternateMobile', e.target.value)}
-                placeholder="Alternate No. (Optional)"
-                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-              />
-            </div>
-          </div>
-        </div>
 
-        {/* Email */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-            Email Address <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            placeholder="example@email.com"
-            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-            required
-          />
-        </div>
+              {/* Country */}
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">
+                  Delivery Country <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.country}
+                  onChange={(e) => handleInputChange('country', e.target.value)}
+                  className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                  required
+                >
+                  <option value="India">🇮🇳 India</option>
+                  <option value="United States">🇺🇸 United States</option>
+                  <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                </select>
+              </div>
 
-        {/* Country */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-            Delivery Country <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={formData.country}
-            onChange={(e) => handleInputChange('country', e.target.value)}
-            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-            required
-          >
-            <option>🇮🇳 India</option>
-            <option>🇺🇸 United States</option>
-            <option>🇬🇧 United Kingdom</option>
-          </select>
-        </div>
+              {/* Street Address */}
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">
+                  Street Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.streetAddress}
+                  onChange={(e) => handleInputChange('streetAddress', e.target.value)}
+                  className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                  required
+                />
+                <p className="text-[10px] text-gray-400 mt-1 text-right">({formData.streetAddress?.length || 0}/180)</p>
+              </div>
 
-        {/* State */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-            State <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={formData.state}
-            onChange={(e) => handleInputChange('state', e.target.value)}
-            placeholder="Maharashtra"
-            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-            required
-          />
-        </div>
+              {/* House/Apartment */}
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">
+                  House/Apartment <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.apartment}
+                  onChange={(e) => handleInputChange('apartment', e.target.value)}
+                  className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                  required
+                />
+              </div>
 
-        {/* Pincode and City */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-              Pincode/Zipcode <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.pincode}
-              onChange={(e) => handleInputChange('pincode', e.target.value)}
-              placeholder="400008"
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-              City <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.city}
-              onChange={(e) => handleInputChange('city', e.target.value)}
-              placeholder="Mumbai"
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-              required
-            />
-          </div>
-        </div>
+              {/* Pincode, City, State */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">
+                    Pincode <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.pincode}
+                    onChange={(e) => handleInputChange('pincode', e.target.value)}
+                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">
+                    City <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">
+                    State <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.state}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    required
+                  />
+                </div>
+              </div>
 
-        {/* Street Address */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-            Street Address <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={formData.streetAddress}
-            onChange={(e) => handleInputChange('streetAddress', e.target.value)}
-            placeholder="Building / Area / Locality"
-            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-            required
-          />
-          <p className="text-xs text-gray-500 mt-1 text-right">(0/180)</p>
-        </div>
+              {/* Mobile Number */}
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">
+                  Mobile Number <span className="text-red-500">*</span>
+                </label>
+                <div className="flex">
+                  <span className="px-3 py-2.5 border-b border-gray-300 bg-transparent text-sm text-gray-500">+91</span>
+                  <input
+                    type="tel"
+                    value={formData.mobileNumber}
+                    onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
+                    className="flex-1 px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    required
+                  />
+                </div>
+              </div>
 
-        {/* Apartment */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-            House/Apartment <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={formData.apartment}
-            onChange={(e) => handleInputChange('apartment', e.target.value)}
-            placeholder="Flat No. / Floor / Unit No"
-            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
-            required
-          />
-          <p className="text-xs text-gray-500 mt-1 text-right">(0/180)</p>
-        </div>
-
-        {/* Submit Button */}
-        <motion.button
-          type="submit"
-          disabled={loading}
-          whileHover={{ scale: loading ? 1 : 1.02 }}
-          whileTap={{ scale: loading ? 1 : 0.98 }}
-          className="w-full bg-[#3e4026] text-white py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-[#5e6043] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin" size={20} />
-              <span>SAVING...</span>
-            </>
-          ) : (
-            "SAVE & DELIVER"
-          )}
-        </motion.button>
-      </form>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    <span>SAVING...</span>
+                  </>
+                ) : (
+                  "SAVE & DELIVER"
+                )}
+              </button>
+            </form>
           </motion.div>
         )}
       </AnimatePresence>
