@@ -55,7 +55,12 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
 
-  const validStatuses = ["PENDING", "ACCEPTED", "PREPARED", "SHIPPED", "DELIVERED", "CANCELLED"];
+  const validStatuses = 
+        ["PLACED",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELLED",
+        "RETURNED"];
   
   if (!validStatuses.includes(status)) {
     throw new ApiError(400, `Invalid status. Must be one of: ${validStatuses.join(", ")}`);
