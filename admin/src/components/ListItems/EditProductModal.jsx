@@ -5,7 +5,6 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
   const [editProduct, setEditProduct] = useState(null)
 
   const categories = [
-    "Same Day Delivery",
     "Birthday",
     "Anniversary",
     "Forever Flowers",
@@ -83,44 +82,72 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">Pricing</label>
             
-            {/* Small Price */}
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Small (₹)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={editProduct.pricing.small}
-                onChange={(e) => handlePricingChange('small', e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                placeholder="0.00"
-              />
-            </div>
+            {(editProduct.category === "Fragrances" || editProduct.category === "Combos") ? (
+              // Single Price for Fragrances and Combos
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Price (₹)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={editProduct.pricing.small}
+                  onChange={(e) => {
+                    const price = e.target.value
+                    setEditProduct({
+                      ...editProduct,
+                      pricing: {
+                        small: price === "" ? "" : parseFloat(price) || 0,
+                        medium: price === "" ? "" : parseFloat(price) || 0,
+                        large: price === "" ? "" : parseFloat(price) || 0
+                      }
+                    })
+                  }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  placeholder="0.00"
+                />
+              </div>
+            ) : (
+              // Three Sizes for other categories
+              <>
+                {/* Small Price */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Small (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editProduct.pricing.small}
+                    onChange={(e) => handlePricingChange('small', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    placeholder="0.00"
+                  />
+                </div>
 
-            {/* Medium Price */}
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Medium (₹)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={editProduct.pricing.medium}
-                onChange={(e) => handlePricingChange('medium', e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                placeholder="0.00"
-              />
-            </div>
+                {/* Medium Price */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Medium (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editProduct.pricing.medium}
+                    onChange={(e) => handlePricingChange('medium', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    placeholder="0.00"
+                  />
+                </div>
 
-            {/* Large Price */}
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Large (₹)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={editProduct.pricing.large}
-                onChange={(e) => handlePricingChange('large', e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                placeholder="0.00"
-              />
-            </div>
+                {/* Large Price */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Large (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editProduct.pricing.large}
+                    onChange={(e) => handlePricingChange('large', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    placeholder="0.00"
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Same Day Delivery Toggle */}
