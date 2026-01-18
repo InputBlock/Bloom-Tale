@@ -84,6 +84,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
   }
 
   order.status = "PAID";
+  order.order_status="PLACED"
   order.paymentInfo.paymentId = razorpay_payment_id;
   order.paymentInfo.signature = razorpay_signature;
 

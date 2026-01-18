@@ -73,7 +73,8 @@ const orderSchema = new Schema(
         "SHIPPED",
         "DELIVERED",
         "CANCELLED",
-        "RETURNED"
+        "RETURNED",
+        "CREATED"
       ],
       default: "CREATED",
     },
