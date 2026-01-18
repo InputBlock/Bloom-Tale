@@ -4,6 +4,9 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
+// Categories that use single pricing (no sizes)
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos"];
+
 const add_item = asyncHandler(async (req, res) => {
     let images_uri = [];
     let image_public = [];
@@ -17,12 +20,20 @@ const add_item = asyncHandler(async (req, res) => {
         }
     }
 
+    const category = req.body.category;
+    const isSinglePrice = SINGLE_PRICE_CATEGORIES.includes(category);
+
     const details = {
         name: req.body.name,
         description: req.body.description,
-        category: req.body.category,
-        pricing: req.body.pricing ? JSON.parse(req.body.pricing) : { small: 0, medium: 0, large: 0 },
-        sizes: req.body.sizes ? JSON.parse(req.body.sizes) : [],
+        category: category,
+        // For Candles/Combos: use single price field
+        // For others: use pricing object with sizes
+        price: isSinglePrice ? parseFloat(req.body.price) || 0 : null,
+        pricing: isSinglePrice 
+            ? { small: null, medium: null, large: null } 
+            : (req.body.pricing ? JSON.parse(req.body.pricing) : { small: 0, medium: 0, large: 0 }),
+        sizes: isSinglePrice ? [] : (req.body.sizes ? JSON.parse(req.body.sizes) : ["Small", "Medium", "Large"]),
         images_uri: images_uri,
         image_public: image_public,
         stock: parseInt(req.body.stock) || 0,

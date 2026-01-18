@@ -3,7 +3,7 @@ import admin_login from "../controller/admin/admin.controller.js";
 import { add_item, list_item, unlist_item, update_item, delete_item,get_list } from "../controller/admin/admin.product.controller.js";
 import { upload } from "../service/cloudinary.service.js";
 import { upload as imagekitUpload } from "../service/image.service.js";
-import {get_user_info} from "../controller/admin/status.controller.js"
+import { get_user_info, get_user_by_id, delete_user, get_user_stats } from "../controller/admin/status.controller.js"
 import { getAllOrders, getOrderById, updateOrderStatus, getOrderStats } from "../controller/admin/order.admin.controller.js";
 import { add_hero_section, get_hero_sections, update_hero_section, delete_hero_section } from "../controller/admin/editcontent.controller.js";
 
@@ -16,7 +16,12 @@ router.post("/unlist", unlist_item);
 router.post("/update", upload.array("images", 5), update_item); // Accept up to 5 images
 router.post("/delete", delete_item);
 router.get("/showlist",get_list);
-router.get("/user_list",get_user_info);
+
+// User management routes
+router.get("/users", get_user_info);
+router.get("/users/stats", get_user_stats);
+router.get("/users/:userId", get_user_by_id);
+router.delete("/users/:userId", delete_user);
 
 // Order routes
 router.get("/orders", getAllOrders);

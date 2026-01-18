@@ -1,6 +1,9 @@
 
 import productSchema from "../models/product.js";
 
+// Categories that use single pricing (no sizes)
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos"];
+
 export async function addItem(details) {
     // Validation
     if (!details.name || !details.name.trim()) {
@@ -9,12 +12,30 @@ export async function addItem(details) {
     if (!details.category || !details.category.trim()) {
         throw new Error("Category is required");
     }
-    if (!details.pricing || !details.pricing.small || !details.pricing.medium || !details.pricing.large) {
-        throw new Error("All pricing tiers (small, medium, large) are required");
+    
+    // Different pricing validation based on category
+    const isSinglePriceCategory = SINGLE_PRICE_CATEGORIES.includes(details.category.trim());
+    
+    if (isSinglePriceCategory) {
+        // For Candles/Combos - use single price field, no sizes
+        if (!details.price || details.price <= 0) {
+            throw new Error("Price is required and must be greater than 0");
+        }
+        // Clear pricing object for single-price products
+        details.pricing = { small: null, medium: null, large: null };
+        details.sizes = []; // No sizes for Candles/Combos
+    } else {
+        // For other categories - require all 3 pricing tiers
+        if (!details.pricing || !details.pricing.small || !details.pricing.medium || !details.pricing.large) {
+            throw new Error("All pricing tiers (small, medium, large) are required");
+        }
+        if (details.pricing.small <= 0 || details.pricing.medium <= 0 || details.pricing.large <= 0) {
+            throw new Error("All prices must be greater than 0");
+        }
+        // Clear single price for sized products
+        details.price = null;
     }
-    if (details.pricing.small <= 0 || details.pricing.medium <= 0 || details.pricing.large <= 0) {
-        throw new Error("All prices must be greater than 0");
-    }
+    
     const existing = await productSchema.findOne({ name: details.name.trim() });
     if (existing) {
         throw new Error("Product with this name already exists");
@@ -85,6 +106,23 @@ export async function updateItem(id, updateData) {
         throw new Error("Product not found");
     }
 
+    // Handle single-price categories (Candles, Combos)
+    const category = updateData.category || existing.category;
+    const isSinglePrice = SINGLE_PRICE_CATEGORIES.includes(category);
+    
+    if (isSinglePrice) {
+        // For single-price categories - use price field, clear pricing
+        if (updateData.price) {
+            updateData.pricing = { small: null, medium: null, large: null };
+            updateData.sizes = [];
+        }
+    } else {
+        // For sized products - use pricing, clear price
+        if (updateData.pricing) {
+            updateData.price = null;
+        }
+    }
+
     Object.assign(existing, updateData);
     return await existing.save();
 }
@@ -113,7 +151,8 @@ export async function getList() {
             description: item.description,
             category: item.category,
             subcategory: item.subcategory,
-            pricing: item.pricing,
+            price: item.price, // Single price for Candles/Combos
+            pricing: item.pricing, // Size-based pricing for other products
             sizes: item.sizes,
             stock: item.stock,
             images: item.images_uri || [],
