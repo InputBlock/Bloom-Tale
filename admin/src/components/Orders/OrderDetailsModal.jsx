@@ -49,7 +49,7 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                 </p>
               </div>
             </div>
-            <OrderStatusBadge status={order.status} color={order.statusColor} />
+            <OrderStatusBadge status={order.order_status || "CREATED"} color={order.orderStatusColor} />
           </div>
 
           {/* Main Grid */}
@@ -62,18 +62,18 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                   <User size={18} />
                   Customer Information
                 </h2>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Name</p>
-                    <p className="text-gray-900 font-medium">{order.customerName}</p>
+                    <p className="text-gray-900 font-medium">{order.customerName || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Email</p>
-                    <p className="text-gray-900 font-medium text-sm">{order.email}</p>
+                    <p className="text-gray-900 font-medium text-sm break-all">{order.email || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Phone</p>
-                    <p className="text-gray-900 font-medium">{order.phone}</p>
+                    <p className="text-gray-900 font-medium">{order.phone || "N/A"}</p>
                   </div>
                 </div>
               </div>
@@ -101,11 +101,11 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                       key={idx}
                       className="flex justify-between items-center pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.name}</p>
-                        <p className="text-sm text-gray-500">{item.description}</p>
+                        <p className="text-sm text-gray-500">Qty: {item.quantity || 1}</p>
                       </div>
-                      <p className="font-semibold text-gray-900">₹{item.price?.toFixed(2) || "0.00"}</p>
+                      <p className="font-semibold text-gray-900">₹{((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
@@ -163,19 +163,37 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
 
               {/* Actions */}
               <div className="border border-gray-200 rounded-lg p-6">
-                <h2 className="text-sm font-semibold text-gray-900 mb-4">Actions</h2>
+                <h2 className="text-sm font-semibold text-gray-900 mb-4">Update Order Status</h2>
                 <div className="space-y-2">
                   <button 
-                    onClick={() => handleStatusUpdate("ACCEPTED")}
+                    onClick={() => handleStatusUpdate("PLACED")}
+                    className="w-full px-4 py-2 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded-lg font-medium hover:bg-yellow-200 transition"
+                  >
+                    Mark as Placed
+                  </button>
+                  <button 
+                    onClick={() => handleStatusUpdate("SHIPPED")}
+                    className="w-full px-4 py-2 bg-purple-100 text-purple-800 border border-purple-200 rounded-lg font-medium hover:bg-purple-200 transition"
+                  >
+                    Mark as Shipped
+                  </button>
+                  <button 
+                    onClick={() => handleStatusUpdate("DELIVERED")}
                     className="w-full px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
                   >
-                    Accept Order
+                    Mark as Delivered
                   </button>
                   <button 
                     onClick={() => handleStatusUpdate("CANCELLED")}
                     className="w-full px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg font-medium hover:bg-red-100 transition"
                   >
-                    Reject Order
+                    Cancel Order
+                  </button>
+                  <button 
+                    onClick={() => handleStatusUpdate("RETURNED")}
+                    className="w-full px-4 py-2 bg-orange-50 text-orange-600 border border-orange-200 rounded-lg font-medium hover:bg-orange-100 transition"
+                  >
+                    Mark as Returned
                   </button>
                 </div>
               </div>

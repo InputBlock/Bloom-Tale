@@ -35,15 +35,24 @@ export default function OrdersTable() {
     fetchOrders()
   }, [])
 
-  // Map status to color
-  const getStatusColor = (status) => {
+  // Map order_status to color
+  const getOrderStatusColor = (status) => {
+    const colors = {
+      CREATED: "bg-gray-100 text-gray-800",
+      PLACED: "bg-yellow-100 text-yellow-800",
+      SHIPPED: "bg-purple-100 text-purple-800",
+      DELIVERED: "bg-green-100 text-green-800",
+      CANCELLED: "bg-red-100 text-red-800",
+      RETURNED: "bg-orange-100 text-orange-800",
+    }
+    return colors[status] || "bg-gray-100 text-gray-800"
+  }
+
+  // Map payment status to color
+  const getPaymentStatusColor = (status) => {
     const colors = {
       PENDING: "bg-yellow-100 text-yellow-800",
       PAID: "bg-green-100 text-green-800",
-      ACCEPTED: "bg-blue-100 text-blue-800",
-      PREPARED: "bg-orange-100 text-orange-800",
-      SHIPPED: "bg-purple-100 text-purple-800",
-      DELIVERED: "bg-green-100 text-green-800",
       CANCELLED: "bg-red-100 text-red-800",
       PAYMENT_FAILED: "bg-red-100 text-red-800",
     }
@@ -76,9 +85,13 @@ export default function OrdersTable() {
     setActionMenu(null)
     if (action === "view") {
       setSelectedOrder(order)
-    } else if (action === "accept") {
-      updateOrderStatus(order._id, "ACCEPTED")
-    } else if (action === "reject") {
+    } else if (action === "placed") {
+      updateOrderStatus(order._id, "PLACED")
+    } else if (action === "shipped") {
+      updateOrderStatus(order._id, "SHIPPED")
+    } else if (action === "delivered") {
+      updateOrderStatus(order._id, "DELIVERED")
+    } else if (action === "cancelled") {
       updateOrderStatus(order._id, "CANCELLED")
     }
   }
@@ -119,7 +132,7 @@ export default function OrdersTable() {
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Customer</th>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Payment Method</th>
                   <th className="px-6 py-4 text-left font-semibold text-gray-900">Created</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-900">Status</th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-900">Order Status</th>
                   <th className="px-6 py-4 text-center font-semibold text-gray-900">Action</th>
                 </tr>
               </thead>
@@ -137,43 +150,52 @@ export default function OrdersTable() {
                       className="border-b border-gray-200 hover:bg-gray-50 transition"
                     >
                       <td className="px-6 py-4 font-medium text-green-600">
-                        {order._id.slice(-8).toUpperCase()}
+                        {order.order_id || order._id.slice(-8).toUpperCase()}
                       </td>
                       <td className="px-6 py-4">
                         <div>
                           <p className="font-medium text-gray-900">
-                            {order.user?.fullName || order.deliveryAddress?.[0]?.fullName || "N/A"}
+                            {order.customerName || order.user?.fullName || order.deliveryAddress?.[0]?.fullName || "N/A"}
                           </p>
                           <p className="text-gray-500 text-xs">
-                            {order.user?.email || order.deliveryAddress?.[0]?.email || "N/A"}
+                            {order.customerEmail || order.user?.email || order.deliveryAddress?.[0]?.email || "N/A"}
                           </p>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-gray-700">{order.paymentMethod || "N/A"}</td>
                       <td className="px-6 py-4 text-gray-600">{formatDate(order.createdAt)}</td>
                       <td className="px-6 py-4">
-                        <OrderStatusBadge status={order.status} color={getStatusColor(order.status)} />
+                        <OrderStatusBadge status={order.order_status || "CREATED"} color={getOrderStatusColor(order.order_status || "CREATED")} />
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2 relative">
                           <button
                             onClick={() => {
                               const addr = order.deliveryAddress?.[0]
-                              const addressStr = addr 
-                                ? `${addr.house || ""}, ${addr.city || ""}, ${addr.state || ""} - ${addr.pincode || ""}`
-                                : "N/A"
+                              const addressParts = []
+                              if (addr?.house) addressParts.push(addr.house)
+                              if (addr?.streetAddress || addr?.street) addressParts.push(addr.streetAddress || addr.street)
+                              if (addr?.city) addressParts.push(addr.city)
+                              if (addr?.state) addressParts.push(addr.state)
+                              const addressMain = addressParts.join(", ")
+                              const addressStr = addr?.pincode 
+                                ? `${addressMain} - ${addr.pincode}${addr?.country ? `, ${addr.country}` : ""}`
+                                : `${addressMain}${addr?.country ? `, ${addr.country}` : ""}`
+                              
                               setSelectedOrder({
                                 ...order,
-                                id: order._id.slice(-8).toUpperCase(),
-                                customerName: order.user?.fullName || addr?.fullName || "N/A",
-                                email: order.user?.email || addr?.email || "N/A",
-                                phone: order.user?.mobile || addr?.mobile || "N/A",
+                                id: order.order_id || order._id.slice(-8).toUpperCase(),
+                                customerName: order.customerName || order.user?.username || addr?.fullName || "N/A",
+                                email: order.customerEmail || order.user?.email || addr?.email || "N/A",
+                                phone: addr?.mobile || order.user?.mobile || "N/A",
                                 created: formatDate(order.createdAt),
-                                statusColor: getStatusColor(order.status),
-                                deliveryAddress: addressStr,
+                                order_status: order.order_status || "CREATED",
+                                orderStatusColor: getOrderStatusColor(order.order_status || "CREATED"),
+                                paymentStatusColor: getPaymentStatusColor(order.status),
+                                deliveryAddress: addressStr || "N/A",
                                 items: order.items?.map(item => ({
                                   name: item.productName || item.product?.name || "Product",
-                                  description: "",
+                                  quantity: item.quantity || 1,
                                   price: item.price || 0
                                 })) || [],
                                 subtotal: order.totalAmount || 0,
@@ -195,18 +217,30 @@ export default function OrdersTable() {
                             <MoreHorizontal size={18} />
                           </button>
                           {actionMenu === order._id && (
-                            <div className="absolute right-0 top-10 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                               <button
-                                onClick={() => handleAction("accept", order)}
-                                className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-gray-50"
+                                onClick={() => handleAction("placed", order)}
+                                className="w-full px-4 py-2 text-left text-sm text-yellow-600 hover:bg-gray-50"
                               >
-                                Accept
+                                Mark Placed
                               </button>
                               <button
-                                onClick={() => handleAction("reject", order)}
+                                onClick={() => handleAction("shipped", order)}
+                                className="w-full px-4 py-2 text-left text-sm text-purple-600 hover:bg-gray-50"
+                              >
+                                Mark Shipped
+                              </button>
+                              <button
+                                onClick={() => handleAction("delivered", order)}
+                                className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-gray-50"
+                              >
+                                Mark Delivered
+                              </button>
+                              <button
+                                onClick={() => handleAction("cancelled", order)}
                                 className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-50"
                               >
-                                Reject
+                                Cancel Order
                               </button>
                             </div>
                           )}

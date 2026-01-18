@@ -90,6 +90,7 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
         body: JSON.stringify({
           address: {
             fullName: formData.recipientName,
+            email: formData.email,
             mobile: formData.mobileNumber,
             house: formData.apartment,
             street: formData.streetAddress,
@@ -356,6 +357,21 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
               />
             </div>
           </div>
+        </div>
+
+        {/* Email */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
+            Email Address <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            placeholder="example@email.com"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3e4026] text-sm sm:text-base"
+            required
+          />
         </div>
 
         {/* Country */}
