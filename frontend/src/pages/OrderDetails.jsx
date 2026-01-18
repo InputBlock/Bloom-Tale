@@ -257,7 +257,7 @@ export default function OrderDetails() {
 
                 {/* Order Summary */}
                 <div className="mt-auto pt-6 border-t border-gray-200">
-                  <div className="flex justify-between text-lg font-bold text-[#3e4026]">
+                  <div class>
                     <span>Total Amount</span>
                     <span className="flex items-center gap-1">
                       <IndianRupee size={20} />
