@@ -7,7 +7,7 @@ export default function ProductForm({ images, setImages }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    type: "Same Day Delivery",
+    type: "Birthday",
     pricing: {
       small: "",
       medium: "",
@@ -30,7 +30,6 @@ export default function ProductForm({ images, setImages }) {
   }, [message])
 
   const categories = [
-    "Same Day Delivery",
     "Birthday",
     "Anniversary",
     "Forever Flowers",
@@ -83,7 +82,7 @@ export default function ProductForm({ images, setImages }) {
       setFormData({
         name: "",
         description: "",
-        type: "Same Day Delivery",
+        type: "Birthday",
         pricing: {
           small: "",
           medium: "",
@@ -223,66 +222,94 @@ export default function ProductForm({ images, setImages }) {
       </div>
 
       <div>
-        <label className="block text-gray-900 font-medium mb-3">Pricing by Size</label>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Small Size */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Small</label>
-            <div className="relative">
+        {(formData.type === "Fragrances" || formData.type === "Combos") ? (
+          // Single Price for Fragrances and Combos
+          <>
+            <label className="block text-gray-900 font-medium mb-3">Price</label>
+            <div className="relative max-w-md">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
               <input
                 type="number"
                 value={formData.pricing.small}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  pricing: { ...formData.pricing, small: e.target.value }
-                })}
+                onChange={(e) => {
+                  const price = e.target.value
+                  setFormData({ 
+                    ...formData, 
+                    pricing: { small: price, medium: price, large: price }
+                  })
+                }}
                 placeholder="0.00"
                 step="0.01"
                 className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
               />
             </div>
-          </div>
+            <p className="mt-2 text-sm text-gray-500">Set the price for this product</p>
+          </>
+        ) : (
+          // Three Sizes for other categories
+          <>
+            <label className="block text-gray-900 font-medium mb-3">Pricing by Size</label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Small Size */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Small</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                  <input
+                    type="number"
+                    value={formData.pricing.small}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      pricing: { ...formData.pricing, small: e.target.value }
+                    })}
+                    placeholder="0.00"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  />
+                </div>
+              </div>
 
-          {/* Medium Size */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Medium</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
-              <input
-                type="number"
-                value={formData.pricing.medium}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  pricing: { ...formData.pricing, medium: e.target.value }
-                })}
-                placeholder="0.00"
-                step="0.01"
-                className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-              />
-            </div>
-          </div>
+              {/* Medium Size */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Medium</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                  <input
+                    type="number"
+                    value={formData.pricing.medium}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      pricing: { ...formData.pricing, medium: e.target.value }
+                    })}
+                    placeholder="0.00"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  />
+                </div>
+              </div>
 
-          {/* Large Size */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Large</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
-              <input
-                type="number"
-                value={formData.pricing.large}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  pricing: { ...formData.pricing, large: e.target.value }
-                })}
-                placeholder="0.00"
-                step="0.01"
-                className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-              />
+              {/* Large Size */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Large</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                  <input
+                    type="number"
+                    value={formData.pricing.large}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      pricing: { ...formData.pricing, large: e.target.value }
+                    })}
+                    placeholder="0.00"
+                    step="0.01"
+                    className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <p className="mt-2 text-sm text-gray-500">Set different prices for small, medium, and large arrangements</p>
+            <p className="mt-2 text-sm text-gray-500">Set different prices for small, medium, and large arrangements</p>
+          </>
+        )}
       </div>
 
       <div className="flex flex-col gap-3">
