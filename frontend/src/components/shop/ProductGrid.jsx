@@ -9,7 +9,8 @@ export default function ProductGrid({
   onLeave,
   onProductClick,
   onAddToCart,
-  onViewAll
+  onViewAll,
+  isComboMode = false
 }) {
   if (loading) {
     return (
@@ -55,6 +56,7 @@ export default function ProductGrid({
           onLeave={onLeave}
           onClick={onProductClick}
           onAddToCart={onAddToCart}
+          isComboMode={isComboMode}
         />
       ))}
     </div>
