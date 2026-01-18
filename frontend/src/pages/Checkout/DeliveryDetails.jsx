@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, Home, Plus, Phone } from "lucide-react"
+import { Loader2, Home, Plus, Phone, MapPin, User, ChevronRight } from "lucide-react"
 
 export default function DeliveryDetails({ formData, handleInputChange, onSubmit }) {
   const [loading, setLoading] = useState(false)
@@ -152,65 +152,101 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="space-y-4"
+      className="space-y-5"
     >
       {error && (
-        <div className="p-3 bg-red-50 border border-red-100 rounded text-red-600 text-sm">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm flex items-center gap-3"
+        >
+          <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+            <span className="text-red-500">!</span>
+          </div>
           {error}
-        </div>
+        </motion.div>
       )}
 
       {/* Saved Addresses */}
       {savedAddresses.length > 0 && !showNewAddressForm && (
-        <div className="bg-white border border-gray-200">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="font-medium text-gray-900">Saved Addresses</h3>
+            <p className="text-sm text-gray-500 mt-1">Select a delivery address</p>
+          </div>
           <div className="divide-y divide-gray-100">
-            {savedAddresses.map((address) => (
-              <div
+            {savedAddresses.map((address, index) => (
+              <motion.div
                 key={address._id}
-                className={`p-4 ${selectedAddressId === address._id ? 'bg-gray-50' : ''}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`p-5 hover:bg-gray-50/50 transition-colors cursor-pointer ${
+                  selectedAddressId === address._id ? 'bg-gray-50 ring-2 ring-inset ring-gray-900/5' : ''
+                }`}
+                onClick={() => handleAddressSelect(address)}
               >
-                <div className="flex items-start gap-3">
-                  <Home size={18} className="text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                    <Home size={18} className="text-gray-600" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-gray-900">{address.title} {address.fullName}</span>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="font-medium text-gray-900">{address.fullName}</span>
                       {address.addressTag && (
-                        <span className="px-2 py-0.5 bg-gray-900 text-white text-[10px] font-medium rounded">
+                        <span className="px-2.5 py-1 bg-gray-900 text-white text-[10px] font-medium rounded-full uppercase tracking-wide">
                           {address.addressTag}
                         </span>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleAddressSelect(address)
-                          setShowNewAddressForm(true)
-                        }}
-                        className="text-gray-500 hover:text-gray-900 text-sm ml-2"
-                      >
-                        Edit
-                      </button>
                     </div>
-                    <p className="text-sm text-gray-600">
-                      {[address.house, address.street, address.pincode, address.city + '-' + address.state].filter(Boolean).join(', ')}
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {[address.house, address.street].filter(Boolean).join(', ')}
                     </p>
-                    <div className="flex items-center gap-1 mt-1 text-sm text-gray-600">
-                      <Phone size={12} />
-                      <span>+91-{address.mobile}</span>
+                    <p className="text-sm text-gray-600">
+                      {address.city}, {address.state} - {address.pincode}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-2 text-sm text-gray-500">
+                      <Phone size={13} />
+                      <span>+91 {address.mobile}</span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleAddressSelect(address)
-                      handleFormSubmit({ preventDefault: () => {} })
-                    }}
-                    disabled={loading}
-                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
-                  >
-                    {loading && selectedAddressId === address._id ? 'PROCESSING...' : 'DELIVER HERE'}
-                  </button>
+                  <div className="flex flex-col items-end gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleAddressSelect(address)
+                        setShowNewAddressForm(true)
+                      }}
+                      className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleAddressSelect(address)
+                        handleFormSubmit({ preventDefault: () => {} })
+                      }}
+                      disabled={loading}
+                      className="px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-all disabled:opacity-50 flex items-center gap-2 group"
+                    >
+                      {loading && selectedAddressId === address._id ? (
+                        <>
+                          <Loader2 className="animate-spin" size={14} />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          Deliver Here
+                          <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -218,32 +254,39 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
 
       {/* Add New Address Button */}
       {savedAddresses.length > 0 && !showNewAddressForm && (
-        <button
+        <motion.button
           type="button"
           onClick={() => setShowNewAddressForm(true)}
-          className="w-full p-4 border border-gray-300 border-dashed bg-white flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:border-gray-400 transition-colors"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+          className="w-full p-5 border-2 border-dashed border-gray-200 rounded-2xl bg-white flex items-center justify-center gap-3 text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-all group"
         >
-          <Plus size={18} />
-          <span className="font-medium">ADD NEW ADDRESS</span>
-        </button>
+          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+            <Plus size={20} />
+          </div>
+          <span className="font-medium">Add New Address</span>
+        </motion.button>
       )}
 
       {/* New Address Form */}
       <AnimatePresence>
         {(showNewAddressForm || savedAddresses.length === 0) && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-white border border-gray-200"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
           >
             {savedAddresses.length > 0 && (
-              <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                <span className="font-medium text-gray-900">Add New Address</span>
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div>
+                  <h3 className="font-medium text-gray-900">New Address</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">Enter delivery details</p>
+                </div>
                 <button
                   type="button"
                   onClick={() => setShowNewAddressForm(false)}
-                  className="text-gray-500 hover:text-gray-900 text-sm"
+                  className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   Cancel
                 </button>
@@ -251,31 +294,34 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
             )}
 
             {/* Save Address Checkbox */}
-            <div className="p-4 border-b border-gray-100">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.saveAddress}
-                  onChange={(e) => handleInputChange('saveAddress', e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
-                />
-                <span className="text-sm text-gray-700 flex items-center gap-1">
-                  <Home size={14} /> Save this address as <strong>'My Home'</strong>
+            <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={formData.saveAddress}
+                    onChange={(e) => handleInputChange('saveAddress', e.target.checked)}
+                    className="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-gray-900 focus:ring-offset-0"
+                  />
+                </div>
+                <span className="text-sm text-gray-700 flex items-center gap-2">
+                  <Home size={16} className="text-gray-400" /> 
+                  Save this address as <span className="font-medium text-gray-900">"My Home"</span>
                 </span>
               </label>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="p-4 space-y-4">
+            <form onSubmit={handleFormSubmit} className="p-6 space-y-5">
               {/* Title and Name */}
               <div className="grid grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
-                    Title <span className="text-red-500">*</span>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Title <span className="text-red-400">*</span>
                   </label>
                   <select
                     value={formData.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
-                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all"
                     required
                   >
                     <option>Mr.</option>
@@ -285,29 +331,29 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
                   </select>
                 </div>
                 <div className="col-span-3">
-                  <label className="block text-sm text-gray-700 mb-1">
-                    Recipient Full Name <span className="text-red-500">*</span>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Full Name <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.recipientName}
                     onChange={(e) => handleInputChange('recipientName', e.target.value)}
-                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    placeholder="Recipient's full name"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all placeholder:text-gray-400"
                     required
                   />
-                  <p className="text-[10px] text-gray-400 mt-1 text-right">({formData.recipientName?.length || 0}/60)</p>
                 </div>
               </div>
 
               {/* Country */}
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Delivery Country <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                  Delivery Country <span className="text-red-400">*</span>
                 </label>
                 <select
                   value={formData.country}
                   onChange={(e) => handleInputChange('country', e.target.value)}
-                  className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all"
                   required
                 >
                   <option value="India">🇮🇳 India</option>
@@ -318,29 +364,30 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
 
               {/* Street Address */}
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Street Address <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                  Street Address <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.streetAddress}
                   onChange={(e) => handleInputChange('streetAddress', e.target.value)}
-                  className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                  placeholder="Street name, area, locality"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all placeholder:text-gray-400"
                   required
                 />
-                <p className="text-[10px] text-gray-400 mt-1 text-right">({formData.streetAddress?.length || 0}/180)</p>
               </div>
 
               {/* House/Apartment */}
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  House/Apartment <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                  House / Apartment <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.apartment}
                   onChange={(e) => handleInputChange('apartment', e.target.value)}
-                  className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                  placeholder="Flat, suite, unit, building, floor"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all placeholder:text-gray-400"
                   required
                 />
               </div>
@@ -348,38 +395,41 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
               {/* Pincode, City, State */}
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
-                    Pincode <span className="text-red-500">*</span>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Pincode <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.pincode}
                     onChange={(e) => handleInputChange('pincode', e.target.value)}
-                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    placeholder="000000"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all placeholder:text-gray-400"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
-                    City <span className="text-red-500">*</span>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    City <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.city}
                     onChange={(e) => handleInputChange('city', e.target.value)}
-                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    placeholder="City"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all placeholder:text-gray-400"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">
-                    State <span className="text-red-500">*</span>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    State <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.state}
                     onChange={(e) => handleInputChange('state', e.target.value)}
-                    className="w-full px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    placeholder="State"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all placeholder:text-gray-400"
                     required
                   />
                 </div>
@@ -387,36 +437,42 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
 
               {/* Mobile Number */}
               <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Mobile Number <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                  Mobile Number <span className="text-red-400">*</span>
                 </label>
                 <div className="flex">
-                  <span className="px-3 py-2.5 border-b border-gray-300 bg-transparent text-sm text-gray-500">+91</span>
+                  <span className="px-4 py-3 border border-r-0 border-gray-200 rounded-l-xl bg-gray-50 text-sm text-gray-500 font-medium">+91</span>
                   <input
                     type="tel"
                     value={formData.mobileNumber}
                     onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
-                    className="flex-1 px-3 py-2.5 border-b border-gray-300 bg-transparent focus:outline-none focus:border-gray-900 text-sm"
+                    placeholder="10-digit mobile number"
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-r-xl bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 text-sm transition-all placeholder:text-gray-400"
                     required
                   />
                 </div>
               </div>
 
               {/* Submit Button */}
-              <button
+              <motion.button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                whileHover={{ scale: loading ? 1 : 1.01 }}
+                whileTap={{ scale: loading ? 1 : 0.99 }}
+                className="w-full py-4 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-900/10"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="animate-spin" size={16} />
-                    <span>SAVING...</span>
+                    <Loader2 className="animate-spin" size={18} />
+                    <span>Saving...</span>
                   </>
                 ) : (
-                  "SAVE & DELIVER"
+                  <>
+                    <span>Continue to Review</span>
+                    <ChevronRight size={18} />
+                  </>
                 )}
-              </button>
+              </motion.button>
             </form>
           </motion.div>
         )}
