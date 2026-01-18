@@ -8,7 +8,7 @@ const heroSlides = [
     id: 1,
     subtitle: "Fresh Flowers, Delivered Daily",
     title: "Bloom Tale",
-    description: "Handcrafted bouquets for life's most meaningful moments",
+    description: "Every bouquet holds a story you can’t put into words.",
     buttonText: "Shop Now",
     image: "/annivarsary-carousel.jpg",
   },

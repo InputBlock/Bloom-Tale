@@ -52,7 +52,7 @@ export default function AboutSection() {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="absolute -bottom-6 -right-6 bg-[#3e4026] text-white p-6 shadow-xl"
             >
-              <p className="text-3xl font-light mb-1" style={{ fontFamily: 'Playfair Display, serif' }}>15+</p>
+              <p className="text-3xl font-light mb-1" style={{ fontFamily: 'Playfair Display, serif' }}>7+</p>
               <p className="text-xs tracking-wider uppercase">Years of Excellence</p>
             </motion.div>
           </motion.div>
