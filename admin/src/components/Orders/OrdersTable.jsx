@@ -155,10 +155,10 @@ export default function OrdersTable() {
                       <td className="px-6 py-4">
                         <div>
                           <p className="font-medium text-gray-900">
-                            {order.user?.fullName || order.deliveryAddress?.[0]?.fullName || "N/A"}
+                            {order.customerName || order.user?.fullName || order.deliveryAddress?.[0]?.fullName || "N/A"}
                           </p>
                           <p className="text-gray-500 text-xs">
-                            {order.user?.email || order.deliveryAddress?.[0]?.email || "N/A"}
+                            {order.customerEmail || order.user?.email || order.deliveryAddress?.[0]?.email || "N/A"}
                           </p>
                         </div>
                       </td>
@@ -172,23 +172,30 @@ export default function OrdersTable() {
                           <button
                             onClick={() => {
                               const addr = order.deliveryAddress?.[0]
-                              const addressStr = addr 
-                                ? `${addr.house || ""}, ${addr.city || ""}, ${addr.state || ""} - ${addr.pincode || ""}`
-                                : "N/A"
+                              const addressParts = []
+                              if (addr?.house) addressParts.push(addr.house)
+                              if (addr?.streetAddress || addr?.street) addressParts.push(addr.streetAddress || addr.street)
+                              if (addr?.city) addressParts.push(addr.city)
+                              if (addr?.state) addressParts.push(addr.state)
+                              const addressMain = addressParts.join(", ")
+                              const addressStr = addr?.pincode 
+                                ? `${addressMain} - ${addr.pincode}${addr?.country ? `, ${addr.country}` : ""}`
+                                : `${addressMain}${addr?.country ? `, ${addr.country}` : ""}`
+                              
                               setSelectedOrder({
                                 ...order,
                                 id: order.order_id || order._id.slice(-8).toUpperCase(),
-                                customerName: order.user?.fullName || addr?.fullName || "N/A",
-                                email: order.user?.email || addr?.email || "N/A",
-                                phone: order.user?.mobile || addr?.mobile || "N/A",
+                                customerName: order.customerName || order.user?.username || addr?.fullName || "N/A",
+                                email: order.customerEmail || order.user?.email || addr?.email || "N/A",
+                                phone: addr?.mobile || order.user?.mobile || "N/A",
                                 created: formatDate(order.createdAt),
                                 order_status: order.order_status || "CREATED",
                                 orderStatusColor: getOrderStatusColor(order.order_status || "CREATED"),
                                 paymentStatusColor: getPaymentStatusColor(order.status),
-                                deliveryAddress: addressStr,
+                                deliveryAddress: addressStr || "N/A",
                                 items: order.items?.map(item => ({
                                   name: item.productName || item.product?.name || "Product",
-                                  description: "",
+                                  quantity: item.quantity || 1,
                                   price: item.price || 0
                                 })) || [],
                                 subtotal: order.totalAmount || 0,

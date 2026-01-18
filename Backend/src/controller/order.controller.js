@@ -46,6 +46,8 @@ export const createOrder = asyncHandler(async (req, res) => {
   const order = await Order.create({
     order_id: generateOrderId(),
     user: userId,
+    customerName: address.fullName || user.username || "N/A",
+    customerEmail: user.email || address.email || "N/A",
     items: cart.items.map((item) => ({
       product: item.product,
       product_id: item.product_id,
@@ -55,6 +57,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     deliveryAddress: address,
     totalAmount,
     status: "PENDING", // payment not done yet
+    order_status: "CREATED", // order fulfillment status
     paymentMethod: null,
   });
 

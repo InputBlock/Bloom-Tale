@@ -13,7 +13,7 @@ export const getAllOrders = asyncHandler(async (req, res) => {
   }
 
   const orders = await Order.find(query)
-    .populate("user", "fullName email mobile")
+    .populate("user", "username email mobile")
     .populate("items.product", "name images_uri price")
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
@@ -38,7 +38,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
   const order = await Order.findById(orderId)
-    .populate("user", "fullName email mobile")
+    .populate("user", "username email mobile")
     .populate("items.product", "name images_uri price description");
 
   if (!order) {
@@ -72,7 +72,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     orderId,
     { order_status: status },
     { new: true }
-  ).populate("user", "fullName email mobile");
+  ).populate("user", "username email mobile");
 
   if (!order) {
     throw new ApiError(404, "Order not found");
