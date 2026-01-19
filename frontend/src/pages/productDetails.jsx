@@ -99,7 +99,7 @@ export default function ProductDetailsPage() {
             </p>
             <Link 
               to="/home" 
-              className="inline-block bg-[#3e4026] text-white py-3 sm:py-4 px-6 sm:px-8 text-sm sm:text-base hover:bg-[#2d2f1c] active:scale-95 transition-all">
+              className="inline-block bg-[#3e4026] text-white py-3 sm:py-4 px-6 sm:px-8 text-sm sm:text-base hover:bg-[#2d2f1c] active:scale-95 transition-all"
             >
               Back to Shop
             </Link>
