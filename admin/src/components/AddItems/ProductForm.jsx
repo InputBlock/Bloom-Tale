@@ -3,11 +3,15 @@ import axios from "axios"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
 
+// Categories that use single pricing (no sizes)
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos"]
+
 export default function ProductForm({ images, setImages }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     type: "Birthday",
+    price: "", // Single price for Candles/Combos
     pricing: {
       small: "",
       medium: "",
@@ -46,16 +50,25 @@ export default function ProductForm({ images, setImages }) {
 
     try {
       const token = localStorage.getItem("adminToken")
+      const isSinglePrice = SINGLE_PRICE_CATEGORIES.includes(formData.type)
       
       // Create FormData for multipart/form-data
       const formDataToSend = new FormData()
       formDataToSend.append("name", formData.name)
       formDataToSend.append("description", formData.description)
       formDataToSend.append("category", formData.type)
-      formDataToSend.append("pricing", JSON.stringify(formData.pricing))
       formDataToSend.append("stock", formData.inStock ? 100 : 0)
       formDataToSend.append("same_day_delivery", formData.sameDayDelivery)
       formDataToSend.append("is_active", formData.isActive)
+      
+      // Send price or pricing based on category
+      if (isSinglePrice) {
+        // For Candles/Combos - send single price
+        formDataToSend.append("price", formData.price)
+      } else {
+        // For other categories - send pricing object
+        formDataToSend.append("pricing", JSON.stringify(formData.pricing))
+      }
       
       // Append all image files - first image will be the main image
       if (images.length > 0) {
@@ -83,6 +96,7 @@ export default function ProductForm({ images, setImages }) {
         name: "",
         description: "",
         type: "Birthday",
+        price: "",
         pricing: {
           small: "",
           medium: "",
@@ -222,7 +236,7 @@ export default function ProductForm({ images, setImages }) {
       </div>
 
       <div>
-        {(formData.type === "Candles" || formData.type === "Combos") ? (
+        {SINGLE_PRICE_CATEGORIES.includes(formData.type) ? (
           // Single Price for Candles and Combos
           <>
             <label className="block text-gray-900 font-medium mb-3">Price</label>
@@ -230,14 +244,8 @@ export default function ProductForm({ images, setImages }) {
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
               <input
                 type="number"
-                value={formData.pricing.small}
-                onChange={(e) => {
-                  const price = e.target.value
-                  setFormData({ 
-                    ...formData, 
-                    pricing: { small: price, medium: price, large: price }
-                  })
-                }}
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                 placeholder="0.00"
                 step="0.01"
                 className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"

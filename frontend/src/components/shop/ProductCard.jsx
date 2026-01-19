@@ -9,7 +9,8 @@ export default function ProductCard({
   onHover,
   onLeave,
   onClick,
-  onAddToCart 
+  onAddToCart,
+  isComboMode = false
 }) {
   const isHovered = hoveredId === product._id
 
@@ -20,7 +21,7 @@ export default function ProductCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       onMouseEnter={() => onHover?.(product._id)}
       onMouseLeave={() => onLeave?.()}
-      onClick={() => onClick?.(product.product_id)}
+      onClick={() => onClick?.(product.product_id, product)}
       className="group cursor-pointer"
     >
       {/* Product Image */}
@@ -45,20 +46,42 @@ export default function ProductCard({
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
 
         {/* Quick Add Button */}
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{
-            opacity: isHovered ? 1 : 0,
-            y: isHovered ? 0 : 10,
-          }}
-          transition={{ duration: 0.3 }}
-          onClick={(e) => {
-            e.stopPropagation()
-            onAddToCart?.(e, product)
-          }}
-          className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 bg-white py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white active:scale-95 transition-all duration-300">
-          Add to Cart
-        </motion.button>
+        {!isComboMode && onAddToCart && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{
+              opacity: isHovered ? 1 : 0,
+              y: isHovered ? 0 : 10,
+            }}
+            transition={{ duration: 0.3 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onAddToCart?.(e, product)
+            }}
+            className="absolute bottom-4 left-4 right-4 bg-white py-3 text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white transition-colors duration-300"
+          >
+            Add to Cart
+          </motion.button>
+        )}
+        
+        {/* Combo Mode - Customize Button */}
+        {isComboMode && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{
+              opacity: isHovered ? 1 : 0,
+              y: isHovered ? 0 : 10,
+            }}
+            transition={{ duration: 0.3 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onClick?.(product.product_id, product)
+            }}
+            className="absolute bottom-4 left-4 right-4 bg-[#3e4026] px-4 py-2.5 text-xs font-medium text-white hover:bg-[#2d2f1c] transition-colors duration-300"
+          >
+            Customize & Add to Combo
+          </motion.button>
+        )}
 
         {/* Wishlist Icon */}
         <div className="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">

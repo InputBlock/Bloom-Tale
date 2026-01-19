@@ -23,7 +23,7 @@ export default function SubHeader() {
     { name: "Birthday", icon: Cake, path: "/shop?category=birthday" },
     { name: "Anniversary", icon: Heart, path: "/shop?category=anniversary" },
     { name: "Forever Flowers", icon: Flower2, path: "/shop?category=forever-flowers" },
-    { name: "Fragrances", icon: Flame, path: "/shop?category=fragrances" },
+    { name: "Candles", icon: Flame, path: "/shop?category=candles" },
     { name: "Premium", icon: Sparkles, path: "/shop?category=premium" },
     { name: "Corporate", icon: Building2, path: "/shop?category=corporate" },
     { name: "Combos", icon: Gift, path: "/shop?category=combos" },
