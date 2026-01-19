@@ -62,16 +62,16 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                   <User size={18} />
                   Customer Information
                 </h2>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="min-w-0">
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Name</p>
-                    <p className="text-gray-900 font-medium">{order.customerName}</p>
+                    <p className="text-gray-900 font-medium truncate">{order.customerName}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Email</p>
-                    <p className="text-gray-900 font-medium text-sm">{order.email}</p>
+                    <p className="text-gray-900 font-medium text-sm break-all">{order.email}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-medium text-gray-500 uppercase mb-1">Phone</p>
                     <p className="text-gray-900 font-medium">{order.phone}</p>
                   </div>
@@ -85,8 +85,18 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                     <MapPin size={18} className="text-green-600" />
                     Delivery Address
                   </h2>
+                  {order.deliveryType && order.deliveryType !== "standard" && (
+                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium capitalize">
+                      {order.deliveryType === "fixed" ? "Fixed Time" : order.deliveryType} Delivery
+                    </span>
+                  )}
                 </div>
                 <p className="text-gray-700">{order.deliveryAddress}</p>
+                {order.deliverySlot && (
+                  <p className="text-gray-600 mt-2 text-sm">
+                    <span className="font-medium">Time Slot:</span> {order.deliverySlot}
+                  </p>
+                )}
               </div>
 
               {/* Order Items */}

@@ -60,10 +60,29 @@ const orderSchema = new Schema(
       type: String,
     },
 
+    customerPhone: {
+      type: String,
+    },
+
     items: [orderItemSchema],
 
     deliveryAddress: [addressSchema],
 
+    // Delivery info
+    deliveryType: {
+      type: String,
+      enum: ["fixed", "midnight", "express", "standard"],
+      default: "standard",
+    },
+
+    deliveryFee: {
+      type: Number,
+      default: 0,
+    },
+
+    deliverySlot: {
+      type: String,
+    },
     
     totalAmount: Number,
 

@@ -14,7 +14,7 @@ const generateOrderId = () => {
 
 export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { address } = req.body;
+  const { address, deliveryType, deliveryFee, deliverySlot } = req.body;
 
   const user = await User.findById(userId);
   if (!user) {
@@ -51,6 +51,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     user: userId,
     customerName: user.fullName || address.fullName || "N/A",
     customerEmail: user.email || address.email || "N/A",
+    customerPhone: address.mobile || user.mobile || "N/A",
     items: cart.items.map((item) => ({
       product: item.product,
       product_id: item.product_id,
@@ -64,6 +65,9 @@ export const createOrder = asyncHandler(async (req, res) => {
       discount_percentage: item.discount_percentage,
     })),
     deliveryAddress: address,
+    deliveryType: deliveryType || "standard",
+    deliveryFee: deliveryFee || 0,
+    deliverySlot: deliverySlot || null,
     totalAmount,
     status: "PENDING", // payment not done yet
     paymentMethod: null,
