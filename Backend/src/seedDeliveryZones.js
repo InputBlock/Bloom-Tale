@@ -17,7 +17,7 @@ const zones = [
     zone_id: "ZONE1",
     name: "South Mumbai",
     description: "Fort, Colaba, Churchgate, Marine Lines, Nariman Point, CST area",
-    pricing: { nextDay: 49, sameDay: 149, express: 249 },
+    pricing: { fixed_time: 49, midnight: 149, express: 249 },
     pincodes: [
       "400001", // Fort, GPO, Stock Exchange, Town Hall
       "400002", // Kalbadevi, Thakurdwar
@@ -28,16 +28,19 @@ const zones = [
       "400007", // Grant Road, Tardeo
       "400020", // Churchgate, Marine Lines
       "400021", // Nariman Point, NCPA
+      "400022", // Cuffe Parade, Air India Building
+      "400023", // Dhobi Talao
       "400032", // Mantralaya, Secretariate
       "400034", // Haji Ali, Tulsiwadi
       "400035", // Rajbhavan, Walkeshwar
+      "400036", // Peddar Road, Breach Candy
     ]
   },
   {
     zone_id: "ZONE2",
     name: "Central Mumbai",
     description: "Dadar, Parel, Worli, Lower Parel, Byculla, Matunga",
-    pricing: { nextDay: 149, sameDay: 199, express: 299 },
+    pricing: { fixed_time: 149, midnight: 199, express: 299 },
     pincodes: [
       "400008", // Mumbai Central, Kamathipura
       "400009", // Chinchbunder, Princess Dock
@@ -66,8 +69,11 @@ const zones = [
     zone_id: "ZONE3",
     name: "Western Suburbs",
     description: "Bandra, Khar, Santacruz, Vile Parle, Andheri, Goregaon, Malad, Kandivali, Borivali",
-    pricing: { nextDay: 199, sameDay: 249, express: 349 },
+    pricing: { fixed_time: 199, midnight: 249, express: 349 },
     pincodes: [
+      "400038", // Bandra Reclamation
+      "400042", // Santa Cruz Airport
+      "400047", // SNDT, Juhu Scheme
       "400049", // Juhu
       "400050", // Bandra West
       "400051", // Bandra East
@@ -93,11 +99,13 @@ const zones = [
       "400091", // Borivali
       "400092", // Borivali West
       "400093", // Chakala MIDC
+      "400094", // Andheri East Industrial
       "400095", // INS Hamla, Kharodi
       "400096", // SEEPZ
       "400097", // Malad East
       "400098", // Vidyanagari
       "400099", // Airport
+      "400100", // Kandivali West Extension
       "400101", // Kandivali East
       "400102", // Jogeshwari West, Oshiwara
       "400103", // Mandapeshwar
@@ -108,11 +116,12 @@ const zones = [
     zone_id: "ZONE4",
     name: "Eastern Suburbs",
     description: "Kurla, Ghatkopar, Vikhroli, Bhandup, Mulund, Chembur, Powai",
-    pricing: { nextDay: 199, sameDay: 249, express: 349 },
+    pricing: { fixed_time: 199, midnight: 249, express: 349 },
     pincodes: [
       "400070", // Kurla West
       "400071", // Kurla East
       "400072", // Chunabhatti
+      "400073", // Chembur Colony
       "400074", // Chembur
       "400075", // Trombay
       "400076", // Mankhurd
@@ -124,6 +133,7 @@ const zones = [
       "400082", // Bhandup East
       "400083", // Ghatkopar West
       "400084", // Ghatkopar East
+      "400085", // Saki Naka, LBS Marg
       "400086", // Vikhroli East
       "400087", // Kanjurmarg
       "400088", // Tilak Nagar
@@ -134,7 +144,7 @@ const zones = [
     zone_id: "ZONE5",
     name: "Thane & Navi Mumbai",
     description: "Thane, Navi Mumbai, Vashi, Airoli, Nerul, Panvel, Kharghar, Belapur",
-    pricing: { nextDay: 249, sameDay: 349, express: 449 },
+    pricing: { fixed_time: 249, midnight: 349, express: 449 },
     pincodes: [
       // Thane
       "400601", // Thane West
@@ -162,6 +172,55 @@ const zones = [
       "410209", // Panvel
       "410210", // New Panvel
     ]
+  },
+  {
+    zone_id: "ZONE6",
+    name: "Mira-Bhayandar",
+    description: "Mira Road, Bhayandar East, Bhayandar West - Growing suburb",
+    pricing: { fixed_time: 299, midnight: 399, express: 0 }, // No express delivery
+    pincodes: [
+      "401105", // Mira Road East
+      "401106", // Bhayandar East
+      "401107", // Bhayandar West
+    ]
+  },
+  {
+    zone_id: "ZONE7",
+    name: "Vasai-Virar",
+    description: "Vasai, Virar, Nalasopara - Popular affordable housing area",
+    pricing: { fixed_time: 349, midnight: 449, express: 0 }, // No express delivery
+    pincodes: [
+      "401201", // Vasai East
+      "401202", // Vasai West
+      "401203", // Vasai Road
+      "401204", // Navghar
+      "401207", // Papdy
+      "401208", // Virar East
+      "401209", // Virar West
+      "401210", // Arnala
+      "401301", // Nalasopara East
+      "401302", // Nalasopara West
+      "401303", // Achole
+    ]
+  },
+  {
+    zone_id: "ZONE8",
+    name: "Kalyan-Dombivli-Bhiwandi",
+    description: "Kalyan, Dombivli, Bhiwandi - Large residential and industrial area",
+    pricing: { fixed_time: 349, midnight: 449, express: 0 }, // No express delivery
+    pincodes: [
+      // Kalyan-Dombivli
+      "421201", // Kalyan West
+      "421202", // Kalyan East
+      "421203", // Kalyan RS
+      "421204", // Dombivli East
+      "421301", // Dombivli West
+      "421302", // Bhiwandi
+      "421303", // Padgha
+      "421304", // Anjur
+      "421305", // Bhiwandi RS
+      "421306", // Kalher
+    ]
   }
 ];
 
@@ -187,7 +246,7 @@ async function seedDeliveryZones() {
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     zones.forEach(z => {
       console.log(`${z.zone_id} - ${z.name}: ${z.pincodes.length} pincodes`);
-      console.log(`   Next Day: ₹${z.pricing.nextDay} | Same Day: ₹${z.pricing.sameDay} | Express: ₹${z.pricing.express}`);
+      console.log(`   Fixed Time: ₹${z.pricing.fixed_time} | Midnight: ₹${z.pricing.midnight} | Express: ₹${z.pricing.express}`);
     });
 
     await mongoose.disconnect();
