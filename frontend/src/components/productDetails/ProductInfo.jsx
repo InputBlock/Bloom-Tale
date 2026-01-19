@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback } from "react"
 import { Minus, Plus } from "lucide-react"
 import { useCart } from "../../context/CartContext"
 import { useNavigate } from "react-router-dom"
@@ -32,10 +32,11 @@ export default function ProductInfo({ product }) {
     }
   }
 
-  const handleDeliveryStatusChange = (status, zone) => {
+  // Memoize the callback to prevent infinite re-renders
+  const handleDeliveryStatusChange = useCallback((status, zone) => {
     setDeliveryStatus(status)
     setDeliveryZone(zone)
-  }
+  }, [])
 
   const handleAddToCart = async () => {
     if (!product) return

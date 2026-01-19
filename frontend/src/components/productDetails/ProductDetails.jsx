@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
@@ -7,29 +7,35 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
   const [fetchedRelated, setFetchedRelated] = useState([])
   const [hoveredId, setHoveredId] = useState(null)
   const navigate = useNavigate()
+  const fetchedForProductRef = useRef(null)
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
-      if (relatedProducts.length === 0 && product?.category) {
-        try {
-          const response = await fetch('/api/v1/getProduct/list', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          const data = await response.json()
-          if (data.success && data.data) {
-            const related = data.data
-              .filter(p => p.product_id !== product.product_id)
-              .slice(0, 4)
-            setFetchedRelated(related)
-          }
-        } catch (error) {
-          console.error('Error fetching related products:', error)
+      // Skip if already fetched for this product or if relatedProducts provided
+      if (relatedProducts.length > 0) return
+      if (!product?.category || !product?.product_id) return
+      if (fetchedForProductRef.current === product.product_id) return
+      
+      fetchedForProductRef.current = product.product_id
+      
+      try {
+        const response = await fetch('/api/v1/getProduct/list', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        const data = await response.json()
+        if (data.success && data.data) {
+          const related = data.data
+            .filter(p => p.product_id !== product.product_id)
+            .slice(0, 4)
+          setFetchedRelated(related)
         }
+      } catch (error) {
+        console.error('Error fetching related products:', error)
       }
     }
     fetchRelatedProducts()
-  }, [product, relatedProducts])
+  }, [product?.product_id, product?.category, relatedProducts.length])
 
   const displayRelated = relatedProducts.length > 0 ? relatedProducts : fetchedRelated
 

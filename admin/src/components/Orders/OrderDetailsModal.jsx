@@ -111,9 +111,19 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                       key={idx}
                       className="flex justify-between items-center pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div>
-                        <p className="font-medium text-gray-900">{item.name}</p>
-                        <p className="text-sm text-gray-500">{item.description}</p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-gray-900">{item.name}</p>
+                          {item.isCombo && (
+                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                              Combo
+                            </span>
+                          )}
+                        </div>
+                        {item.description && (
+                          <p className="text-sm text-gray-500">{item.description}</p>
+                        )}
+                        <p className="text-xs text-gray-400 mt-1">Qty: {item.quantity}</p>
                       </div>
                       <p className="font-semibold text-gray-900">₹{item.price?.toFixed(2) || "0.00"}</p>
                     </div>

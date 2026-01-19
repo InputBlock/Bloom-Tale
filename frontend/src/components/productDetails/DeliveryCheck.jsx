@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 
 export default function DeliveryCheck({ 
   onDeliveryStatusChange, 
@@ -10,12 +10,44 @@ export default function DeliveryCheck({
   const [selectedDeliveryType, setSelectedDeliveryType] = useState("fixed")
   const [selectedSlot, setSelectedSlot] = useState("")
   const [showWarning, setShowWarning] = useState(false)
+  
+  // Track previous values to prevent infinite loops
+  const prevValuesRef = useRef({ selectedDeliveryType: "", selectedSlot: "", zoneId: null, pincode: "" })
 
-  // Notify parent when delivery options change
+  // Calculate delivery fee based on selected type
+  const getDeliveryFee = useCallback((zoneData, deliveryType) => {
+    if (!zoneData?.pricing) return 0
+    if (!sameDayDelivery) return 0 // Standard delivery - free or fixed rate
+    
+    switch (deliveryType) {
+      case "fixed": return zoneData.pricing.fixed_time || 0
+      case "midnight": return zoneData.pricing.midnight || 0
+      case "express": return zoneData.pricing.express || 0
+      default: return 0
+    }
+  }, [sameDayDelivery])
+
+  // Notify parent when delivery options change - only if values actually changed
   useEffect(() => {
     if (status === 'available' && zone) {
+      const zoneId = zone._id || zone.zone_name
+      const prev = prevValuesRef.current
+      
+      // Check if anything actually changed
+      if (
+        prev.selectedDeliveryType === selectedDeliveryType &&
+        prev.selectedSlot === selectedSlot &&
+        prev.zoneId === zoneId &&
+        prev.pincode === pincode
+      ) {
+        return // Nothing changed, skip callback
+      }
+      
+      // Update ref with current values
+      prevValuesRef.current = { selectedDeliveryType, selectedSlot, zoneId, pincode }
+      
       const deliveryType = sameDayDelivery ? selectedDeliveryType : "standard"
-      const deliveryFee = getDeliveryFee()
+      const deliveryFee = getDeliveryFee(zone, selectedDeliveryType)
       onDeliveryStatusChange?.('available', {
         zone,
         pincode,
@@ -24,20 +56,7 @@ export default function DeliveryCheck({
         deliverySlot: selectedDeliveryType === "fixed" ? selectedSlot : null
       })
     }
-  }, [selectedDeliveryType, selectedSlot, zone, status])
-
-  // Calculate delivery fee based on selected type
-  const getDeliveryFee = () => {
-    if (!zone?.pricing) return 0
-    if (!sameDayDelivery) return 0 // Standard delivery - free or fixed rate
-    
-    switch (selectedDeliveryType) {
-      case "fixed": return zone.pricing.fixed_time || 0
-      case "midnight": return zone.pricing.midnight || 0
-      case "express": return zone.pricing.express || 0
-      default: return 0
-    }
-  }
+  }, [selectedDeliveryType, selectedSlot, zone, status, sameDayDelivery, pincode, onDeliveryStatusChange, getDeliveryFee])
 
   const handlePincodeChange = (e) => {
     const value = e.target.value.replace(/\D/g, "")

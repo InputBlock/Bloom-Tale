@@ -236,7 +236,11 @@ export default function Checkout() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[#5e6043]">Shipping</span>
-                      <span className="text-[#3e4026] font-medium">Free</span>
+                      <span className="text-[#3e4026] font-medium">
+                        {(orderDetails?.deliveryFee || 0) > 0 
+                          ? `₹${orderDetails.deliveryFee.toLocaleString('en-IN')}` 
+                          : 'Free'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[#5e6043]">Tax</span>
@@ -248,7 +252,7 @@ export default function Checkout() {
                     <div className="flex justify-between items-center">
                       <span className="text-base font-semibold text-[#3e4026]">Total</span>
                       <span className="text-xl font-bold text-[#3e4026]">
-                        ₹{(orderDetails?.totalAmount || cartTotal).toLocaleString('en-IN')}
+                        ₹{((orderDetails?.totalAmount || cartTotal) + (orderDetails?.deliveryFee || 0)).toLocaleString('en-IN')}
                       </span>
                     </div>
                   </div>

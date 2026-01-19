@@ -13,8 +13,19 @@ export const createPaymentOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.body;
   const userId = req.user._id;
 
+  console.log("🔹 createPaymentOrder called with orderId:", orderId);
+
   const order = await Order.findById(orderId);
-  if (!order) throw new ApiError(404, "Order not found");
+  if (!order) {
+    console.log("❌ Order not found for ID:", orderId);
+    throw new ApiError(404, "Order not found");
+  }
+
+  console.log("🔹 Order found:", { 
+    orderId: order._id, 
+    paymentMethod: order.paymentMethod, 
+    status: order.status 
+  });
 
   if (order.user.toString() !== userId.toString()) {
     throw new ApiError(403, "Not allowed");
@@ -25,7 +36,8 @@ export const createPaymentOrder = asyncHandler(async (req, res) => {
   }
 
   if (order.paymentMethod !== "ONLINE") {
-    throw new ApiError(400, "Invalid payment method");
+    console.log("❌ Payment method is not ONLINE:", order.paymentMethod);
+    throw new ApiError(400, `Invalid payment method: ${order.paymentMethod}. Expected ONLINE.`);
   }
 
   // 🟢 Create Razorpay order only once

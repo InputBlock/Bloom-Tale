@@ -189,10 +189,13 @@ export default function OrdersTable() {
                                 deliveryType: order.deliveryType || "standard",
                                 deliverySlot: order.deliverySlot || "",
                                 items: order.items?.map(item => ({
-                                  name: item.productName || item.product?.name || "Product",
-                                  description: item.size ? `Size: ${item.size}` : "",
+                                  name: item.productName || item.comboName || item.product?.name || "Product",
+                                  description: item.isCombo 
+                                    ? `Combo (${item.combo_items?.length || 0} items)` 
+                                    : (item.size ? `Size: ${item.size}` : ""),
                                   price: item.price || 0,
-                                  quantity: item.quantity || 1
+                                  quantity: item.quantity || 1,
+                                  isCombo: item.isCombo || false
                                 })) || [],
                                 subtotal: order.totalAmount || 0,
                                 tax: 0,
