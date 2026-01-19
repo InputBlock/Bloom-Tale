@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import { productsAPI } from "../../api"
 
 export default function ProductDetails({ product, relatedProducts = [] }) {
   const [fetchedRelated, setFetchedRelated] = useState([])
@@ -19,11 +20,7 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
       fetchedForProductRef.current = product.product_id
       
       try {
-        const response = await fetch('/api/v1/getProduct/list', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        })
-        const data = await response.json()
+        const { response, data } = await productsAPI.getList()
         if (data.success && data.data) {
           const related = data.data
             .filter(p => p.product_id !== product.product_id)

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react"
-import api from "../utils/api"
+import { cartAPI, authAPI } from "../api"
 
 const CartContext = createContext()
 
@@ -18,8 +18,7 @@ export const CartProvider = ({ children }) => {
 
   // Check if user is logged in
   const isLoggedIn = () => {
-    const user = localStorage.getItem("user")
-    return !!user
+    return authAPI.isAuthenticated()
   }
 
   // Fetch cart from backend
@@ -32,8 +31,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true)
-      const response = await api.post("/api/v1/cart/getCart")
-      const data = await response.json()
+      const { response, data } = await cartAPI.get()
 
       // Check if response is 401/403 (token expired) - auto-handled by api utility
       if (!response.ok) {
@@ -98,8 +96,7 @@ export const CartProvider = ({ children }) => {
         pincode: product.pincode || null,
       }
 
-      const response = await api.post("/api/v1/cart/addToCart", requestBody)
-      const data = await response.json()
+      const { response, data } = await cartAPI.add(requestBody)
 
       // Check for auth errors (auto-handled by api utility)
       if (!response.ok) {

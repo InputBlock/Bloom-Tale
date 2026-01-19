@@ -1,16 +1,12 @@
 import { X, ArrowLeft, Package, MapPin, CreditCard, User } from "lucide-react"
-import axios from "axios"
+import { ordersAPI } from "../../api"
 import OrderStatusBadge from "./OrderStatusBadge"
-
-const API_URL = "/api/v1/admin"
 
 export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
   
   const handleStatusUpdate = async (status) => {
     try {
-      await axios.patch(`${API_URL}/orders/${order._id}/status`, { status }, {
-        withCredentials: true
-      })
+      await ordersAPI.updateStatus(order._id, status)
       if (onStatusUpdate) onStatusUpdate()
       onClose()
     } catch (err) {

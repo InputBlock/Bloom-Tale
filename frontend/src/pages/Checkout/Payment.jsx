@@ -2,6 +2,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle2, Smartphone, Banknote, ChevronLeft, Loader2, X, Shield, CreditCard, Sparkles } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { orderAPI } from "../../api"
 
 export default function Payment({ paymentMethod, setPaymentMethod, onBack, orderId, orderDetails }) {
   const [loading, setLoading] = useState(false)
@@ -23,35 +24,8 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
     try {
       const paymentMethodValue = paymentMethod === "upi" ? "ONLINE" : "COD"
       
-      // Get token from localStorage for auth
-      const token = localStorage.getItem("token")
-      const headers = {
-        "Content-Type": "application/json",
-      }
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`
-      }
-
       // Step 1: Set payment method
-      const response = await fetch(`/api/v1/order/${orderId}/payment-method`, {
-        method: "PATCH",
-        headers,
-        credentials: "include",
-        body: JSON.stringify({
-          paymentMethod: paymentMethodValue
-        }),
-      })
-
-      // Get response text first, then try to parse as JSON
-      const responseText = await response.text()
-      let data
-      
-      try {
-        data = JSON.parse(responseText)
-      } catch (parseError) {
-        console.error("Non-JSON response:", responseText)
-        throw new Error("Server error. Please try again.")
-      }
+      const { response, data } = await orderAPI.setPaymentMethod(orderId, paymentMethodValue)
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to set payment method")

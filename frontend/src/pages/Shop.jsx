@@ -9,6 +9,7 @@ import { useCombo } from "../context/ComboContext"
 import SuccessModal from "../components/common/SuccessModal"
 import { ProductGrid, FilterSidebar } from "../components/shop"
 import ComboSidebar from "../components/combo/ComboSidebar"
+import { productsAPI } from "../api"
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -167,17 +168,12 @@ export default function Shop() {
         setLoading(true)
         
         // Build query params
-        const params = new URLSearchParams()
+        const params = {}
         if (selectedCategory !== 'all') {
-          params.append('category', selectedCategory)
+          params.category = selectedCategory
         }
         
-        const response = await fetch(`/api/v1/getProduct/list?${params.toString()}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        })
-        
-        const data = await response.json()
+        const { response, data } = await productsAPI.getList(params)
         
         if (data.success && data.data) {
           let sortedProducts = [...data.data]

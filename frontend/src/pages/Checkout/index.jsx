@@ -7,6 +7,7 @@ import DeliveryDetails from "./DeliveryDetails"
 import OrderSummary from "./OrderSummary"
 import Payment from "./Payment"
 import { useCart } from "../../context/CartContext"
+import { orderAPI } from "../../api"
 
 export default function Checkout() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -42,21 +43,14 @@ export default function Checkout() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleDeliverySubmit = async (orderId) => {
-    setOrderId(orderId)
+  const handleDeliverySubmit = async (newOrderId) => {
+    setOrderId(newOrderId)
     
     // Fetch order details
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/v1/order/${orderId}/orderSummary`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-      })
+      const { response, data } = await orderAPI.getSummary(newOrderId)
 
       if (response.ok) {
-        const data = await response.json()
         setOrderDetails(data.data)
       }
     } catch (error) {

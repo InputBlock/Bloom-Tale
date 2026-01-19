@@ -6,6 +6,7 @@ import { motion, useInView } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../../context/CartContext"
 import SuccessModal from "../common/SuccessModal"
+import { productsAPI } from "../../api"
 
 export default function BestsellingBlooms() {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -23,14 +24,7 @@ export default function BestsellingBlooms() {
     const fetchBestsellerProducts = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/v1/getProduct/bestseller', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        
-        const data = await response.json()
+        const { response, data } = await productsAPI.getBestsellers()
         
         if (data.success && data.data) {
           setProducts(data.data)

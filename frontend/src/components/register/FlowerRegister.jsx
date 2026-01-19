@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FlowerScene } from "../login/flowers";
 import { showToast } from "../common/ToastContainer";
 import ErrorMessage from "../common/ErrorMessage";
+import { authAPI } from "../../api";
 
 // Email validation helper
 const isValidEmail = (email) => {
@@ -308,23 +309,7 @@ export default function FlowerRegister() {
     setRegisterState("typing");
 
     try {
-      const response = await fetch("/api/v1/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        data = { message: text || "Server error occurred" };
-      }
+      const { response, data } = await authAPI.register(email, password);
 
       if (!response.ok) {
         throw new Error(data.message || "Registration failed");
@@ -377,23 +362,7 @@ export default function FlowerRegister() {
     setError(null);
 
     try {
-      const response = await fetch("/api/v1/verifyOtp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ otp: otpValue }),
-      });
-
-      let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        data = { message: text || "Server error occurred" };
-      }
+      const { response, data } = await authAPI.verifyOtp(otpValue);
 
       if (!response.ok) {
         throw new Error(data.message || "OTP verification failed");
@@ -421,23 +390,7 @@ export default function FlowerRegister() {
     setError(null);
 
     try {
-      const response = await fetch("/api/v1/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        data = { message: text || "Server error occurred" };
-      }
+      const { response, data } = await authAPI.resendOtp(email, password);
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to resend OTP");
@@ -457,7 +410,7 @@ export default function FlowerRegister() {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "/api/v1/google";
+    authAPI.googleLogin();
   };
 
   return (

@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react"
 import { Search, Edit2, Trash2 } from "lucide-react"
 import EditProductModal from "../components/ListItems/EditProductModal"
-import axios from "axios"
-
-const API_URL = "/api/v1/admin"
+import { productsAPI } from "../api"
 
 export default function ListItems() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -20,9 +18,7 @@ export default function ListItems() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_URL}/showlist`, {
-        withCredentials: true
-      })
+      const response = await productsAPI.getAll()
 
       // Backend returns ApiResponse with data wrapped in response.data.data
       const productsData = response.data?.data?.flowers || response.data?.flowers || []
@@ -62,21 +58,7 @@ export default function ListItems() {
     if (newStock !== null && !isNaN(newStock)) {
       const stockValue = parseInt(newStock)
       try {
-        const token = localStorage.getItem("adminToken")
-        await axios.post(
-          `${API_URL}/update`,
-          { 
-            id: id,
-            stock: stockValue
-          },
-          {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Content-Type": "application/json"
-            },
-            withCredentials: true
-          }
-        )
+        await productsAPI.update({ id, stock: stockValue })
         setProducts(products.map((p) => 
           p.id === id ? { ...p, stock: stockValue, isListed: stockValue > 0 ? p.isListed : false } : p
         ))
@@ -87,22 +69,11 @@ export default function ListItems() {
   }
   const handleToggleStatus = async (id, currentStatus) => {
     try {
-      const token = localStorage.getItem("adminToken")
-      const endpoint = currentStatus
-        ? `${API_URL}/unlist`
-        : `${API_URL}/list`
-
-      await axios.post(
-        endpoint,
-        { id: id },
-        {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          withCredentials: true
-        }
-      )
+      if (currentStatus) {
+        await productsAPI.unlist(id)
+      } else {
+        await productsAPI.list(id)
+      }
 
       setProducts(products.map((p) =>
         p.id === id ? { ...p, isListed: !currentStatus } : p
@@ -119,24 +90,13 @@ export default function ListItems() {
 
   const handleSaveEdit = async (updatedProduct) => {
     try {
-      const token = localStorage.getItem("adminToken")
-      await axios.post(
-        `${API_URL}/update`,
-        {
-          id: updatedProduct.id,
-          name: updatedProduct.name,
-          category: updatedProduct.category,
-          pricing: updatedProduct.pricing,
-          same_day_delivery: updatedProduct.sameDayDelivery
-        },
-        {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          withCredentials: true
-        }
-      )
+      await productsAPI.update({
+        id: updatedProduct.id,
+        name: updatedProduct.name,
+        category: updatedProduct.category,
+        pricing: updatedProduct.pricing,
+        same_day_delivery: updatedProduct.sameDayDelivery
+      })
 
       setProducts(products.map((p) =>
         p.id === updatedProduct.id ? updatedProduct : p

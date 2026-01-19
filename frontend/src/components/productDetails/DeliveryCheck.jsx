@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react"
+import { deliveryAPI } from "../../api"
 
 export default function DeliveryCheck({ 
   onDeliveryStatusChange, 
@@ -79,8 +80,7 @@ export default function DeliveryCheck({
     setStatus('checking')
 
     try {
-      const res = await fetch(`/api/v1/delivery/check?pincode=${pincode}`)
-      const data = await res.json()
+      const { response, data } = await deliveryAPI.check(pincode)
 
       if (data.success && data.data.available) {
         setStatus('available')

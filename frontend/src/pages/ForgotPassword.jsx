@@ -5,6 +5,7 @@ import F_email from "../components/login/F_email"
 import F_otp from "../components/login/F_otp"
 import F_newPassword from "../components/login/F_newPassword"
 import { showToast } from "../components/common/ToastContainer"
+import { authAPI } from "../api"
 
 export default function ForgotPassword() {
   const [step, setStep] = useState("email") // "email" | "otp" | "newPassword" | "done"
@@ -14,22 +15,7 @@ export default function ForgotPassword() {
 
   const handleEmailNext = async (email) => {
     try {
-      const response = await fetch("/api/v1/forgotPassword", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email }),
-      })
-
-      // Handle non-JSON responses gracefully
-      let data
-      const contentType = response.headers.get("content-type")
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json()
-      } else {
-        const text = await response.text()
-        data = { message: text || "Server error occurred" }
-      }
+      const { response, data } = await authAPI.forgotPassword(email)
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to send OTP")
@@ -53,22 +39,7 @@ export default function ForgotPassword() {
 
   const handlePasswordSubmit = async (password) => {
     try {
-      const response = await fetch("/api/v1/resetPassword", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ otp: otpValue, newPassword: password }),
-      })
-
-      // Handle non-JSON responses gracefully
-      let data
-      const contentType = response.headers.get("content-type")
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json()
-      } else {
-        const text = await response.text()
-        data = { message: text || "Server error occurred" }
-      }
+      const { response, data } = await authAPI.resetPassword(otpValue, password)
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to reset password")
@@ -88,22 +59,7 @@ export default function ForgotPassword() {
 
   const handleResendOtp = async () => {
     try {
-      const response = await fetch("/api/v1/forgotPassword", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: userEmail }),
-      })
-
-      // Handle non-JSON responses gracefully
-      let data
-      const contentType = response.headers.get("content-type")
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json()
-      } else {
-        const text = await response.text()
-        data = { message: text || "Server error occurred" }
-      }
+      const { response, data } = await authAPI.forgotPassword(userEmail)
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to resend OTP")

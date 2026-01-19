@@ -221,7 +221,144 @@ const zones = [
       "421305", // Bhiwandi RS
       "421306", // Kalher
     ]
-  }
+  },
+  // ============================================
+  // PUNE ZONES (Branch: Kalyani Nagar - 411006)
+  // Store: Blooms Only, Hindustan Estate, Kalyani Nagar
+  // GPS VERIFIED - Distances calculated using Haversine formula
+  // ============================================
+  {
+    zone_id: "PUNE_ZONE1",
+    name: "Pune Central (0-5km)",
+    description: "Kalyani Nagar, Kharadi, Vadgaon Sheri - GPS verified 0-5km from store",
+    pricing: { fixed_time: 49, midnight: 149, express: 249 },
+    pincodes: [
+      // GPS VERIFIED - Within 5km of 411006 (Kalyani Nagar)
+      "411006", // Kalyani Nagar/Yerwada (CENTER) - 0.00 km
+      "412207", // Kharadi/Viman Nagar East - 2.87 km
+      "411014", // Vadgaon Sheri - 3.48 km
+    ]
+  },
+  {
+    zone_id: "PUNE_ZONE2",
+    name: "Pune Extended (5-10km)",
+    description: "Lohegaon, Mundhwa, Airport, Koregaon Park, Hadapsar, Wagholi - GPS verified 5-10km",
+    pricing: { fixed_time: 99, midnight: 199, express: 299 },
+    pincodes: [
+      // GPS VERIFIED - 5-10km from 411006 (Kalyani Nagar)
+      "411047", // Lohegaon - 5.06 km
+      "411036", // Mundhwa - 5.65 km
+      "411032", // Vidyanagar/Airport - 6.46 km
+      "411011", // Koregaon Park - 6.61 km
+      "411015", // Dhanori/Vishrantwadi - 7.54 km
+      "412307", // Wagholi - 7.93 km
+      "411013", // Hadapsar IE - 8.37 km
+      "411028", // Hadapsar - 8.61 km
+      "411037", // Kondhwa - 9.23 km
+    ]
+  },
+  // ============================================
+  // DELHI ZONES (Branch: Greater Kailash - 110048)
+  // Store: Ishwar Florist, Block B Part 1, Greater Kailash
+  // GPS VERIFIED - Distances calculated using Haversine formula
+  // ============================================
+  {
+    zone_id: "DELHI_ZONE1",
+    name: "Delhi Central (0-5km)",
+    description: "Greater Kailash, Defence Colony, Lajpat Nagar, Kalkaji, Hauz Khas - GPS verified 0-5km from store",
+    pricing: { fixed_time: 49, midnight: 149, express: 249 },
+    pincodes: [
+      // GPS VERIFIED - Within 5km of 110048 (Greater Kailash)
+      "110065", // Greater Kailash II, CR Park - 0.00 km
+      "110014", // Defence Colony, Lajpat Nagar - 1.48 km
+      "110048", // Greater Kailash (STORE LOCATION) - 2.11 km
+      "110013", // Jangpura, Andrews Ganj - 2.41 km
+      "110019", // Kalkaji, Nehru Place - 2.49 km
+      "110049", // Hauz Khas, Green Park - 2.82 km
+      "110076", // Kalkaji Extension - 3.43 km
+      "110025", // Okhla, Jasola - 3.83 km
+      "110003", // Lodhi Colony, JLN Stadium - 3.98 km
+      "110017", // Hauz Khas, SDA - 4.67 km
+      "110029", // Vasant Vihar, Munirka - 4.71 km
+    ]
+  },
+  {
+    zone_id: "DELHI_ZONE2",
+    name: "Delhi Extended (5-10km)",
+    description: "RK Puram, Saket, Mayur Vihar, Connaught Place, Old Delhi - GPS verified 5-10km",
+    pricing: { fixed_time: 99, midnight: 199, express: 299 },
+    pincodes: [
+      // GPS VERIFIED - 5-10km from 110048 (Greater Kailash)
+      "110023", // RK Puram - 5.24 km
+      "110016", // Hauz Khas, IIT - 5.27 km
+      "110062", // Saket, Tigri - 6.17 km
+      "110091", // Mayur Vihar Phase I - 6.42 km
+      "110022", // Vasant Vihar, Vasant Kunj - 7.18 km
+      "110021", // RK Puram, Vasant Vihar - 7.21 km
+      "110080", // Sangam Vihar - 7.30 km
+      "110001", // Connaught Place, Parliament - 7.46 km
+      "110002", // Old Delhi, Chandni Chowk - 7.61 km
+      "110096", // Mayur Vihar Phase II - 8.15 km
+      "110068", // Saket, Lado Sarai - 8.18 km
+      "110044", // Sarita Vihar, Okhla Phase II - 8.44 km
+      "110024", // Saket, Malviya Nagar - 8.79 km
+      "110092", // Preet Vihar, Anand Vihar - 9.43 km
+    ]
+  },
+  // ============================================
+  // BANGALORE ZONES (Branch: Richmond Town - 560027)
+  // Store: 1st Main, Rammondir Road, Richmond Town
+  // GPS VERIFIED - Distances calculated using Haversine formula
+  // ============================================
+  {
+    zone_id: "BANGALORE_ZONE1",
+    name: "Bangalore Central (0-5km)",
+    description: "Richmond Town, Indiranagar, MG Road, Koramangala, Jayanagar - GPS verified 0-5km from store",
+    pricing: { fixed_time: 49, midnight: 149, express: 249 },
+    pincodes: [
+      // GPS VERIFIED - Within 5km of 560027 (Richmond Town)
+      "560027", // Richmond Town (STORE LOCATION) - 0.00 km
+      "560025", // Ashokanagar, Domlur - 1.20 km
+      "560002", // Shanthinagar, Wilson Garden - 1.53 km
+      "560069", // Kanakanapalya - 2.16 km
+      "560030", // Adugodi, Koramangala - 2.19 km
+      "560001", // Vasanth Nagar, MG Road - 2.34 km
+      "560053", // Cottonpete, City Market - 2.50 km
+      "560047", // Austin Town, Vivek Nagar - 2.57 km
+      "560004", // Sunkenahalli, Basavanagudi - 2.74 km
+      "560009", // Nehru Nagar, Cubbon Park - 2.74 km
+      "560051", // Shivajinagar, Commercial Street - 3.27 km
+      "560011", // Tilak Nagar, Jayanagar - 3.39 km
+      "560052", // Vasanth Nagar - 3.43 km
+      "560042", // Halasuru, Ulsoor Lake - 3.50 km
+      "560029", // SG Palya, BTM Layout - 3.57 km
+      "560095", // Adugodi, Ejipura - 3.76 km
+      "560041", // Tilak Nagar - 3.88 km
+      "560008", // Halasuru, Ulsoor - 4.13 km
+      "560046", // SK Garden, Lingarajapuram - 4.59 km
+      "560070", // Banashankari - 4.74 km
+      "560071", // Indiranagar, HAL - 4.99 km
+    ]
+  },
+  {
+    zone_id: "BANGALORE_ZONE2",
+    name: "Bangalore Extended (5-10km)",
+    description: "Frazer Town, Malleshwaram, Koramangala East, JP Nagar - GPS verified 5-10km",
+    pricing: { fixed_time: 99, midnight: 199, express: 299 },
+    pincodes: [
+      // GPS VERIFIED - 5-10km from 560027 (Richmond Town)
+      "560005", // Frazer Town, Cox Town - 5.02 km
+      "560003", // Kodandarampura, Malleshwaram - 5.12 km
+      "560038", // Indiranagar - 5.54 km
+      "560034", // Koramangala East - 5.88 km
+      "560010", // Manjunath Nagar, Rajajinagar - 6.01 km
+      "560075", // HAL 2nd Stage - 7.01 km
+      "560017", // HAL Airport - 7.35 km
+      "560068", // BTM Layout 2nd Stage - 8.27 km
+      "560076", // Arakere, JP Nagar - 8.66 km
+      "560043", // Kalyan Nagar, HRBR Layout - 8.89 km
+    ]
+  },
 ];
 
 async function seedDeliveryZones() {

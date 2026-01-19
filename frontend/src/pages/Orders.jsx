@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Package, Loader2, ChevronRight, ChevronDown, ChevronUp, MapPin, Calendar, IndianRupee, ShoppingBag, CheckCircle2, Circle } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
+import { orderAPI } from "../api"
 
 export default function Orders() {
   const navigate = useNavigate()
@@ -19,28 +20,14 @@ export default function Orders() {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("token")
-      const headers = {
-        "Content-Type": "application/json",
-      }
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`
-      }
-
-      const response = await fetch("/api/v1/order/myOrder", {
-        method: "GET",
-        headers,
-        credentials: "include",
-      })
+      const { response, data } = await orderAPI.getMyOrders()
 
       if (response.ok) {
-        const data = await response.json()
         // Handle different response structures
         const ordersData = data.data || data.orders || data || []
         setOrders(Array.isArray(ordersData) ? ordersData : [])
       } else {
-        const errorData = await response.json()
-        setError(errorData.message || "Failed to fetch orders")
+        setError(data.message || "Failed to fetch orders")
       }
     } catch (err) {
       console.error("Error fetching orders:", err)

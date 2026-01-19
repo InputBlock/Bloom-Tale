@@ -4,7 +4,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import helmet from "helmet"
 import compression from "compression"
-// import { generalLimiter } from "./middlewares/rateLimiter.middleware.js"
+// import { generalLimiter, authLimiter, cartLimiter, orderLimiter } from "./middlewares/rateLimiter.middleware.js"
 
 const app = express()
 
@@ -25,7 +25,7 @@ app.use(cors({
     credentials: true
 }))
 
-// Rate limiting (enable in production)
+// Rate limiting disabled for testing
 // app.use(generalLimiter)
 
 app.use(express.json({ limit: "16kb" }))
@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 import authRoutes from "./route/auth.route.js"
 import adminRoutes from "./route/admin.route.js"
 
-// Apply strict auth rate limiting to login/register routes
+// Rate limiting disabled for testing
 app.use("/api/v1", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 
@@ -49,7 +49,7 @@ import productRoutes from "./route/product.route.js"
 app.use("/api/v1/getProductDetail",productRoutes)
 
 import cartRoutes from "./route/cart.route.js"
-//  Apply cart rate limiting
+// Rate limiting disabled for testing
 app.use("/api/v1/cart", cartRoutes)
 
 import getProductRoutes from "./route/getProduct.route.js"
@@ -57,7 +57,7 @@ app.use("/api/v1/getProduct",getProductRoutes)
 app.use("/api/v1/getList", getProductRoutes)
 
 import orderRoutes from "./route/order.route.js"
-//  Apply order rate limiting
+// Rate limiting disabled for testing
 app.use("/api/v1/order", orderRoutes)
 
 import testimonialRoutes from "./route/testimonial.route.js"

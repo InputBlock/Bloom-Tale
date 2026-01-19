@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { API_ENDPOINTS } from "../../config/api"
+import { heroAPI } from "../../api"
 
 export default function HeroSectionList({ sections, loading, onEdit, onDelete }) {
   const [deleting, setDeleting] = useState(null)
@@ -9,15 +9,7 @@ export default function HeroSectionList({ sections, loading, onEdit, onDelete })
 
     setDeleting(id)
     try {
-      const response = await fetch(API_ENDPOINTS.DELETE_HERO_SECTION(id), {
-        method: "DELETE",
-        credentials: "include",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete")
-      }
-
+      await heroAPI.delete(id)
       onDelete()
     } catch (error) {
       console.error("Delete failed:", error)

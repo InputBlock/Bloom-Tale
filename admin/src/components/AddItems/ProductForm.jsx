@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import axios from "axios"
+import { productsAPI } from "../../api"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
 
@@ -49,7 +49,6 @@ export default function ProductForm({ images, setImages }) {
     setLoading(true)
 
     try {
-      const token = localStorage.getItem("adminToken")
       const isSinglePrice = SINGLE_PRICE_CATEGORIES.includes(formData.type)
       
       // Create FormData for multipart/form-data
@@ -79,16 +78,7 @@ export default function ProductForm({ images, setImages }) {
         })
       }
 
-      await axios.post(
-        "/api/v1/admin/add",
-        formDataToSend,
-        {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      )
+      await productsAPI.add(formDataToSend)
 
       setMessage({ type: "success", text: "Product added successfully!" })
       // Reset form

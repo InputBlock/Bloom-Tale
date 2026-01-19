@@ -12,6 +12,8 @@ export default defineConfig({
         target: process.env.VITE_ADMIN_API_BASE_URL || 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
+        // Required for cookies to work with proxy
+        cookieDomainRewrite: 'localhost',
       },
     },
   },

@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react"
 import { Plus, Loader2, MapPin } from "lucide-react"
-import axios from "axios"
+import { deliveryAPI } from "../../api"
 import ZoneCard from "./ZoneCard"
 import ZoneModal from "./ZoneModal"
 import AddPincodesModal from "./AddPincodesModal"
-
-const API_URL = "/api/v1/delivery"
 
 export default function ZonesTable() {
   const [zones, setZones] = useState([])
@@ -27,7 +25,7 @@ export default function ZonesTable() {
   const fetchZones = async () => {
     try {
       setLoading(true)
-      const res = await axios.get(`${API_URL}/zones`)
+      const res = await deliveryAPI.getAllZones()
       if (res.data?.data?.zones) {
         setZones(res.data.data.zones)
       }
@@ -40,7 +38,7 @@ export default function ZonesTable() {
 
   const fetchZoneDetails = async (zoneId) => {
     try {
-      const res = await axios.get(`${API_URL}/zones/${zoneId}`)
+      const res = await deliveryAPI.getZoneById(zoneId)
       return res.data?.data
     } catch (err) {
       return null
@@ -62,9 +60,9 @@ export default function ZonesTable() {
     setSaving(true)
     try {
       if (isEdit) {
-        await axios.put(`${API_URL}/zones/${data.zone_id}`, data)
+        await deliveryAPI.updateZone(data.zone_id, data)
       } else {
-        await axios.post(`${API_URL}/zones`, data)
+        await deliveryAPI.createZone(data)
       }
       setShowModal(false)
       setEditingZone(null)
@@ -79,7 +77,7 @@ export default function ZonesTable() {
   const handleAddPincodes = async (zoneId, pincodes) => {
     setSaving(true)
     try {
-      await axios.post(`${API_URL}/zones/${zoneId}/pincodes`, { pincodes })
+      await deliveryAPI.addPincodes(zoneId, pincodes)
       setAddPincodesZone(null)
       fetchZones()
       if (expandedZone === zoneId) {
@@ -96,9 +94,7 @@ export default function ZonesTable() {
   const handleRemovePincode = async (zoneId, pincode) => {
     if (!confirm(`Remove ${pincode}?`)) return
     try {
-      await axios.delete(`${API_URL}/zones/${zoneId}/pincodes`, { 
-        data: { pincodes: [pincode] }
-      })
+      await deliveryAPI.removePincodes(zoneId, [pincode])
       fetchZones()
       if (expandedZone === zoneId) {
         const data = await fetchZoneDetails(zoneId)
@@ -112,7 +108,7 @@ export default function ZonesTable() {
   const handleDelete = async (zoneId) => {
     if (!confirm(`Delete zone ${zoneId}?`)) return
     try {
-      await axios.delete(`${API_URL}/zones/${zoneId}`)
+      await deliveryAPI.deleteZone(zoneId)
       fetchZones()
     } catch (err) {
       alert("Failed to delete zone")
@@ -121,7 +117,7 @@ export default function ZonesTable() {
 
   const handleToggleActive = async (zone) => {
     try {
-      await axios.put(`${API_URL}/zones/${zone.id}`, { isActive: !zone.isActive })
+      await deliveryAPI.updateZone(zone.id, { isActive: !zone.isActive })
       fetchZones()
     } catch (err) {
       alert("Failed to update status")

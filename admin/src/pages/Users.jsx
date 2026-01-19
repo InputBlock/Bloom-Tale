@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import axios from "axios"
+import { usersAPI } from "../api"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   Mail, 
@@ -30,10 +30,7 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("adminToken")
-      const response = await axios.get("/api/v1/admin/users", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await usersAPI.getAll()
       setUsers(response.data.data.users || [])
     } catch (error) {
       console.error("Error fetching users:", error)
@@ -46,10 +43,7 @@ export default function Users() {
     setModalLoading(true)
     setShowModal(true)
     try {
-      const token = localStorage.getItem("adminToken")
-      const response = await axios.get(`/api/v1/admin/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await usersAPI.getById(userId)
       setSelectedUser(response.data.data)
     } catch (error) {
       console.error("Error fetching user details:", error)
@@ -60,10 +54,7 @@ export default function Users() {
 
   const deleteUser = async (userId) => {
     try {
-      const token = localStorage.getItem("adminToken")
-      await axios.delete(`/api/v1/admin/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await usersAPI.delete(userId)
       setUsers(users.filter(u => u._id !== userId))
       setShowDeleteConfirm(null)
     } catch (error) {

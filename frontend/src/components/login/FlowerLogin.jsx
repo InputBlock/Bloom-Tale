@@ -4,6 +4,7 @@ import { Eye, EyeOff, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlowerScene } from "./flowers";
 import ErrorMessage from "../common/ErrorMessage";
+import { authAPI } from "../../api";
 
 // Email validation helper
 const isValidEmail = (email) => {
@@ -335,23 +336,7 @@ export default function FlowerLogin() {
     setLoginState("typing");
 
     try {
-      const response = await fetch("/api/v1/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        data = { message: text || "Server error occurred" };
-      }
+      const { response, data } = await authAPI.login(email, password);
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
@@ -381,7 +366,7 @@ export default function FlowerLogin() {
   }, [email, password, navigate, redirectUrl]);
 
   const handleGoogleLogin = useCallback(() => {
-    window.location.href = "/api/v1/google";
+    authAPI.googleLogin();
   }, []);
 
   return (

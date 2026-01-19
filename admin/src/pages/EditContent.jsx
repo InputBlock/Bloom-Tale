@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { API_ENDPOINTS } from "../config/api"
+import { heroAPI } from "../api"
 import HeroSectionForm from "../components/EditContent/HeroSectionForm"
 import HeroSectionList from "../components/EditContent/HeroSectionList"
 
@@ -11,12 +11,9 @@ export default function EditContent() {
   const fetchHeroSections = async () => {
     try {
       setLoading(true)
-      const response = await fetch(API_ENDPOINTS.GET_HERO_SECTIONS, {
-        credentials: "include",
-      })
-      const result = await response.json()
+      const response = await heroAPI.getAll()
       // Handle ApiResponse format: { statusCode, data, message }
-      const sections = result.data || result
+      const sections = response.data?.data || response.data || []
       setHeroSections(Array.isArray(sections) ? sections : [])
     } catch (error) {
       console.error("Failed to fetch hero sections:", error)

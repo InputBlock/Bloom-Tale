@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react"
 import { Eye, MoreHorizontal, Loader2 } from "lucide-react"
-import axios from "axios"
+import { ordersAPI } from "../../api"
 import OrderStatusBadge from "./OrderStatusBadge"
 import OrderDetailsModal from "./OrderDetailsModal"
-
-const API_URL = "/api/v1/admin"
 
 export default function OrdersTable() {
   const [selectedOrder, setSelectedOrder] = useState(null)
@@ -17,9 +15,7 @@ export default function OrdersTable() {
   const fetchOrders = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_URL}/orders`, {
-        withCredentials: true
-      })
+      const response = await ordersAPI.getAll()
       if (response.data?.data?.orders) {
         setOrders(response.data.data.orders)
       }
@@ -71,9 +67,7 @@ export default function OrdersTable() {
   // Update order status
   const updateOrderStatus = async (orderId, status) => {
     try {
-      await axios.patch(`${API_URL}/orders/${orderId}/status`, { status }, {
-        withCredentials: true
-      })
+      await ordersAPI.updateStatus(orderId, status)
       fetchOrders() // Refresh orders
     } catch (err) {
       console.error("Error updating order:", err)

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, Home, Plus, Phone, MapPin, User, ChevronRight } from "lucide-react"
+import { orderAPI } from "../../api"
 
 export default function DeliveryDetails({ formData, handleInputChange, onSubmit }) {
   const [loading, setLoading] = useState(false)
@@ -14,22 +15,9 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
   useEffect(() => {
     const fetchSavedAddresses = async () => {
       try {
-        const token = localStorage.getItem("token")
-        const headers = {
-          "Content-Type": "application/json",
-        }
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`
-        }
-
-        const response = await fetch("/api/v1/order/getaddress", {
-          method: "POST",
-          headers,
-          credentials: "include",
-        })
+        const { response, data } = await orderAPI.getAddress()
 
         if (response.ok) {
-          const data = await response.json()
           // Handle different response structures
           const addresses = data.data || data.addresses || data || []
           setSavedAddresses(Array.isArray(addresses) ? addresses : [])
@@ -74,45 +62,19 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
     setError("")
 
     try {
-      // Get token from localStorage for auth
-      const token = localStorage.getItem("token")
-      const headers = {
-        "Content-Type": "application/json",
-      }
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`
-      }
-
-      const response = await fetch("/api/v1/order/checkout", {
-        method: "POST",
-        headers,
-        credentials: "include",
-        body: JSON.stringify({
-          address: {
-            fullName: formData.recipientName,
-            email: formData.email,
-            mobile: formData.mobileNumber,
-            house: formData.apartment,
-            street: formData.streetAddress,
-            city: formData.city,
-            state: formData.state,
-            pincode: formData.pincode,
-            addressTag: formData.addressTag || "Home",
-          }
-        }),
+      const { response, data } = await orderAPI.checkout({
+        address: {
+          fullName: formData.recipientName,
+          email: formData.email,
+          mobile: formData.mobileNumber,
+          house: formData.apartment,
+          street: formData.streetAddress,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          addressTag: formData.addressTag || "Home",
+        }
       })
-
-      // Get response text first, then try to parse as JSON
-      const responseText = await response.text()
-      let data
-      
-      try {
-        data = JSON.parse(responseText)
-      } catch (parseError) {
-        // If not JSON, show the text response or a generic error
-        console.error("Non-JSON response:", responseText)
-        throw new Error(responseText || "Server error. Please try again.")
-      }
 
       if (!response.ok) {
         // Show the actual backend error message
