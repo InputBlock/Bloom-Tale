@@ -1,6 +1,39 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
+
+const comboSubItemSchema = new Schema(
+  {
+    product: {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+    },
+    product_id: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: String,
+      default: null,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    price: {
+      type: Number, // snapshot price
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
+
 const cartItemSchema = new Schema({
   product: {
     type: Schema.Types.ObjectId,
@@ -29,17 +62,16 @@ const cartItemSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  name: {
+  comboName: {
     type: String,
     required: false, // Name for combo packages
   },
   combo_items: {
-    type: Array,
-    required: false, // Array of items in the combo
+    type: [comboSubItemSchema], // ✅ STRUCTURED
+    required: false,
   },
   delivery_pincode: {
     type: String,
-    required: false,
   },
   delivery_charge: {
     type: Number,
@@ -59,6 +91,8 @@ const cartItemSchema = new Schema({
   },
 });
 
+
+
 const cartSchema = new Schema(
   {
     user: {
@@ -75,7 +109,7 @@ const cartSchema = new Schema(
     },
     items: [cartItemSchema],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Cart", cartSchema);
