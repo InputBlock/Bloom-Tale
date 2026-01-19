@@ -1,13 +1,15 @@
 import Header from "../../components/common/Header"
 import Footer from "../../components/common/Footer"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowUp, X } from "lucide-react"
+import { X } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
+import { weddingServicesData, weddingGalleryData } from "./WeddingServices"
+import { socialServicesData, socialGalleryData } from "./SocialEvents"
+import { corporateServicesData, corporateGalleryData } from "./CorporateEvents"
 
 export default function Services() {
   const [searchParams] = useSearchParams()
-  const [showScrollTop, setShowScrollTop] = useState(false)
   const [activeTab, setActiveTab] = useState("wedding")
   const [showAll, setShowAll] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -24,15 +26,6 @@ export default function Services() {
     subject: "",
     message: ""
   })
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 500)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   useEffect(() => {
     // Check URL parameters for tab
@@ -52,7 +45,6 @@ export default function Services() {
   useEffect(() => {
     const activeServices = getActiveServices()
     const visibleCount = showAll ? activeServices.length : Math.min(2, activeServices.length)
-    const galleryLength = 8 // Number of images per service
     
     // Initialize indexes for all visible services
     const newIndexes = {}
@@ -68,6 +60,9 @@ export default function Services() {
     // Set up intervals for auto-advancing
     const intervals = []
     for (let i = 0; i < visibleCount; i++) {
+      const service = activeServices[i]
+      const galleryLength = service?.images?.length || 4
+      
       const interval = setInterval(() => {
         setActiveMainImageIndexes(prev => ({
           ...prev,
@@ -79,10 +74,6 @@ export default function Services() {
     
     return () => intervals.forEach(interval => clearInterval(interval))
   }, [activeTab, showAll])
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
 
   const openModal = (service) => {
     setSelectedService(service)
@@ -169,157 +160,28 @@ export default function Services() {
     }
   }
 
-  const weddingServices = [
-    {
-      title: "Wedding Theme Designing & Setup",
-      description: "Transform your vision into reality with our expert theme design and comprehensive setup services, ensuring every detail reflects your unique love story.",
-      image: "/wedding-theme.jpg"
-    },
-    {
-      title: "Let Us Manage Your Wedding Moments",
-      description: "Share your love story beautifully with our comprehensive social media management service. We create a dedicated Instagram page for your wedding, curate stunning content from pre-wedding to post-wedding moments, and assist you throughout your journey. Let us capture and showcase every magical moment of your celebration.",
-      image: "/services/social-media.jpg"
-    },
-    {
-      title: "Catering",
-      description: "Delight your guests with exquisite culinary experiences, featuring customized menus and presentation that matches your wedding's elegance.",
-      image: "/services/catering.jpg"
-    },
-    {
-      title: "Transportation",
-      description: "Ensure seamless arrivals and departures with our premium transportation services, from vintage cars to luxury vehicles.",
-      image: "/services/transportation.jpg"
-    },
-    {
-      title: "Photography",
-      description: "Capture every precious moment with our professional photography services, creating timeless memories you'll cherish forever.",
-      image: "/services/photography.jpg"
-    },
-    {
-      title: "Gifting & Hampers",
-      description: "Express gratitude with thoughtfully curated gift hampers and favors that leave a lasting impression on your guests.",
-      image: "/services/gifting.jpg"
-    },
-    {
-      title: "Bridal Makeup (MUA Services)",
-      description: "Look absolutely stunning on your special day with our professional makeup artists who specialize in bridal beauty.",
-      image: "/services/bridal-makeup.jpg"
-    },
-    {
-      title: "Location Scouting",
-      description: "Discover the perfect venue that matches your dreams, with our expert location scouting and recommendation services.",
-      image: "/services/location-scouting.jpg"
-    }
-  ]
+  // Use imported data from separate service files
+  const weddingServices = weddingServicesData.map(service => ({
+    title: service.title,
+    description: service.description,
+    images: service.images || []
+  }))
 
-  const socialServices = [
-    {
-      title: "Birthday Parties",
-      description: "Create unforgettable birthday celebrations with themed decorations, entertainment, and personalized touches that make every milestone special.",
-      image: "/services/birthday.jpg"
-    },
-    {
-      title: "Anniversaries",
-      description: "Celebrate love and commitment with elegant anniversary setups that honor your journey together with sophistication and style.",
-      image: "/services/anniversary.jpg"
-    },
-    {
-      title: "Baby Showers",
-      description: "Welcome new beginnings with adorable baby shower arrangements featuring delicate decorations and memorable moments.",
-      image: "/services/baby-shower.jpg"
-    },
-    {
-      title: "Cultural & Community Events",
-      description: "Celebrate traditions and bring communities together with festive decorations for Diwali, Christmas, and other cultural occasions.",
-      image: "/services/cultural-events.jpg"
-    },
-    {
-      title: "Social Cause Events",
-      description: "Make a difference with impactful awareness programs and NGO events that inspire positive change in the community.",
-      image: "/services/social-cause.jpg"
-    }
-  ]
+  const socialServices = socialServicesData.map(service => ({
+    title: service.title,
+    description: service.description,
+    images: service.images || []
+  }))
 
-  const corporateServices = [
-    {
-      title: "Employee Engagement Programs",
-      description: "Boost team morale and productivity with engaging corporate events designed to inspire collaboration and celebrate achievements.",
-      image: "/services/employee-engagement.jpg"
-    },
-    {
-      title: "Training & Workshops",
-      description: "Facilitate professional development with well-organized training sessions and interactive workshops in inspiring environments.",
-      image: "/services/training.jpg"
-    },
-    {
-      title: "Brand Activations",
-      description: "Create immersive brand experiences that engage audiences and build lasting connections with your target market.",
-      image: "/services/brand-activation.jpg"
-    },
-    {
-      title: "Award Nights",
-      description: "Honor excellence and achievement with glamorous award ceremonies that recognize and celebrate outstanding performance.",
-      image: "/services/award-nights.jpg"
-    },
-    {
-      title: "Corporate Offsites",
-      description: "Strengthen team bonds and foster innovation with memorable offsite retreats in stunning locations.",
-      image: "/services/offsites.jpg"
-    },
-    {
-      title: "Conference & Seminars",
-      description: "Execute professional conferences and seminars with state-of-the-art facilities and seamless coordination.",
-      image: "/services/conference.jpg"
-    },
-    {
-      title: "Product Launches",
-      description: "Make a lasting impression with spectacular product launch events that showcase your brand's innovation and excellence.",
-      image: "/services/product-launch.jpg"
-    },
-    {
-      title: "Annual Day & Gala Dinner",
-      description: "Host prestigious corporate gatherings with sophisticated themes, premium entertainment, and flawless execution.",
-      image: "/services/gala-dinner.jpg"
-    },
-    {
-      title: "ATL & BTL Events",
-      description: "Execute impactful above-the-line and below-the-line marketing campaigns with innovative strategies and memorable brand experiences.",
-      image: "/services/atl-btl.jpg"
-    }
-  ]
+  const corporateServices = corporateServicesData.map(service => ({
+    title: service.title,
+    description: service.description,
+    images: service.images || []
+  }))
 
-  const weddingGallery = [
-    { id: 1, image: "/gallery/wedding-1.jpg", alt: "Wedding Ceremony" },
-    { id: 2, image: "/gallery/wedding-2.jpg", alt: "Wedding Couple" },
-    { id: 3, image: "/gallery/wedding-3.jpg", alt: "Wedding Venue" },
-    { id: 4, image: "/gallery/wedding-4.jpg", alt: "Wedding Decor" },
-    { id: 5, image: "/gallery/wedding-5.jpg", alt: "Wedding Stage" },
-    { id: 6, image: "/gallery/wedding-6.jpg", alt: "Wedding Couple Portrait" },
-    { id: 7, image: "/gallery/wedding-7.jpg", alt: "Wedding Reception" },
-    { id: 8, image: "/gallery/wedding-8.jpg", alt: "Wedding Table Setup" }
-  ]
-
-  const socialGallery = [
-    { id: 1, image: "/gallery/social-1.jpg", alt: "Birthday Party" },
-    { id: 2, image: "/gallery/social-2.jpg", alt: "Anniversary Celebration" },
-    { id: 3, image: "/gallery/social-3.jpg", alt: "Baby Shower" },
-    { id: 4, image: "/gallery/social-4.jpg", alt: "Cultural Event" },
-    { id: 5, image: "/gallery/social-5.jpg", alt: "Social Gathering" },
-    { id: 6, image: "/gallery/social-6.jpg", alt: "Party Decor" },
-    { id: 7, image: "/gallery/social-7.jpg", alt: "Event Setup" },
-    { id: 8, image: "/gallery/social-8.jpg", alt: "Celebration" }
-  ]
-
-  const corporateGallery = [
-    { id: 1, image: "/gallery/corporate-1.jpg", alt: "Corporate Event" },
-    { id: 2, image: "/gallery/corporate-2.jpg", alt: "Conference" },
-    { id: 3, image: "/gallery/corporate-3.jpg", alt: "Product Launch" },
-    { id: 4, image: "/gallery/corporate-4.jpg", alt: "Award Night" },
-    { id: 5, image: "/gallery/corporate-5.jpg", alt: "Corporate Gala" },
-    { id: 6, image: "/gallery/corporate-6.jpg", alt: "Brand Activation" },
-    { id: 7, image: "/gallery/corporate-7.jpg", alt: "Corporate Offsite" },
-    { id: 8, image: "/gallery/corporate-8.jpg", alt: "Training Workshop" }
-  ]
+  const weddingGallery = weddingGalleryData
+  const socialGallery = socialGalleryData
+  const corporateGallery = corporateGalleryData
 
   const getActiveServices = () => {
     switch(activeTab) {
@@ -342,23 +204,6 @@ export default function Services() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fafafa] via-white to-[#f5f5f5]">
       <Header />
-
-      {/* Scroll to Top Button */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.3 }}
-            onClick={scrollToTop}
-            className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 w-11 h-11 sm:w-12 sm:h-12 bg-[#3e4026] hover:bg-[#2d2f1c] rounded-sm flex items-center justify-center shadow-lg transition-all active:scale-95"
-            aria-label="Scroll to top"
-          >
-            <ArrowUp size={18} className="sm:w-5 sm:h-5 text-white" />
-          </motion.button>
-        )}
-      </AnimatePresence>
 
       {/* Services Section */}
       <section className="pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 bg-transparent">
@@ -433,18 +278,23 @@ export default function Services() {
               {/* Subcategories with Numbered Sections */}
               <div className="space-y-14 sm:space-y-16 md:space-y-20">
                 {getActiveServices().slice(0, showAll ? undefined : 2).map((service, index) => {
-                  // Create unified gallery images array for this service
-                  const galleryImages = [1, 2, 3, 4, 5, 6, 7, 8]
+                  // Get images for this service (defaulting to 4 images)
+                  const serviceImages = service.images || []
+                  const galleryLength = serviceImages.length || 4
                   
                   const currentImageIndex = activeMainImageIndexes[index] || 0
                   
                   // Calculate which thumbnails to show (4 at a time, centered around current image)
                   const getThumbnailRange = () => {
-                    const startIdx = Math.max(0, Math.min(currentImageIndex - 1, galleryImages.length - 4))
-                    return galleryImages.slice(startIdx, startIdx + 4).map((img, idx) => ({
-                      imageNum: img,
-                      globalIndex: startIdx + idx
-                    }))
+                    const startIdx = Math.max(0, Math.min(currentImageIndex - 1, galleryLength - 4))
+                    const thumbnails = []
+                    for (let i = 0; i < Math.min(4, galleryLength); i++) {
+                      thumbnails.push({
+                        imageNum: startIdx + i + 1,
+                        globalIndex: startIdx + i
+                      })
+                    }
+                    return thumbnails
                   }
                   
                   const visibleThumbnails = getThumbnailRange()
@@ -510,7 +360,18 @@ export default function Services() {
                                           : 'hover:ring-1 hover:ring-gray-300'
                                       }`}
                                     >
-                                      <div className="w-full h-full flex items-center justify-center">
+                                      {serviceImages[thumb.globalIndex] ? (
+                                        <img 
+                                          src={serviceImages[thumb.globalIndex]} 
+                                          alt={`${service.title} thumbnail ${thumb.imageNum}`}
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => {
+                                            e.target.style.display = 'none'
+                                            e.target.nextElementSibling.style.display = 'flex'
+                                          }}
+                                        />
+                                      ) : null}
+                                      <div className={`w-full h-full flex items-center justify-center ${serviceImages[thumb.globalIndex] ? 'hidden' : ''}`}>
                                         <span className={`text-xs sm:text-sm ${
                                           currentImageIndex === thumb.globalIndex 
                                             ? 'text-[#3e4026] font-semibold' 
@@ -527,7 +388,7 @@ export default function Services() {
                             
                             {/* Progress Indicator */}
                             <div className="flex justify-center gap-1.5 mt-2 sm:mt-3">
-                              {galleryImages.map((_, imgIdx) => (
+                              {Array.from({ length: galleryLength }).map((_, imgIdx) => (
                                 <button
                                   key={imgIdx}
                                   onClick={() => setActiveMainImageIndexes(prev => ({ ...prev, [index]: imgIdx }))}
@@ -554,9 +415,20 @@ export default function Services() {
                               transition={{ duration: 0.4, ease: "easeInOut" }}
                               className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f3f0] to-[#e8e6e2]"
                             >
-                              {/* Placeholder - replace with actual images */}
-                              <div className="text-center">
-                                <p className="text-gray-400 text-base">{service.title} - {galleryImages[currentImageIndex]}</p>
+                              {/* Display actual image if available */}
+                              {serviceImages[currentImageIndex] ? (
+                                <img 
+                                  src={serviceImages[currentImageIndex]} 
+                                  alt={`${service.title} - ${currentImageIndex + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.target.style.display = 'none'
+                                    e.target.nextElementSibling.style.display = 'flex'
+                                  }}
+                                />
+                              ) : null}
+                              <div className={`text-center ${serviceImages[currentImageIndex] ? 'hidden' : 'flex'} items-center justify-center w-full h-full`}>
+                                <p className="text-gray-400 text-base">{service.title} - {currentImageIndex + 1}</p>
                               </div>
                             </motion.div>
                           </AnimatePresence>
@@ -568,7 +440,7 @@ export default function Services() {
                               <button
                                 onClick={() => setActiveMainImageIndexes(prev => ({ 
                                   ...prev, 
-                                  [index]: (prev[index] - 1 + galleryImages.length) % galleryImages.length 
+                                  [index]: (prev[index] - 1 + galleryLength) % galleryLength 
                                 }))}
                                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
                                 aria-label="Previous image"
@@ -580,14 +452,14 @@ export default function Services() {
                               
                               {/* Title with Image Number */}
                               <span className="text-xs sm:text-sm md:text-base text-[#3e4026] font-medium tracking-wide truncate">
-                                {service.title} - {galleryImages[currentImageIndex]}
+                                {service.title} - {currentImageIndex + 1}
                               </span>
                               
                               {/* Next Arrow */}
                               <button
                                 onClick={() => setActiveMainImageIndexes(prev => ({ 
                                   ...prev, 
-                                  [index]: (prev[index] + 1) % galleryImages.length 
+                                  [index]: (prev[index] + 1) % galleryLength 
                                 }))}
                                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-300 hover:border-[#3e4026] flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
                                 aria-label="Next image"

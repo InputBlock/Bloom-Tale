@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import Services from './pages/Services/Services'
-import WeddingServicesPage from './pages/Services/WeddingServicesPage'
+import WeddingServices from './pages/Services/WeddingServices'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import ForgotPassword from './pages/ForgotPassword'
@@ -31,7 +31,7 @@ function App() {
             <Route path="/" element={<Landing/>} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/services" element={<Services />} />
-            <Route path="/services/wedding" element={<WeddingServicesPage />} />
+            <Route path="/services/wedding" element={<WeddingServices />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
