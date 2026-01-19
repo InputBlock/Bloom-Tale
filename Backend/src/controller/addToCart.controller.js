@@ -44,6 +44,8 @@ export const addToCart = asyncHandler(async (req, res) => {
   // }
   
   // 🔹 Price calculation ONLY from DB
+
+  let price;
   if (product.product_type === "sized") {
     if (!size || !product.pricing[size]) {
       throw new ApiError(400, "Invalid size selected");

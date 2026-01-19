@@ -16,11 +16,10 @@ export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { address } = req.body;
 
-  const user = await User.findById(userId)
+  const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
 
   if (!address) {
     throw new ApiError(400, "Delivery address is required");
@@ -33,14 +32,18 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   //  Calculate totals
   let totalAmount = 0;
+
   cart.items.forEach((item) => {
-    totalAmount += item.price * item.quantity;
+    if (item.isCombo) {
+      totalAmount += item.price; // combo final price
+    } else {
+      totalAmount += item.price * item.quantity;
+    }
   });
 
- await User.findByIdAndUpdate(userId, {
-    $set: { addresses: [address] }
+  await User.findByIdAndUpdate(userId, {
+    $set: { addresses: [address] },
   });
-
 
   // 📦 Create order (CART → ORDER snapshot)
   const order = await Order.create({
@@ -51,8 +54,14 @@ export const createOrder = asyncHandler(async (req, res) => {
     items: cart.items.map((item) => ({
       product: item.product,
       product_id: item.product_id,
+      name: item.name,
       quantity: item.quantity,
       price: item.price,
+      isCombo: item.isCombo,
+      combo_items: item.isCombo ? item.combo_items : undefined,
+      subtotal: item.subtotal,
+      discount: item.discount,
+      discount_percentage: item.discount_percentage,
     })),
     deliveryAddress: address,
     totalAmount,
@@ -113,9 +122,9 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
 
   await order.save();
 
-   // 🧹 Clear cart
+  // 🧹 Clear cart
   await Cart.findOneAndUpdate({ user: userId }, { items: [] });
-  
+
   return res
     .status(200)
     .json(new ApiResponse(200, order, "Payment method updated successfully"));
