@@ -16,11 +16,10 @@ const deliveryZoneSchema = new mongoose.Schema(
     },
     pincodes: [{
       type: String,
-      index: true,
     }],
     pricing: {
-      nextDay: { type: Number, required: true },
-      sameDay: { type: Number, required: true },
+      fixed_time: { type: Number, required: true },
+      midnight : { type: Number, required: true },
       express: { type: Number, required: true },
     },
     isActive: {

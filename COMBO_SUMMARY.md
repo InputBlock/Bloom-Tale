@@ -5,7 +5,7 @@ A complete **Custom Combo Builder** system where users can create personalized g
 
 ---
 
-## ✨ What Makes This Special
+## What Makes This Special
 
 ### 1. **User-Centric Design**
 - **Intuitive Flow**: Browse → Customize → Verify → Deliver → Cart

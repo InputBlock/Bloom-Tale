@@ -7,6 +7,7 @@ import ListItems from './pages/ListItems'
 import Orders from './pages/Orders'
 import Users from './pages/Users'
 import EditContent from './pages/EditContent'
+import DeliveryZones from './pages/DeliveryZones'
 import Login from './pages/Login'
 import './App.css'
 
@@ -49,6 +50,13 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<Users />} />
+        </Route>
+        <Route path="/delivery-zones" element={
+          <ProtectedRoute>
+            <Layout title="Delivery Zones" subtitle="Manage delivery areas and pricing" />
+          </ProtectedRoute>
+        }>
+          <Route index element={<DeliveryZones />} />
         </Route>
         <Route path="/edit-content" element={
           <ProtectedRoute>
