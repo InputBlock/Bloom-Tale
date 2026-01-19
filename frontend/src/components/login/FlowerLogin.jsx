@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlowerScene } from "./flowers";
-import { showToast } from "../common/ToastContainer";
 import ErrorMessage from "../common/ErrorMessage";
 
 // Email validation helper
@@ -12,60 +11,93 @@ const isValidEmail = (email) => {
   return emailRegex.test(email);
 };
 
-// Parse and improve error messages
+// Parse and improve error messages with beautiful, user-friendly descriptions
 const getErrorMessage = (errorMsg) => {
   const msg = errorMsg.toLowerCase();
   
+  // Invalid credentials / wrong password
   if (msg.includes('invalid credentials') || msg.includes('incorrect password') || msg.includes('wrong password')) {
     return {
-      title: 'Invalid Credentials',
-      message: 'The email or password you entered is incorrect. Please try again.',
+      title: 'Incorrect Password',
+      message: 'The password you entered doesn\'t match our records. Please double-check and try again, or reset your password if you\'ve forgotten it.',
       type: 'credentials'
     };
   }
   
-  if (msg.includes('user not found') || msg.includes('email not found') || msg.includes('no user')) {
+  // User not found
+  if (msg.includes('user not found') || msg.includes('email not found') || msg.includes('no user') || msg.includes('account not found')) {
     return {
       title: 'Account Not Found',
-      message: 'We couldn\'t find an account with this email. Would you like to sign up?',
+      message: 'We couldn\'t find an account with this email address. Would you like to create a new account?',
       type: 'notfound',
-      action: { text: 'Create Account', link: '/register' }
+      action: { text: 'Create New Account', link: '/register' }
     };
   }
   
-  if (msg.includes('email') && (msg.includes('invalid') || msg.includes('format'))) {
+  // Invalid email format
+  if (msg.includes('email') && (msg.includes('invalid') || msg.includes('format') || msg.includes('valid email'))) {
     return {
-      title: 'Invalid Email',
-      message: 'Please enter a valid email address.',
+      title: '✉️ Invalid Email Format',
+      message: 'Please enter a valid email address (e.g., you@example.com)',
       type: 'email'
     };
   }
   
-  if (msg.includes('network') || msg.includes('fetch')) {
+  // Network/connection errors
+  if (msg.includes('network') || msg.includes('fetch') || msg.includes('connection') || msg.includes('offline')) {
     return {
-      title: 'Connection Error',
-      message: 'Unable to connect to the server. Please check your internet connection.',
+      title: 'Connection Problem',
+      message: 'We\'re having trouble connecting to our servers. Please check your internet connection and try again.',
       type: 'network'
     };
   }
   
-  if (msg.includes('server error') || msg.includes('500')) {
+  // Server errors (500, 503, etc.)
+  if (msg.includes('server error') || msg.includes('500') || msg.includes('503') || msg.includes('internal server')) {
     return {
-      title: 'Server Error',
-      message: 'Something went wrong on our end. Please try again in a moment.',
+      title: 'Server Issue',
+      message: 'Our servers are experiencing some difficulties right now. We\'re working on it! Please try again in a few moments.',
       type: 'server'
     };
   }
   
+  // Too many attempts / rate limit
+  if (msg.includes('too many') || msg.includes('rate limit') || msg.includes('try again later')) {
+    return {
+      title: 'Too Many Attempts',
+      message: 'You\'ve tried logging in too many times. Please wait a few minutes before trying again to keep your account secure.',
+      type: 'credentials'
+    };
+  }
+  
+  // Account locked/suspended
+  if (msg.includes('locked') || msg.includes('suspended') || msg.includes('disabled')) {
+    return {
+      title: 'Account Restricted',
+      message: 'Your account has been temporarily restricted for security reasons. Please contact support for assistance.',
+      type: 'credentials'
+    };
+  }
+  
+  // Session expired
+  if (msg.includes('session') || msg.includes('expired') || msg.includes('token')) {
+    return {
+      title: 'Session Expired',
+      message: 'Your session has expired for security reasons. Please log in again to continue.',
+      type: 'session-expired'
+    };
+  }
+  
+  // Generic fallback with friendly tone
   return {
-    title: 'Error',
-    message: errorMsg || 'An unexpected error occurred. Please try again.',
+    title: 'Oops! Something Went Wrong',
+    message: errorMsg || 'We encountered an unexpected issue. Please try again, or contact support if the problem persists.',
     type: 'general'
   };
 };
 
-// Handwritten Letter-by-Letter Text Animation Component
-const HandwrittenText = ({ text, delay = 0, className = "", style = {} }) => {
+// Handwritten Letter-by-Letter Text Animation Component (Memoized)
+const HandwrittenText = memo(({ text, delay = 0, className = "", style = {} }) => {
   return (
     <motion.span 
       className={className} 
@@ -91,10 +123,10 @@ const HandwrittenText = ({ text, delay = 0, className = "", style = {} }) => {
       ))}
     </motion.span>
   );
-};
+});
 
-// Welcome Message Component - displays on right side after login success
-const WelcomeAnimation = () => {
+// Welcome Message Component - displays on right side after login success (Memoized)
+const WelcomeAnimation = memo(() => {
   return (
     <motion.div
       className="flex flex-col items-center justify-center h-full"
@@ -217,13 +249,17 @@ const WelcomeAnimation = () => {
       </div>
     </motion.div>
   );
-};
+});
 
 // Creative Flower-themed Login Page
 export default function FlowerLogin() {
+  const timeoutRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/home";
+  
+  // Get redirect URL from query params or location state
+  const searchParams = new URLSearchParams(location.search);
+  const redirectUrl = searchParams.get('redirect') || location.state?.from || "/home";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -233,38 +269,63 @@ export default function FlowerLogin() {
   const [emailError, setEmailError] = useState("");
   const [focusedField, setFocusedField] = useState(null);
   const [loginState, setLoginState] = useState("idle"); // idle, typing, error, success
+  const [userIsTyping, setUserIsTyping] = useState(false); // Track if user is actively typing
 
-  // Reset error when user starts typing
+  // Check for session expired message from sessionStorage
   useEffect(() => {
-    if (error && (email || password)) {
+    const sessionMessage = sessionStorage.getItem('loginMessage');
+    if (sessionMessage) {
+      try {
+        const messageData = JSON.parse(sessionMessage);
+        setError(messageData);
+        sessionStorage.removeItem('loginMessage'); // Clear after reading
+      } catch {
+        // Ignore parsing errors
+      }
+    }
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Reset error when user starts typing AFTER an error occurred
+  useEffect(() => {
+    if (error && userIsTyping) {
       setError(null);
       setLoginState("typing");
+      setUserIsTyping(false); // Reset the flag
     }
-  }, [email, password]);
+  }, [email, password, error, userIsTyping]);
 
   // Validate email on blur
-  const handleEmailBlur = () => {
+  const handleEmailBlur = useCallback(() => {
     setFocusedField(null);
     if (email && !isValidEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError('Please enter a valid email address (e.g., you@example.com)');
     } else {
       setEmailError('');
     }
-  };
+  }, [email]);
 
   // Clear email error on focus
-  const handleEmailFocus = () => {
+  const handleEmailFocus = useCallback(() => {
     setFocusedField("email");
     setEmailError('');
-  };
+  }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     if (!email || !password) return;
 
     // Validate email format before submitting
     if (!isValidEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError('Please enter a valid email address (e.g., you@example.com)');
       return;
     }
 
@@ -304,28 +365,24 @@ export default function FlowerLogin() {
       }
 
       // Wait for welcome animation then redirect (longer delay for text animation)
-      setTimeout(() => {
-        navigate(from);
+      timeoutRef.current = setTimeout(() => {
+        navigate(redirectUrl);
       }, 4500);
 
     } catch (err) {
-      console.error("Login error:", err);
-      const errorInfo = getErrorMessage(err.message);
+      const errorInfo = getErrorMessage(err?.message || "An unexpected error occurred");
       setError(errorInfo);
       setLoginState("error");
       
-      // Reset error state after animation
-      setTimeout(() => {
-        setLoginState("idle");
-      }, 1500);
+      // Don't auto-clear error - let user dismiss it
     } finally {
       setLoading(false);
     }
-  };
+  }, [email, password, navigate, redirectUrl]);
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = useCallback(() => {
     window.location.href = "/api/v1/google";
-  };
+  }, []);
 
   return (
     <div className="min-h-screen flex bg-[#f5f2ed]">
@@ -403,11 +460,30 @@ export default function FlowerLogin() {
             <AnimatePresence mode="wait">
               {error && (
                 <ErrorMessage 
+                  key={error.type + error.message}
                   error={error} 
-                  onClose={() => setError(null)}
+                  onClose={() => {
+                    setError(null);
+                    setLoginState("idle");
+                  }}
                 />
               )}
             </AnimatePresence>
+
+            {/* Session Expired Indicator */}
+            {redirectUrl !== '/home' && !error && (
+              <motion.div
+                className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700 flex items-start gap-2"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <svg className="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <span>You'll be redirected to your previous page after login</span>
+              </motion.div>
+            )}
 
             {/* Email Field */}
             <div>
@@ -418,7 +494,10 @@ export default function FlowerLogin() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) setUserIsTyping(true); // Set flag if there's an error
+                  }}
                   onFocus={handleEmailFocus}
                   onBlur={handleEmailBlur}
                   placeholder="Enter your email"
@@ -432,14 +511,17 @@ export default function FlowerLogin() {
                 />
               </div>
               {emailError && (
-                <motion.p 
-                  className="mt-1.5 text-xs text-red-600 flex items-center gap-1"
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <motion.div
+                  className="mt-2 flex items-start gap-2 bg-red-50/80 border border-red-200/60 rounded-lg p-2.5 backdrop-blur-sm"
+                  initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <span className="inline-block w-1 h-1 rounded-full bg-red-600"></span>
-                  {emailError}
-                </motion.p>
+                  <Mail className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                  <p className="text-xs text-red-700 font-medium leading-relaxed">
+                    {emailError}
+                  </p>
+                </motion.div>
               )}
             </div>
 
@@ -452,7 +534,10 @@ export default function FlowerLogin() {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) setUserIsTyping(true); // Set flag if there's an error
+                  }}
                   onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
                   placeholder="••••••••"

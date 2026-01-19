@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 // Cute eyes for the leaf with always visible mouth
@@ -53,7 +54,7 @@ const LeafEyes = ({ state, cursorAngle }) => {
       >
         <ellipse cx="7" cy="7" rx="5.5" ry={eyeState.squint ? 2.5 : 5.5} fill="white" stroke="#333" strokeWidth="1" />
         <motion.ellipse 
-          cx="7" cy="7" rx="2.5" ry="2.5" fill="#333"
+          cx={7 + pupilOffset} cy={7 + eyeState.pupilY * 0.4} rx="2.5" ry="2.5" fill="#333"
           animate={{ cx: 7 + pupilOffset, cy: 7 + eyeState.pupilY * 0.4 }}
           transition={{ type: "spring", stiffness: 300 }}
         />
@@ -84,7 +85,7 @@ const LeafEyes = ({ state, cursorAngle }) => {
       >
         <ellipse cx="7" cy="7" rx="5.5" ry={eyeState.squint ? 2.5 : 5.5} fill="white" stroke="#333" strokeWidth="1" />
         <motion.ellipse 
-          cx="7" cy="7" rx="2.5" ry="2.5" fill="#333"
+          cx={7 + pupilOffset} cy={7 + eyeState.pupilY * 0.4} rx="2.5" ry="2.5" fill="#333"
           animate={{ cx: 7 + pupilOffset, cy: 7 + eyeState.pupilY * 0.4 }}
           transition={{ type: "spring", stiffness: 300 }}
         />

@@ -1,7 +1,8 @@
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 // Cute Eyes Component for flowers with neutral mouth by default
-const FlowerFace = ({ state, cursorAngle, size = 1 }) => {
+const FlowerFace = ({ state = "idle", cursorAngle = 0, size = 1 }) => {
   const getExpressionState = () => {
     switch (state) {
       case "shy":
@@ -15,13 +16,14 @@ const FlowerFace = ({ state, cursorAngle, size = 1 }) => {
       case "bloom":
         return { eyeScale: 1.15, pupilY: -1, blush: true, sparkle: true, mouthType: "happy" };
       default:
-        // GENTLE SMILE expression by default - good vibes!
-        return { eyeScale: 1, pupilY: 0, blush: false, mouthType: "gentle" };
+        // GENTLE SMILE expression by default - good vibes with subtle blush!
+        return { eyeScale: 1, pupilY: 0, blush: true, mouthType: "gentle", sparkle: false };
     }
   };
 
   const expr = getExpressionState();
-  const pupilOffset = (cursorAngle / 30) * 4;
+  const safeCursorAngle = typeof cursorAngle === 'number' && !isNaN(cursorAngle) ? cursorAngle : 0;
+  const pupilOffset = (safeCursorAngle / 30) * 4;
 
   // Mouth path based on expression
   const getMouthPath = () => {
@@ -84,27 +86,27 @@ const FlowerFace = ({ state, cursorAngle, size = 1 }) => {
             />
             {/* Pupil */}
             <motion.ellipse 
-              cx="14" 
-              cy="13"
-              rx="6" ry="6"
+              cx={14 + pupilOffset} 
+              cy={13 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0)}
+              rx={6} ry={6}
               fill="#2a2a2a"
               animate={{ 
                 cx: 14 + pupilOffset,
-                cy: 13 + expr.pupilY,
+                cy: 13 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0),
               }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             />
             {/* Eye shine - main */}
             <motion.circle 
               cx={16 + pupilOffset * 0.5} 
-              cy={10 + expr.pupilY * 0.5} 
+              cy={10 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0) * 0.5} 
               r="2.5" 
               fill="white" 
             />
             {/* Eye shine - small */}
             <motion.circle 
               cx={12 + pupilOffset * 0.5} 
-              cy={15 + expr.pupilY * 0.5} 
+              cy={15 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0) * 0.5} 
               r="1" 
               fill="white" 
               opacity="0.7"
@@ -177,25 +179,25 @@ const FlowerFace = ({ state, cursorAngle, size = 1 }) => {
               opacity="0.15"
             />
             <motion.ellipse 
-              cx="14" 
-              cy="13"
-              rx="6" ry="6"
+              cx={14 + pupilOffset} 
+              cy={13 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0)}
+              rx={6} ry={6}
               fill="#2a2a2a"
               animate={{ 
                 cx: 14 + pupilOffset,
-                cy: 13 + expr.pupilY,
+                cy: 13 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0),
               }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             />
             <motion.circle 
               cx={16 + pupilOffset * 0.5} 
-              cy={10 + expr.pupilY * 0.5} 
+              cy={10 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0) * 0.5} 
               r="2.5" 
               fill="white" 
             />
             <motion.circle 
               cx={12 + pupilOffset * 0.5} 
-              cy={15 + expr.pupilY * 0.5} 
+              cy={15 + (typeof expr.pupilY === 'number' ? expr.pupilY : 0) * 0.5} 
               r="1" 
               fill="white" 
               opacity="0.7"

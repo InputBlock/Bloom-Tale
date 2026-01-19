@@ -43,10 +43,10 @@ export default function HomePage() {
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 w-11 h-11 sm:w-12 sm:h-12 bg-[#3e4026] hover:bg-[#2d2f1c] active:scale-95 flex items-center justify-center shadow-lg rounded-sm transition-all duration-300"
+            className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-[#3e4026] hover:bg-[#2d2f1c] flex items-center justify-center shadow-lg transition-colors duration-300"
             aria-label="Scroll to top"
           >
-            <ArrowUp size={18} className="sm:w-5 sm:h-5 text-white" />
+            <ArrowUp size={20} className="text-white" />
           </motion.button>
         )}
       </AnimatePresence>

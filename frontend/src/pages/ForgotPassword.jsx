@@ -37,10 +37,10 @@ export default function ForgotPassword() {
 
       setUserEmail(email)
       setStep("otp")
-      showToast("A secret bloomed in your inbox! 🌷", "success")
+      showToast("OTP sent to your email", "success")
       return { success: true }
     } catch (error) {
-      showToast(error.message || "Our garden is taking a nap! 💤", "error")
+      showToast(error.message || "Failed to send OTP", "error")
       return { success: false }
     }
   }
@@ -48,7 +48,7 @@ export default function ForgotPassword() {
   const handleOtpNext = (otp) => {
     setOtpValue(otp)
     setStep("newPassword")
-    showToast("Perfect! Your garden gate is open! 🌻", "success")
+    showToast("OTP verified successfully", "success")
   }
 
   const handlePasswordSubmit = async (password) => {
@@ -74,14 +74,14 @@ export default function ForgotPassword() {
         throw new Error(data.message || "Failed to reset password")
       }
 
-      showToast("Your password is fresh as morning dew! 💐", "success")
+      showToast("Password reset successful", "success")
       setStep("done")
       setTimeout(() => {
         navigate("/login")
       }, 2000)
       return { success: true }
     } catch (error) {
-      showToast(error.message || "This key doesn't fit our garden! 🔑", "error")
+      showToast(error.message || "Failed to reset password", "error")
       return { success: false }
     }
   }
@@ -109,10 +109,10 @@ export default function ForgotPassword() {
         throw new Error(data.message || "Failed to resend OTP")
       }
 
-      showToast("Fresh petals sent to your inbox! 🌺", "success")
+      showToast("OTP resent to your email", "success")
       return { success: true }
     } catch (error) {
-      showToast(error.message || "Couldn't resend the bloom! 🥀", "error")
+      showToast(error.message || "Failed to resend OTP", "error")
       return { success: false }
     }
   }

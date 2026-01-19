@@ -2,7 +2,7 @@ import { motion, useInView } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
 import { Heart, Sparkles, Gift, Play, Pause } from "lucide-react"
 
-const API_URL = import.meta.env.VITE_API_URL || ""
+const API_URL = import.meta.env.VITE_API_BASE_URL || ""
 
 export default function CategoryShowcase() {
   const sectionRef = useRef(null)
