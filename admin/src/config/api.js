@@ -31,4 +31,13 @@ export const API_ENDPOINTS = {
   ADD_HERO_SECTION: `${API_BASE_URL}/api/v1/admin/hero`,
   UPDATE_HERO_SECTION: (id) => `${API_BASE_URL}/api/v1/admin/hero/${id}`,
   DELETE_HERO_SECTION: (id) => `${API_BASE_URL}/api/v1/admin/hero/${id}`,
+
+  // Delivery Zones
+  GET_DELIVERY_ZONES: `${API_BASE_URL}/api/v1/delivery/zones`,
+  GET_ZONE_BY_ID: (id) => `${API_BASE_URL}/api/v1/delivery/zones/${id}`,
+  CREATE_ZONE: `${API_BASE_URL}/api/v1/delivery/zones`,
+  UPDATE_ZONE: (id) => `${API_BASE_URL}/api/v1/delivery/zones/${id}`,
+  ADD_PINCODES: (id) => `${API_BASE_URL}/api/v1/delivery/zones/${id}/pincodes`,
+  REMOVE_PINCODES: (id) => `${API_BASE_URL}/api/v1/delivery/zones/${id}/pincodes`,
+  DELETE_ZONE: (id) => `${API_BASE_URL}/api/v1/delivery/zones/${id}`,
 };

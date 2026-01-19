@@ -3,8 +3,8 @@ import axios from "axios"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
 
-// Categories that use single pricing (no sizes)
-const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos"]
+// Categories that use single pricing (no sizes) - product_type: "simple"
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"]
 
 export default function ProductForm({ images, setImages }) {
   const [formData, setFormData] = useState({
@@ -38,9 +38,9 @@ export default function ProductForm({ images, setImages }) {
     "Anniversary",
     "Forever Flowers",
     "Candles",
+    "Balloons",
     "Premium",
-    "Corporate",
-    "Combos"
+    "Corporate"
   ]
 
   const handleSubmit = async (e) => {

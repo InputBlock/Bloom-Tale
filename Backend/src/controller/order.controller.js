@@ -14,13 +14,12 @@ const generateOrderId = () => {
 
 export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { address } = req.body;
+  const { address, deliveryType: reqDeliveryType, deliveryFee: reqDeliveryFee, deliverySlot: reqDeliverySlot } = req.body;
 
-  const user = await User.findById(userId)
+  const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
 
   if (!address) {
     throw new ApiError(400, "Delivery address is required");
@@ -31,16 +30,42 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Cart is empty");
   }
 
-  //  Calculate totals
+  //  Calculate totals and get delivery info from cart items
   let totalAmount = 0;
+  let cartDeliveryType = "standard";
+  let cartDeliveryFee = 0;
+  let cartDeliverySlot = null;
+  let cartPincode = null;
+
   cart.items.forEach((item) => {
-    totalAmount += item.price * item.quantity;
+    if (item.isCombo) {
+      totalAmount += item.price; // combo final price
+    } else {
+      totalAmount += item.price * item.quantity;
+    }
+    // Get delivery info from first item that has it
+    if (item.deliveryType && cartDeliveryType === "standard") {
+      cartDeliveryType = item.deliveryType;
+    }
+    if (item.delivery_charge && cartDeliveryFee === 0) {
+      cartDeliveryFee = item.delivery_charge;
+    }
+    if (item.deliverySlot && !cartDeliverySlot) {
+      cartDeliverySlot = item.deliverySlot;
+    }
+    if (item.delivery_pincode && !cartPincode) {
+      cartPincode = item.delivery_pincode;
+    }
   });
 
- await User.findByIdAndUpdate(userId, {
-    $set: { addresses: [address] }
-  });
+  // Use request body values if provided, otherwise use cart values
+  const finalDeliveryType = reqDeliveryType || cartDeliveryType || "standard";
+  const finalDeliveryFee = reqDeliveryFee !== undefined ? reqDeliveryFee : cartDeliveryFee;
+  const finalDeliverySlot = reqDeliverySlot || cartDeliverySlot;
 
+  await User.findByIdAndUpdate(userId, {
+    $set: { addresses: [address] },
+  });
 
   // 📦 Create order (CART → ORDER snapshot)
   const order = await Order.create({
@@ -48,13 +73,23 @@ export const createOrder = asyncHandler(async (req, res) => {
     user: userId,
     customerName: user.fullName || address.fullName || "N/A",
     customerEmail: user.email || address.email || "N/A",
+    customerPhone: address.mobile || user.mobile || "N/A",
     items: cart.items.map((item) => ({
       product: item.product,
       product_id: item.product_id,
+      name: item.name,
       quantity: item.quantity,
       price: item.price,
+      isCombo: item.isCombo,
+      combo_items: item.isCombo ? item.combo_items : undefined,
+      subtotal: item.subtotal,
+      discount: item.discount,
+      discount_percentage: item.discount_percentage,
     })),
     deliveryAddress: address,
+    deliveryType: finalDeliveryType,
+    deliveryFee: finalDeliveryFee,
+    deliverySlot: finalDeliverySlot,
     totalAmount,
     status: "PENDING", // payment not done yet
     paymentMethod: null,
@@ -113,9 +148,9 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
 
   await order.save();
 
-   // 🧹 Clear cart
+  // 🧹 Clear cart
   await Cart.findOneAndUpdate({ user: userId }, { items: [] });
-  
+
   return res
     .status(200)
     .json(new ApiResponse(200, order, "Payment method updated successfully"));

@@ -178,23 +178,26 @@ export default function OrdersTable() {
                               setSelectedOrder({
                                 ...order,
                                 id: order.order_id || order._id.slice(-8).toUpperCase(),
-                                customerName: order.user?.fullName || addr?.fullName || "N/A",
-                                email: order.user?.email || addr?.email || "N/A",
-                                phone: order.user?.mobile || addr?.mobile || "N/A",
+                                customerName: order.customerName || order.user?.fullName || addr?.fullName || "N/A",
+                                email: order.customerEmail || order.user?.email || addr?.email || "N/A",
+                                phone: order.customerPhone || addr?.mobile || order.user?.mobile || "N/A",
                                 created: formatDate(order.createdAt),
                                 order_status: order.order_status || "CREATED",
                                 orderStatusColor: getOrderStatusColor(order.order_status || "CREATED"),
                                 paymentStatusColor: getPaymentStatusColor(order.status),
                                 deliveryAddress: addressStr,
+                                deliveryType: order.deliveryType || "standard",
+                                deliverySlot: order.deliverySlot || "",
                                 items: order.items?.map(item => ({
                                   name: item.productName || item.product?.name || "Product",
-                                  description: "",
-                                  price: item.price || 0
+                                  description: item.size ? `Size: ${item.size}` : "",
+                                  price: item.price || 0,
+                                  quantity: item.quantity || 1
                                 })) || [],
                                 subtotal: order.totalAmount || 0,
                                 tax: 0,
-                                deliveryFee: 0,
-                                total: order.totalAmount || 0,
+                                deliveryFee: order.deliveryFee || 0,
+                                total: (order.totalAmount || 0) + (order.deliveryFee || 0),
                                 paymentStatus: order.status === "PAID" ? "Paid" : "Unpaid"
                               })
                             }}
