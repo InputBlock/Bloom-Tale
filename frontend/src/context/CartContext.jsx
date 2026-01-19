@@ -99,6 +99,11 @@ export const CartProvider = ({ children }) => {
         product_id: product.product_id,
         quantity: product.quantity || 1,
         size: product.size || "medium",
+        // Delivery info
+        deliveryType: product.deliveryType || 'standard',
+        deliveryFee: product.deliveryFee || 0,
+        deliverySlot: product.deliverySlot || null,
+        pincode: product.pincode || null,
       }
 
       const response = await fetch("/api/v1/cart/addToCart", {

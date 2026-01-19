@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function DeliveryCheck({ 
   onDeliveryStatusChange, 
@@ -8,7 +8,36 @@ export default function DeliveryCheck({
   const [status, setStatus] = useState(null) // null, 'checking', 'available', 'unavailable'
   const [zone, setZone] = useState(null)
   const [selectedDeliveryType, setSelectedDeliveryType] = useState("fixed")
+  const [selectedSlot, setSelectedSlot] = useState("")
   const [showWarning, setShowWarning] = useState(false)
+
+  // Notify parent when delivery options change
+  useEffect(() => {
+    if (status === 'available' && zone) {
+      const deliveryType = sameDayDelivery ? selectedDeliveryType : "standard"
+      const deliveryFee = getDeliveryFee()
+      onDeliveryStatusChange?.('available', {
+        zone,
+        pincode,
+        deliveryType,
+        deliveryFee,
+        deliverySlot: selectedDeliveryType === "fixed" ? selectedSlot : null
+      })
+    }
+  }, [selectedDeliveryType, selectedSlot, zone, status])
+
+  // Calculate delivery fee based on selected type
+  const getDeliveryFee = () => {
+    if (!zone?.pricing) return 0
+    if (!sameDayDelivery) return 0 // Standard delivery - free or fixed rate
+    
+    switch (selectedDeliveryType) {
+      case "fixed": return zone.pricing.fixed_time || 0
+      case "midnight": return zone.pricing.midnight || 0
+      case "express": return zone.pricing.express || 0
+      default: return 0
+    }
+  }
 
   const handlePincodeChange = (e) => {
     const value = e.target.value.replace(/\D/g, "")
@@ -37,7 +66,16 @@ export default function DeliveryCheck({
       if (data.success && data.data.available) {
         setStatus('available')
         setZone(data.data.zone)
-        onDeliveryStatusChange?.('available', data.data.zone)
+        // Initial callback with zone info
+        const deliveryType = sameDayDelivery ? selectedDeliveryType : "standard"
+        const deliveryFee = sameDayDelivery ? (data.data.zone?.pricing?.fixed_time || 0) : 0
+        onDeliveryStatusChange?.('available', {
+          zone: data.data.zone,
+          pincode,
+          deliveryType,
+          deliveryFee,
+          deliverySlot: null
+        })
       } else {
         setStatus('unavailable')
         setZone(null)
@@ -55,8 +93,20 @@ export default function DeliveryCheck({
     setPincode("")
     setStatus(null)
     setZone(null)
+    setSelectedSlot("")
     setShowWarning(false)
     onDeliveryStatusChange?.(null, null)
+  }
+
+  const handleDeliveryTypeChange = (type) => {
+    setSelectedDeliveryType(type)
+    if (type !== "fixed") {
+      setSelectedSlot("")
+    }
+  }
+
+  const handleSlotChange = (e) => {
+    setSelectedSlot(e.target.value)
   }
 
   // Get today's date formatted
@@ -164,7 +214,7 @@ export default function DeliveryCheck({
           <div className={`grid ${zone.pricing.express > 0 ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
             {/* Fixed Time */}
             <button
-              onClick={() => setSelectedDeliveryType("fixed")}
+              onClick={() => handleDeliveryTypeChange("fixed")}
               className={`p-4 text-left border transition-all ${
                 selectedDeliveryType === "fixed"
                   ? "border-[#3e4026] bg-[#f9f8f6]"
@@ -180,7 +230,7 @@ export default function DeliveryCheck({
 
             {/* Midnight */}
             <button
-              onClick={() => setSelectedDeliveryType("midnight")}
+              onClick={() => handleDeliveryTypeChange("midnight")}
               className={`p-4 text-left border transition-all ${
                 selectedDeliveryType === "midnight"
                   ? "border-[#3e4026] bg-[#f9f8f6]"
@@ -197,7 +247,7 @@ export default function DeliveryCheck({
             {/* Express - Only if available */}
             {zone.pricing.express > 0 && (
               <button
-                onClick={() => setSelectedDeliveryType("express")}
+                onClick={() => handleDeliveryTypeChange("express")}
                 className={`p-4 text-left border transition-all ${
                   selectedDeliveryType === "express"
                     ? "border-[#3e4026] bg-[#f9f8f6]"
@@ -215,14 +265,18 @@ export default function DeliveryCheck({
 
           {/* Time Slot for Fixed Time */}
           {selectedDeliveryType === "fixed" && (
-            <select className="w-full border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-[#3e4026]">
-              <option>Select Time Slot</option>
-              <option>9:00 AM - 11:00 AM</option>
-              <option>11:00 AM - 1:00 PM</option>
-              <option>1:00 PM - 3:00 PM</option>
-              <option>3:00 PM - 5:00 PM</option>
-              <option>5:00 PM - 7:00 PM</option>
-              <option>7:00 PM - 9:00 PM</option>
+            <select 
+              value={selectedSlot}
+              onChange={handleSlotChange}
+              className="w-full border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-[#3e4026]"
+            >
+              <option value="">Select Time Slot</option>
+              <option value="9:00 AM - 11:00 AM">9:00 AM - 11:00 AM</option>
+              <option value="11:00 AM - 1:00 PM">11:00 AM - 1:00 PM</option>
+              <option value="1:00 PM - 3:00 PM">1:00 PM - 3:00 PM</option>
+              <option value="3:00 PM - 5:00 PM">3:00 PM - 5:00 PM</option>
+              <option value="5:00 PM - 7:00 PM">5:00 PM - 7:00 PM</option>
+              <option value="7:00 PM - 9:00 PM">7:00 PM - 9:00 PM</option>
             </select>
           )}
         </div>

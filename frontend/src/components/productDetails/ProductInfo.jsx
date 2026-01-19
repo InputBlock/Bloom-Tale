@@ -60,6 +60,11 @@ export default function ProductInfo({ product }) {
       product_id: product.product_id,
       quantity: quantity,
       size: selectedSize.toLowerCase(),
+      // Delivery info from DeliveryCheck component
+      deliveryType: deliveryZone?.deliveryType || 'standard',
+      deliveryFee: deliveryZone?.deliveryFee || 0,
+      deliverySlot: deliveryZone?.deliverySlot || null,
+      pincode: deliveryZone?.pincode || null,
     })
 
     if (result && result.success) {
@@ -96,6 +101,11 @@ export default function ProductInfo({ product }) {
       product_id: product.product_id,
       quantity: quantity,
       size: selectedSize.toLowerCase(),
+      // Delivery info from DeliveryCheck component
+      deliveryType: deliveryZone?.deliveryType || 'standard',
+      deliveryFee: deliveryZone?.deliveryFee || 0,
+      deliverySlot: deliveryZone?.deliverySlot || null,
+      pincode: deliveryZone?.pincode || null,
     })
 
     if (result && result.success) {

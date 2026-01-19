@@ -14,7 +14,7 @@ const generateOrderId = () => {
 
 export const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { address, deliveryType, deliveryFee, deliverySlot } = req.body;
+  const { address, deliveryType: reqDeliveryType, deliveryFee: reqDeliveryFee, deliverySlot: reqDeliverySlot } = req.body;
 
   const user = await User.findById(userId);
   if (!user) {
@@ -30,8 +30,12 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Cart is empty");
   }
 
-  //  Calculate totals
+  //  Calculate totals and get delivery info from cart items
   let totalAmount = 0;
+  let cartDeliveryType = "standard";
+  let cartDeliveryFee = 0;
+  let cartDeliverySlot = null;
+  let cartPincode = null;
 
   cart.items.forEach((item) => {
     if (item.isCombo) {
@@ -39,7 +43,25 @@ export const createOrder = asyncHandler(async (req, res) => {
     } else {
       totalAmount += item.price * item.quantity;
     }
+    // Get delivery info from first item that has it
+    if (item.deliveryType && cartDeliveryType === "standard") {
+      cartDeliveryType = item.deliveryType;
+    }
+    if (item.delivery_charge && cartDeliveryFee === 0) {
+      cartDeliveryFee = item.delivery_charge;
+    }
+    if (item.deliverySlot && !cartDeliverySlot) {
+      cartDeliverySlot = item.deliverySlot;
+    }
+    if (item.delivery_pincode && !cartPincode) {
+      cartPincode = item.delivery_pincode;
+    }
   });
+
+  // Use request body values if provided, otherwise use cart values
+  const finalDeliveryType = reqDeliveryType || cartDeliveryType || "standard";
+  const finalDeliveryFee = reqDeliveryFee !== undefined ? reqDeliveryFee : cartDeliveryFee;
+  const finalDeliverySlot = reqDeliverySlot || cartDeliverySlot;
 
   await User.findByIdAndUpdate(userId, {
     $set: { addresses: [address] },
@@ -65,9 +87,9 @@ export const createOrder = asyncHandler(async (req, res) => {
       discount_percentage: item.discount_percentage,
     })),
     deliveryAddress: address,
-    deliveryType: deliveryType || "standard",
-    deliveryFee: deliveryFee || 0,
-    deliverySlot: deliverySlot || null,
+    deliveryType: finalDeliveryType,
+    deliveryFee: finalDeliveryFee,
+    deliverySlot: finalDeliverySlot,
     totalAmount,
     status: "PENDING", // payment not done yet
     paymentMethod: null,

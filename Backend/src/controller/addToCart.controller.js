@@ -8,7 +8,7 @@ import Cart from "../models/cart.model.js";
 
 export const addToCart = asyncHandler(async (req, res) => {
   const userId = req.user._id; // from auth middleware
-  const { product_id, size, quantity } = req.body;
+  const { product_id, size, quantity, deliveryType, deliveryFee, deliverySlot, pincode } = req.body;
 
   const user = await User.findById(userId);
   if (!user) {
@@ -80,14 +80,23 @@ export const addToCart = asyncHandler(async (req, res) => {
 
   if (itemIndex > -1) {
     cart.items[itemIndex].quantity += quantity;
+    // Update delivery info if provided
+    if (deliveryType) cart.items[itemIndex].deliveryType = deliveryType;
+    if (deliveryFee !== undefined) cart.items[itemIndex].delivery_charge = deliveryFee;
+    if (deliverySlot) cart.items[itemIndex].deliverySlot = deliverySlot;
+    if (pincode) cart.items[itemIndex].delivery_pincode = pincode;
   } else {
     cart.items.push({
       product: product._id,
       product_id: product.product_id,
-      size:size || null,
+      size: size || null,
       quantity,
       price, // ✅ DB-derived snapshot
       isCombo: false,
+      deliveryType: deliveryType || 'standard',
+      delivery_charge: deliveryFee || 0,
+      deliverySlot: deliverySlot || null,
+      delivery_pincode: pincode || null,
     });
   }
 

@@ -70,11 +70,22 @@ const cartItemSchema = new Schema({
     type: [comboSubItemSchema], // ✅ STRUCTURED
     required: false,
   },
+  // Delivery fields
   delivery_pincode: {
     type: String,
   },
   delivery_charge: {
     type: Number,
+    required: false,
+    default: 0,
+  },
+  deliveryType: {
+    type: String,
+    enum: ["fixed", "midnight", "express", "standard"],
+    default: "standard",
+  },
+  deliverySlot: {
+    type: String,
     required: false,
   },
   subtotal: {
