@@ -78,15 +78,34 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
+      // Check if this is a combo product
+      const isCombo = product.isCombo || product.combo_items
+
+      const requestBody = isCombo ? {
+        // Combo product structure
+        product_id: product.product_id,
+        quantity: product.quantity || 1,
+        isCombo: true,
+        combo_items: product.combo_items,
+        price: product.price,
+        name: product.name || 'Custom Combo Package',
+        delivery_pincode: product.delivery_pincode,
+        delivery_charge: product.delivery_charge,
+        subtotal: product.subtotal,
+        discount: product.discount,
+        discount_percentage: product.discount_percentage
+      } : {
+        // Regular product structure
+        product_id: product.product_id,
+        quantity: product.quantity || 1,
+        size: product.size || "medium",
+      }
+
       const response = await fetch("/api/v1/cart/addToCart", {
         method: "POST",
         headers: getAuthHeaders(),
         credentials: "include",
-        body: JSON.stringify({
-          product_id: product.product_id,
-          quantity: product.quantity || 1,
-          size: product.size || "medium",
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       const data = await response.json()

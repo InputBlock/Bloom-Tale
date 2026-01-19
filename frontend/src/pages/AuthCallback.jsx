@@ -41,10 +41,10 @@ export default function AuthCallback() {
   }, [searchParams, navigate])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-6">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6B7C59] mx-auto mb-4"></div>
-        <p className="text-gray-600">{status}</p>
+        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[#6B7C59] mx-auto mb-3 sm:mb-4"></div>
+        <p className="text-sm sm:text-base text-gray-600">{status}</p>
       </div>
     </div>
   )

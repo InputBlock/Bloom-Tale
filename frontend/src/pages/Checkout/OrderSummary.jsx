@@ -76,7 +76,7 @@ export default function OrderSummary({ formData, orderDetails, onBack, onNext })
                     <img 
                       src={item.productImage || item.product?.images_uri?.[0]} 
                       alt={item.productName || item.product?.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
                     />
                   ) : (
                     <div className="w-full h-full bg-[#EDE8E0]" />

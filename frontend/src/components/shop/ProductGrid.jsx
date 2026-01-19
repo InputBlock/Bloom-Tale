@@ -9,16 +9,17 @@ export default function ProductGrid({
   onLeave,
   onProductClick,
   onAddToCart,
-  onViewAll
+  onViewAll,
+  isComboMode = false
 }) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="animate-pulse">
-            <div className="aspect-[3/4] bg-[#f9f8f6] mb-4"></div>
-            <div className="h-5 bg-[#eceae7] w-3/4 mb-2"></div>
-            <div className="h-5 bg-[#eceae7] w-1/3 mb-2"></div>
+            <div className="aspect-[3/4] bg-[#f9f8f6] mb-3 sm:mb-4"></div>
+            <div className="h-4 sm:h-5 bg-[#eceae7] w-3/4 mb-2"></div>
+            <div className="h-4 sm:h-5 bg-[#eceae7] w-1/3 mb-2"></div>
             <div className="h-3 bg-[#eceae7] w-1/4"></div>
           </div>
         ))}
@@ -28,8 +29,8 @@ export default function ProductGrid({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-20">
-        <p className="text-[#3e4026]/40 mb-4 text-sm">No products found</p>
+      <div className="text-center py-12 sm:py-16 md:py-20">
+        <p className="text-[#3e4026]/40 mb-3 sm:mb-4 text-xs sm:text-sm">No products found</p>
         {onViewAll && (
           <button
             onClick={onViewAll}
@@ -43,7 +44,7 @@ export default function ProductGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
       {products.map((product, index) => (
         <ProductCard
           key={product._id}
@@ -55,6 +56,7 @@ export default function ProductGrid({
           onLeave={onLeave}
           onClick={onProductClick}
           onAddToCart={onAddToCart}
+          isComboMode={isComboMode}
         />
       ))}
     </div>

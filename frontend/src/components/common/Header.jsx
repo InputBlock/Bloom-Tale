@@ -110,7 +110,7 @@ export default function Header() {
             <img 
               src="/BloomTaleLogopng(500x350px).png" 
               alt="Bloom Tale" 
-              className="h-14 md:h-16 w-auto object-contain"
+              className="h-10 sm:h-12 md:h-16 w-auto object-contain"
             />
           </Link>
 
@@ -186,17 +186,17 @@ export default function Header() {
           </nav>
 
           {/* Right Icons */}
-          <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
 
             {/* Cart */}
             <button 
               onClick={handleCartClick}
-              className={`relative p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
+              className={`relative p-2.5 md:p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
               aria-label="Cart"
             >
-              <ShoppingCart size={20} strokeWidth={1.5} />
+              <ShoppingCart size={22} className="md:w-5 md:h-5" strokeWidth={1.5} />
               {getCartCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#3e4026] text-white text-[10px] w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-[#3e4026] text-white text-[10px] md:text-[10px] w-5 h-5 md:w-5 md:h-5 flex items-center justify-center rounded-full font-semibold">
                   {getCartCount()}
                 </span>
               )}
@@ -212,15 +212,15 @@ export default function Header() {
                     setShowLogout(!showLogout)
                   }
                 }}
-                className={`p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
+                className={`p-2.5 md:p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
                 aria-label="Account"
               >
                 {isLoggedIn() ? (
-                  <div className="w-9 h-9 rounded-full bg-[#3e4026] flex items-center justify-center text-white text-sm font-medium border-2 border-white shadow-md">
+                  <div className="w-9 h-9 md:w-9 md:h-9 rounded-full bg-[#3e4026] flex items-center justify-center text-white text-sm font-medium border-2 border-white shadow-md">
                     {getFirstLetter()}
                   </div>
                 ) : (
-                  <User size={20} strokeWidth={1.5} />
+                  <User size={22} className="md:w-5 md:h-5" strokeWidth={1.5} />
                 )}
               </button>
               
@@ -263,10 +263,10 @@ export default function Header() {
             {/* Mobile Menu Toggle */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`md:hidden p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
+              className={`md:hidden p-2.5 ${iconColor} hover:opacity-70 transition-all duration-300`}
               aria-label="Menu"
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
             </button>
           </div>
         </div>
@@ -279,15 +279,15 @@ export default function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t"
+            className="md:hidden bg-white border-t shadow-lg"
           >
-            <nav className="max-w-7xl mx-auto px-6 py-6">
+            <nav className="max-w-7xl mx-auto px-4 py-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3 text-[#3e4026] text-lg border-b border-gray-100 last:border-0"
+                  className="block py-4 px-3 text-[#3e4026] text-base font-medium border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors"
                 >
                   {link.name}
                 </Link>

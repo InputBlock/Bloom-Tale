@@ -29,10 +29,10 @@ export default function CorporateEvents() {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => setIsExpanded(true)}
-                className="relative group cursor-pointer overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="relative group cursor-pointer overflow-hidden rounded-sm shadow-lg hover:shadow-2xl transition-all duration-500"
             >
                 {/* Image */}
-                <div className="relative h-80 bg-gradient-to-br from-blue-50 to-cyan-100">
+                <div className="relative h-64 sm:h-72 md:h-80 bg-gradient-to-br from-blue-50 to-cyan-100">
                     <div className="absolute inset-0">
                         <img
                             src="/corporate-services.jpg"
@@ -42,7 +42,7 @@ export default function CorporateEvents() {
                     </div>
 
                     {/* Badge */}
-                    <div className="absolute top-4 left-4 bg-[#3e4026] text-white px-3 py-1 text-xs font-medium">
+                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-[#3e4026] text-white px-2.5 py-1 sm:px-3 text-xs font-medium">
                         Professional
                     </div>
                 </div>

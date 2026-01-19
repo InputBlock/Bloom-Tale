@@ -5,10 +5,10 @@ const cartItemSchema = new Schema({
   product: {
     type: Schema.Types.ObjectId,
     ref: "Product",
-    required: true,
+    required: false, // Not required for combo items
   },
   product_id: {
-    type: String, // PRO2
+    type: String, // PRO2 or COMBO_xxx
     required: true,
   },
   quantity: {
@@ -16,13 +16,46 @@ const cartItemSchema = new Schema({
     required: true,
     min: 1,
   },
-  size  : {
+  size: {
     type: String,
-    required: true,
+    required: false, // Not required for combo items
   },
   price: {
     type: Number, // price at time of add
     required: true,
+  },
+  // Combo-specific fields
+  isCombo: {
+    type: Boolean,
+    default: false,
+  },
+  name: {
+    type: String,
+    required: false, // Name for combo packages
+  },
+  combo_items: {
+    type: Array,
+    required: false, // Array of items in the combo
+  },
+  delivery_pincode: {
+    type: String,
+    required: false,
+  },
+  delivery_charge: {
+    type: Number,
+    required: false,
+  },
+  subtotal: {
+    type: Number,
+    required: false,
+  },
+  discount: {
+    type: Number,
+    required: false,
+  },
+  discount_percentage: {
+    type: Number,
+    required: false,
   },
 });
 

@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import ForgotPassword from './pages/ForgotPassword'
 import ProductDetailsPage from './pages/productDetails'
+import ComboProductDetails from './pages/ComboProductDetails'
 import Landing from './pages/Landing'
 import ProductCart from './pages/ProductCart/productCart'
 import Checkout from './pages/Checkout'
@@ -14,6 +15,7 @@ import RazorpayPayment from './pages/RazorpayPayment'
 import Orders from './pages/Orders'
 import OrderDetails from './pages/OrderDetails'
 import { CartProvider } from './context/CartContext'
+import { ComboProvider } from './context/ComboContext'
 import ToastContainer from './components/common/ToastContainer'
 import AuthCallback from './pages/AuthCallback'
 
@@ -22,27 +24,30 @@ import './App.css'
 function App() {
   return (
     <CartProvider>
-      <Router>
-        <ToastContainer />
-        <Routes>
-          <Route path="/" element={<Landing/>} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/services/wedding" element={<WeddingServicesPage />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/productDetails" element={<ProductDetailsPage />} />
-          <Route path="/product/:productId" element={<ProductDetailsPage />} />
-          <Route path="/cart" element={<ProductCart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/razorpay-payment" element={<RazorpayPayment />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/orders/:orderId" element={<OrderDetails />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-        </Routes>
-      </Router>
+      <ComboProvider>
+        <Router>
+          <ToastContainer />
+          <Routes>
+            <Route path="/" element={<Landing/>} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/wedding" element={<WeddingServicesPage />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/productDetails" element={<ProductDetailsPage />} />
+            <Route path="/product/:productId" element={<ProductDetailsPage />} />
+            <Route path="/combo-product/:id" element={<ComboProductDetails />} />
+            <Route path="/cart" element={<ProductCart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/razorpay-payment" element={<RazorpayPayment />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/:orderId" element={<OrderDetails />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+          </Routes>
+        </Router>
+      </ComboProvider>
     </CartProvider>
   )
 }

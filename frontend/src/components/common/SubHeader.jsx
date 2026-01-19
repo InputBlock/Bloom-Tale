@@ -64,13 +64,13 @@ export default function SubHeader() {
       </div>
 
       {/* Mobile View */}
-      <div className="md:hidden px-4 py-4">
+      <div className="md:hidden px-4 py-3">
         <button 
-          className="flex items-center gap-2 text-[#3e4026] cursor-pointer"
+          className="flex items-center gap-2 text-[#3e4026] cursor-pointer py-2"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
-          <span className="text-sm font-medium">Browse Categories</span>
+          {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          <span className="text-sm font-semibold">Browse Categories</span>
         </button>
 
         {isMenuOpen && (
@@ -78,7 +78,7 @@ export default function SubHeader() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4 grid grid-cols-4 gap-3 pb-2"
+            className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 pb-2"
           >
             {categories.map((category, index) => {
               const Icon = category.icon
@@ -89,16 +89,16 @@ export default function SubHeader() {
                     navigate(category.path)
                     setIsMenuOpen(false)
                   }}
-                  className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl cursor-pointer"
+                  className="flex flex-col items-center gap-2 p-3 sm:p-4 bg-white rounded-xl cursor-pointer shadow-sm active:scale-95 transition-transform"
                 >
-                  <div className="w-10 h-10 flex items-center justify-center bg-[#f5f4f0] rounded-lg">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-[#f5f4f0] rounded-lg">
                     <Icon 
-                      size={18} 
+                      size={20} 
                       className="text-[#3e4026]" 
                       strokeWidth={1.5} 
                     />
                   </div>
-                  <span className="text-[9px] font-medium text-[#3e4026] text-center leading-tight">
+                  <span className="text-[10px] sm:text-[11px] font-medium text-[#3e4026] text-center leading-tight">
                     {category.name}
                   </span>
                 </button>

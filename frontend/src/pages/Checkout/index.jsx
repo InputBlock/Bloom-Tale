@@ -80,7 +80,7 @@ export default function Checkout() {
       <Header />
       
       <div className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           
           {/* Page Title */}
           <div className="mb-8">
@@ -204,7 +204,7 @@ export default function Checkout() {
                       >
                         <div className="w-20 h-20 bg-[#EDE8E0] rounded-xl overflow-hidden shrink-0">
                           {imageUrl ? (
-                            <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
+                            <img src={imageUrl} alt={name} className="w-full h-full object-cover object-center" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <Package size={24} className="text-[#5e6043]" />

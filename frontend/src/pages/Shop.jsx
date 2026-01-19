@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useSearchParams, Link } from "react-router-dom"
 import { useInView } from "framer-motion"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Package, ShoppingBag } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
 import { useCart } from "../context/CartContext"
+import { useCombo } from "../context/ComboContext"
 import SuccessModal from "../components/common/SuccessModal"
 import { ProductGrid, FilterSidebar } from "../components/shop"
+import ComboSidebar from "../components/combo/ComboSidebar"
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { comboItems } = useCombo()
   
   // State
   const [products, setProducts] = useState([])
@@ -21,6 +24,10 @@ export default function Shop() {
   const [sortBy, setSortBy] = useState('featured')
   const [hoveredId, setHoveredId] = useState(null)
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
+  
+  // Combo-specific state
+  const [showComboSidebar, setShowComboSidebar] = useState(searchParams.get('category') === 'combos')
   
   // Filter accordion states
   const [openFilters, setOpenFilters] = useState({
@@ -144,6 +151,15 @@ export default function Shop() {
     return filtered
   }
 
+  // Show combo sidebar always when in combos category
+  useEffect(() => {
+    if (selectedCategory === 'combos') {
+      setShowComboSidebar(true)
+    } else {
+      setShowComboSidebar(false)
+    }
+  }, [selectedCategory])
+
   // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -175,6 +191,15 @@ export default function Shop() {
               if (selectedCategory === 'same-day-delivery') {
                 // Filter by same_day_delivery flag
                 sortedProducts = sortedProducts.filter(p => p.same_day_delivery === true)
+              } else if (selectedCategory === 'combos') {
+                // For combos, show flowers + balloons + candles
+                sortedProducts = sortedProducts.filter(p => 
+                  p.category?.toLowerCase().includes('flower') ||
+                  p.category?.toLowerCase().includes('balloon') ||
+                  p.category?.toLowerCase().includes('candle') ||
+                  p.name?.toLowerCase().includes('balloon') ||
+                  p.name?.toLowerCase().includes('candle')
+                )
               } else {
                 // Filter by category name (convert id to match backend format)
                 const categoryName = selectedCategory.replace(/-/g, ' ')
@@ -226,7 +251,12 @@ export default function Shop() {
   }, [selectedCategory, setSearchParams])
 
   const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`)
+    // If combos category, navigate to combo product details page
+    if (selectedCategory === 'combos') {
+      navigate(`/combo-product/${productId}`)
+    } else {
+      navigate(`/product/${productId}`)
+    }
   }
 
   const handleAddToCart = async (e, product) => {
@@ -256,8 +286,8 @@ export default function Shop() {
       
       <main className="pt-24">
         {/* Breadcrumb */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-6">
-          <nav className="flex items-center gap-2 text-[11px] tracking-[0.12em] text-[#9a9a9a]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 mb-4 sm:mb-6">
+          <nav className="flex items-center gap-2 text-[10px] sm:text-[11px] tracking-[0.12em] text-[#9a9a9a]">
             <Link to="/home" className="hover:text-[#3e4026] transition-colors">HOME</Link>
             <ChevronRight size={10} className="text-[#c4c4c4]" />
             <span className="text-[#3e4026]">{searchQuery ? 'SEARCH' : 'CATEGORIES'}</span>
@@ -265,8 +295,8 @@ export default function Shop() {
           
           {/* Search Results Info */}
           {searchQuery && (
-            <div className="mt-4 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200">
-              <p className="text-sm text-gray-600">
+            <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200">
+              <p className="text-xs sm:text-sm text-gray-600">
                 Showing <span className="font-semibold text-[#3e4026]">{products.length}</span> results for 
                 <span className="font-semibold text-[#3e4026]"> "{searchQuery}"</span>
               </p>
@@ -279,29 +309,40 @@ export default function Shop() {
           )}
         </div>
 
-        {/* Page Title */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 mt-6">
-          <h1 
-            className="text-2xl md:text-[28px] text-[#3e4026] tracking-[0.08em] mb-4"
-            style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400 }}
-          >
-            {getPageTitle()}
-          </h1>
-          <p className="text-[#7a7a7a] text-[14px] leading-relaxed max-w-xl">
-            Send extraordinary <span className="text-[#3e4026] underline underline-offset-2 cursor-pointer hover:no-underline">flowers</span> and{' '}
-            <span className="text-[#3e4026] underline underline-offset-2 cursor-pointer hover:no-underline">luxury bouquets</span>, whatever the moment.
-          </p>
-          <button className="text-[11px] tracking-[0.12em] text-[#3e4026] underline underline-offset-4 mt-3 hover:no-underline transition-all">
-            READ MORE
-          </button>
+        {/* Page Header */}
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-4">
+          {selectedCategory === 'combos' ? (
+            <div className="flex items-center justify-between">
+              <h1 className="text-[32px] md:text-[42px] font-bold text-[#3e4026] tracking-tight">
+                COMBOS
+              </h1>
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded mr-50">
+                <span className="text-lg font-bold text-green-600 ">20% OFF</span>
+                <span className="text-xs text-green-700">Build & Save</span>
+              </div>
+            </div>
+          ) : (
+            <>
+              <h1 className="text-[26px] md:text-[32px] font-light mb-6 text-[#3e4026] leading-tight">
+                {getPageTitle()}
+              </h1>
+              <p className="text-[#7a7a7a] text-[14px] leading-relaxed max-w-xl">
+                Send extraordinary <span className="text-[#3e4026] underline underline-offset-2 cursor-pointer hover:no-underline">flowers</span> and{' '}
+                <span className="text-[#3e4026] underline underline-offset-2 cursor-pointer hover:no-underline">luxury bouquets</span>, whatever the moment.
+              </p>
+              <button className="text-[11px] tracking-[0.12em] text-[#3e4026] underline underline-offset-4 mt-3 hover:no-underline transition-all">
+                READ MORE
+              </button>
+            </>
+          )}
         </div>
 
         {/* Main Content with Sidebar */}
         <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
-          <div className="flex gap-16">
+          <div className={`flex gap-0 transition-all duration-300 ${selectedCategory === 'combos' ? 'pr-0 md:pr-[220px]' : 'gap-16'}`}>
             
             {/* Left Sidebar - Filters (Sticky) */}
-            <div className="hidden lg:block w-52 flex-shrink-0">
+            <div className="hidden lg:block w-52 shrink-0">
               <div className="sticky top-24">
                 <FilterSidebar
                   categories={categories}
@@ -315,13 +356,50 @@ export default function Shop() {
             </div>
 
             {/* Right - Products */}
-            <div className="flex-1" ref={sectionRef}>
-              {/* Products Count */}
-              <div className="mb-10">
+            <div className={`flex-1 ml-5 ${selectedCategory === 'combos' ? 'pr-0' : ''}`} ref={sectionRef}>
+              {/* Products Count with Combo Button */}
+              <div className="mb-6 flex items-center justify-between">
                 <p className="text-[13px] tracking-[0.2em] text-[#3e4026] font-medium">
                   {products.length} PRODUCTS
                 </p>
+                
+                {selectedCategory === 'combos' && comboItems.length > 0 && (
+                  <button
+                    onClick={() => setShowComboSidebar(!showComboSidebar)}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#3e4026] text-white rounded-lg font-semibold hover:bg-[#2d2f1c] transition-all md:hidden"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>View Combo ({comboItems.length})</span>
+                  </button>
+                )}
               </div>
+              
+              {selectedCategory === 'combos' && (
+                <div className="mb-4 p-2.5 bg-[#f9f8f6] rounded border border-gray-200">
+                  <div className="flex items-center gap-4">
+                    <div className="w-6 h-6 bg-[#3e4026] rounded flex items-center justify-center shrink-0">
+                      <Package className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div className="flex items-center gap-6 flex-1">
+                      <h3 className="text-xs font-semibold text-[#3e4026]">How to Build Your Combo</h3>
+                      <div className="flex items-center gap-4 text-[11px] text-[#3e4026]/70">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[9px]">1</span>
+                          <span>Click product to customize</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[9px]">2</span>
+                          <span>Verify pincode in sidebar</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[9px]">3</span>
+                          <span>Select delivery & save 20%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <ProductGrid
                 products={products}
@@ -331,15 +409,47 @@ export default function Shop() {
                 onHover={setHoveredId}
                 onLeave={() => setHoveredId(null)}
                 onProductClick={handleProductClick}
-                onAddToCart={handleAddToCart}
+                onAddToCart={selectedCategory === 'combos' ? null : handleAddToCart}
                 onViewAll={() => setSelectedCategory('all')}
+                isComboMode={selectedCategory === 'combos'}
               />
             </div>
           </div>
         </div>
       </main>
 
-      <Footer />
+      <Footer isComboSidebarOpen={selectedCategory === 'combos'} />
+
+      {/* Combo Sidebar - Always show in combos category */}
+      {selectedCategory === 'combos' && (
+        <>
+          {/* Mobile Overlay */}
+          {!showComboSidebar && (
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+              onClick={() => setShowComboSidebar(true)}
+            />
+          )}
+          
+          {/* Sidebar */}
+          <ComboSidebar />
+        </>
+      )}
+
+      {/* Floating Action Button - Mobile (Combo Mode) */}
+      {selectedCategory === 'combos' && !showComboSidebar && (
+        <button
+          onClick={() => setShowComboSidebar(true)}
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-[#3e4026] to-[#5a5c3d] text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all z-30 md:hidden"
+        >
+          <div className="relative">
+            <ShoppingBag className="w-6 h-6" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+              {comboItems.length}
+            </span>
+          </div>
+        </button>
+      )}
 
       {/* Success Modal */}
       <SuccessModal

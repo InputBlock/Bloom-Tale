@@ -54,7 +54,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative h-[90vh] md:h-screen overflow-hidden">
+    <section className="relative h-[85vh] sm:h-[90vh] md:h-screen overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
@@ -77,7 +77,7 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative h-full flex items-center z-10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full">
           <div className="max-w-2xl">
             <AnimatePresence mode="wait">
               <motion.div
@@ -89,21 +89,21 @@ export default function Hero() {
               >
                 {/* Subtitle */}
                 <motion.p
-                  className="text-white/80 text-sm md:text-base tracking-[0.3em] uppercase mb-4"
+                  className="text-white/80 text-[11px] sm:text-xs md:text-sm tracking-[0.25em] sm:tracking-[0.3em] uppercase mb-3 sm:mb-4"
                 >
                   {heroSlides[currentSlide].subtitle}
                 </motion.p>
 
                 {/* Title */}
                 <h1 
-                  className="text-5xl md:text-7xl lg:text-8xl text-white font-light mb-6 leading-tight"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white font-light mb-4 sm:mb-5 md:mb-6 leading-tight"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   {heroSlides[currentSlide].title}
                 </h1>
 
                 {/* Description */}
-                <p className="text-white/90 text-lg md:text-xl mb-8 font-light max-w-lg">
+                <p className="text-white/90 text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-7 md:mb-8 font-light max-w-lg">
                   {heroSlides[currentSlide].description}
                 </p>
 
@@ -112,10 +112,10 @@ export default function Hero() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => navigate('/shop')}
-                  className="group inline-flex items-center gap-3 bg-white text-gray-900 px-8 py-4 text-sm font-medium tracking-wide hover:bg-gray-100 transition-all duration-300"
+                  className="group inline-flex items-center gap-2 sm:gap-3 bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-medium tracking-wide hover:bg-gray-100 active:scale-95 transition-all duration-300 rounded-sm"
                 >
                   {heroSlides[currentSlide].buttonText}
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px] group-hover:translate-x-1 transition-transform" />
                 </motion.button>
               </motion.div>
             </AnimatePresence>
@@ -124,29 +124,31 @@ export default function Hero() {
       </div>
 
       {/* Navigation Arrows */}
-      <div className="absolute bottom-12 right-12 flex gap-3 z-20">
+      <div className="absolute bottom-6 sm:bottom-8 md:bottom-12 right-4 sm:right-6 md:right-12 flex gap-2 sm:gap-3 z-20">
         <button
           onClick={handlePrev}
-          className="w-12 h-12 border border-white/40 hover:bg-white/10 text-white flex items-center justify-center transition-all duration-300"
+          className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 border border-white/40 hover:bg-white/10 text-white flex items-center justify-center active:scale-95 transition-all duration-300 rounded-sm backdrop-blur-sm"
+          aria-label="Previous slide"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
         </button>
         <button
           onClick={handleNext}
-          className="w-12 h-12 border border-white/40 hover:bg-white/10 text-white flex items-center justify-center transition-all duration-300"
+          className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 border border-white/40 hover:bg-white/10 text-white flex items-center justify-center active:scale-95 transition-all duration-300 rounded-sm backdrop-blur-sm"
+          aria-label="Next slide"
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={18} className="sm:w-5 sm:h-5" />
         </button>
       </div>
 
       {/* Slide Counter */}
-      <div className="absolute bottom-12 left-12 z-20">
-        <div className="flex items-center gap-4 text-white">
-          <span className="text-3xl font-light" style={{ fontFamily: 'Playfair Display, serif' }}>
+      <div className="absolute bottom-6 sm:bottom-8 md:bottom-12 left-4 sm:left-6 md:left-12 z-20">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 text-white">
+          <span className="text-2xl sm:text-3xl font-light" style={{ fontFamily: 'Playfair Display, serif' }}>
             0{currentSlide + 1}
           </span>
-          <div className="w-12 h-px bg-white/40" />
-          <span className="text-sm text-white/60">0{heroSlides.length}</span>
+          <div className="w-8 sm:w-10 md:w-12 h-px bg-white/40" />
+          <span className="text-xs sm:text-sm text-white/60">0{heroSlides.length}</span>
         </div>
       </div>
 

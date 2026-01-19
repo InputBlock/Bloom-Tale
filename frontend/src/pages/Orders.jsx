@@ -180,24 +180,24 @@ export default function Orders() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mb-8 md:mb-12"
+            className="mb-8 sm:mb-10 md:mb-12"
           >
             <h1 
-              className="text-3xl md:text-4xl lg:text-5xl text-[#3e4026] mb-2 font-bold"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#3e4026] mb-2 font-bold"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               My Orders
             </h1>
-            <p className="text-gray-600">Track and manage your orders</p>
+            <p className="text-sm sm:text-base text-gray-600">Track and manage your orders</p>
           </motion.div>
 
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+              className="mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-sm"
             >
-              <p className="text-red-600 font-medium">{error}</p>
+              <p className="text-sm sm:text-base text-red-600 font-medium">{error}</p>
             </motion.div>
           )}
 
@@ -206,14 +206,14 @@ export default function Orders() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-xl shadow-lg p-12 text-center"
+              className="bg-white rounded-sm shadow-lg p-8 sm:p-10 md:p-12 text-center"
             >
-              <Package className="mx-auto mb-4 text-gray-300" size={64} />
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">No Orders Yet</h2>
-              <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
+              <Package className="mx-auto mb-4 text-gray-300" size={48} />
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">No Orders Yet</h2>
+              <p className="text-sm sm:text-base text-gray-600 mb-6">Start shopping to see your orders here</p>
               <a
                 href="/shop"
-                className="inline-block px-8 py-3 bg-[#3e4026] text-white font-semibold rounded-lg hover:bg-[#5e6043] transition-colors"
+                className="inline-block px-6 sm:px-8 py-3 sm:py-3.5 bg-[#3e4026] text-white text-sm sm:text-base font-semibold rounded-sm hover:bg-[#5e6043] transition-all active:scale-95"
               >
                 Start Shopping
               </a>
@@ -231,29 +231,29 @@ export default function Orders() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                    className="bg-white rounded-sm shadow-md hover:shadow-lg transition-shadow overflow-hidden"
                   >
                     {/* Order Header */}
-                    <div className="bg-gradient-to-r from-[#3e4026]/5 to-[#c4a574]/5 p-4 md:p-6 border-b border-gray-200">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="bg-gradient-to-r from-[#3e4026]/5 to-[#c4a574]/5 p-4 sm:p-5 md:p-6 border-b border-gray-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-3">
-                            <h3 className="text-lg md:text-xl font-semibold text-[#3e4026]">
+                          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                            <h3 className="text-base sm:text-lg md:text-xl font-semibold text-[#3e4026]">
                               #{order.order_id || order._id?.slice(-8).toUpperCase() || 'N/A'}
                             </h3>
-                            <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+                            <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
                               {getStatusLabel(order.order_status)}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar size={16} />
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                            <Calendar size={14} className="sm:w-4 sm:h-4" />
                             <span>{formatDate(order.createdAt)}</span>
                           </div>
                         </div>
                         <div className="text-left sm:text-right">
-                          <p className="text-sm text-gray-600">Total Amount</p>
-                          <p className="text-2xl font-bold text-[#3e4026] flex items-center sm:justify-end gap-1">
-                            <IndianRupee size={20} />
+                          <p className="text-xs sm:text-sm text-gray-600">Total Amount</p>
+                          <p className="text-xl sm:text-2xl font-bold text-[#3e4026] flex items-center sm:justify-end gap-1">
+                            <IndianRupee size={18} className="sm:w-5 sm:h-5" />
                             {formatPrice(order.totalAmount || 0).replace('₹', '')}
                           </p>
                         </div>
@@ -261,13 +261,13 @@ export default function Orders() {
                     </div>
 
                     {/* Order Content */}
-                    <div className="p-4 md:p-6">
+                    <div className="p-4 sm:p-5 md:p-6">
                       {/* Order Items */}
                       {order.items && order.items.length > 0 && (
                         <div>
-                          <div className="flex items-center gap-2 mb-4">
-                            <ShoppingBag className="text-[#3e4026]" size={20} />
-                            <h4 className="font-semibold text-gray-800">
+                          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                            <ShoppingBag className="text-[#3e4026]" size={18} />
+                            <h4 className="text-sm sm:text-base font-semibold text-gray-800">
                               Items ({order.items.length})
                             </h4>
                           </div>
@@ -284,14 +284,14 @@ export default function Orders() {
                               return (
                               <div
                                 key={itemIndex}
-                                className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
+                                className="flex items-center gap-3 sm:gap-4 p-3 bg-gray-50 rounded-sm"
                               >
-                                <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-200 rounded-sm flex-shrink-0 overflow-hidden">
                                   {imageUrl ? (
                                     <img 
                                       src={imageUrl} 
                                       alt={item.productName || item.product?.name || 'Product'}
-                                      className="w-full h-full object-cover"
+                                      className="w-full h-full object-cover object-center"
                                     />
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center">
@@ -300,16 +300,16 @@ export default function Orders() {
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-800 truncate">
+                                  <p className="text-sm sm:text-base font-medium text-gray-800 truncate">
                                     {item.productName || item.product?.name || 'Product'}
                                   </p>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-xs sm:text-sm text-gray-600">
                                     Quantity: {item.quantity || 1}
                                   </p>
                                 </div>
                                 <div className="text-right">
-                                  <p className="font-semibold text-[#3e4026] flex items-center gap-1">
-                                    <IndianRupee size={16} />
+                                  <p className="text-sm sm:text-base font-semibold text-[#3e4026] flex items-center gap-0.5 sm:gap-1">
+                                    <IndianRupee size={14} className="sm:w-4 sm:h-4" />
                                     {formatPrice(item.price || 0).replace('₹', '')}
                                   </p>
                                 </div>
@@ -320,14 +320,14 @@ export default function Orders() {
                       )}
 
                       {/* Payment Info */}
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <div className="flex items-center justify-between text-sm">
+                      <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+                        <div className="flex items-center justify-between text-xs sm:text-sm">
                           <span className="text-gray-600">Payment:</span>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
                             <span className="font-medium text-gray-800">
                               {order.paymentMethod || 'N/A'}
                             </span>
-                            <span className={`text-xs px-2 py-0.5 rounded ${
+                            <span className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded ${
                               order.status === 'PAID' 
                                 ? 'bg-green-100 text-green-700' 
                                 : order.status === 'PAYMENT_FAILED'
@@ -343,13 +343,13 @@ export default function Orders() {
                       {/* Order Status Toggle Button */}
                       <button
                         onClick={() => toggleOrderExpand(order._id)}
-                        className="mt-4 w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="mt-4 w-full flex items-center justify-between px-3 sm:px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-sm transition-all active:scale-95"
                       >
-                        <span className="text-sm font-medium text-gray-700">Order Status</span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Order Status</span>
                         {expandedOrder === order._id ? (
-                          <ChevronUp size={20} className="text-gray-500" />
+                          <ChevronUp size={18} className="sm:w-5 sm:h-5 text-gray-500" />
                         ) : (
-                          <ChevronDown size={20} className="text-gray-500" />
+                          <ChevronDown size={18} className="sm:w-5 sm:h-5 text-gray-500" />
                         )}
                       </button>
 
@@ -363,26 +363,26 @@ export default function Orders() {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden"
                           >
-                            <div className="pt-4 pb-2">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-4">ORDER PROGRESS</p>
+                            <div className="pt-3 sm:pt-4 pb-2">
+                              <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide mb-3 sm:mb-4">ORDER PROGRESS</p>
                               <div className="flex items-center justify-between">
                                 {getOrderStatusSteps(order.order_status).map((step, stepIndex, arr) => (
                                   <div key={step.key} className="flex items-center flex-1">
                                     <div className="flex flex-col items-center">
                                       <div
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all ${
                                           step.isCompleted
                                             ? "bg-[#3e4026] text-white"
                                             : "bg-gray-200 text-gray-400"
                                         }`}
                                       >
                                         {step.isCompleted ? (
-                                          <CheckCircle2 size={16} />
+                                          <CheckCircle2 size={14} className="sm:w-4 sm:h-4" />
                                         ) : (
-                                          <Circle size={16} />
+                                          <Circle size={14} className="sm:w-4 sm:h-4" />
                                         )}
                                       </div>
-                                      <span className={`text-xs mt-2 font-medium ${
+                                      <span className={`text-[9px] sm:text-xs mt-1.5 sm:mt-2 font-medium text-center ${
                                         step.isCompleted
                                           ? "text-[#3e4026]"
                                           : "text-gray-400"
@@ -391,7 +391,7 @@ export default function Orders() {
                                       </span>
                                     </div>
                                     {stepIndex < arr.length - 1 && (
-                                      <div className={`flex-1 h-0.5 mx-2 ${
+                                      <div className={`flex-1 h-0.5 mx-1 sm:mx-2 ${
                                         step.isCompleted && arr[stepIndex + 1]?.isCompleted
                                           ? "bg-[#3e4026]"
                                           : "bg-gray-200"
