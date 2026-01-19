@@ -10,6 +10,13 @@ const productSchema = new mongoose.Schema(
     },
     category: { type: String, required: true,
     },
+
+     product_type: {
+      type: String,
+      enum: ["simple", "sized"], // simple = candle, balloon | sized = flowers
+      default: "simple",
+    },
+
     // Single price for products without sizes (Candles, Combos)
     price: { type: Number, default: null },
     // Size-based pricing for products with sizes
