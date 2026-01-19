@@ -13,14 +13,10 @@ const isValidEmail = (email) => {
 
 // Parse and improve error messages with beautiful, user-friendly descriptions
 const getErrorMessage = (errorMsg) => {
-  console.log('2. Type of errorMsg:', typeof errorMsg);
-  
   const msg = errorMsg.toLowerCase();
-  console.log('3. Lowercase msg:', msg);
   
   // Invalid credentials / wrong password
   if (msg.includes('invalid credentials') || msg.includes('incorrect password') || msg.includes('wrong password')) {
-    console.log('4. MATCHED: Invalid credentials pattern');
     return {
       title: 'Incorrect Password',
       message: 'The password you entered doesn\'t match our records. Please double-check and try again, or reset your password if you\'ve forgotten it.',
@@ -301,19 +297,11 @@ export default function FlowerLogin() {
   // Reset error when user starts typing AFTER an error occurred
   useEffect(() => {
     if (error && userIsTyping) {
-      console.log('Clearing error because user is typing after error');
-      setError(null);      const API_URL = import.meta.env.VITE_API_URL || ""
+      setError(null);
+      setLoginState("typing");
       setUserIsTyping(false); // Reset the flag
     }
   }, [email, password, error, userIsTyping]);
-
-  // Debug: Log error state changes
-  useEffect(() => {
-    console.log('=== ERROR STATE CHANGED ===');
-    console.log('Current error state:', error);
-    console.log('Error exists?', !!error);
-    console.log('========================');
-  }, [error]);
 
   // Validate email on blur
   const handleEmailBlur = useCallback(() => {
@@ -382,21 +370,9 @@ export default function FlowerLogin() {
       }, 4500);
 
     } catch (err) {
-      console.log('=== LOGIN ERROR DEBUG ===');
-      console.log('1. Caught error:', err);
-      console.log('2. Error message:', err?.message);
-      console.log('3. Error type:', typeof err);
-      console.log('4. Error stringified:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
-      
       const errorInfo = getErrorMessage(err?.message || "An unexpected error occurred");
-      console.log('5. Parsed error info:', errorInfo);
-      console.log('6. Setting error state with:', errorInfo);
-      
       setError(errorInfo);
       setLoginState("error");
-      
-      console.log('7. Error state should now be set');
-      console.log('========================');
       
       // Don't auto-clear error - let user dismiss it
     } finally {
