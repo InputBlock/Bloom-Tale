@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 
+// Categories that use single pricing (no sizes) - product_type: "simple"
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"]
+
 export default function EditProductModal({ product, isOpen, onClose, onSave }) {
   const [editProduct, setEditProduct] = useState(null)
 
@@ -8,7 +11,8 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
     "Birthday",
     "Anniversary",
     "Forever Flowers",
-    "Fragrances",
+    "Candles",
+    "Balloons",
     "Premium",
     "Corporate",
     "Combos"
@@ -82,23 +86,20 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">Pricing</label>
             
-            {(editProduct.category === "Fragrances" || editProduct.category === "Combos") ? (
-              // Single Price for Fragrances and Combos
+            {SINGLE_PRICE_CATEGORIES.includes(editProduct.category) ? (
+              // Single Price for Candles, Combos, Balloons
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Price (₹)</label>
                 <input
                   type="number"
                   step="0.01"
-                  value={editProduct.pricing.small}
+                  value={editProduct.price || editProduct.pricing?.small || ""}
                   onChange={(e) => {
-                    const price = e.target.value
+                    const price = e.target.value === "" ? "" : parseFloat(e.target.value) || 0
                     setEditProduct({
                       ...editProduct,
-                      pricing: {
-                        small: price === "" ? "" : parseFloat(price) || 0,
-                        medium: price === "" ? "" : parseFloat(price) || 0,
-                        large: price === "" ? "" : parseFloat(price) || 0
-                      }
+                      price: price,
+                      pricing: { small: null, medium: null, large: null }
                     })
                   }}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"

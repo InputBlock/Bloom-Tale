@@ -1,8 +1,13 @@
 
 import productSchema from "../models/product.js";
 
-// Categories that use single pricing (no sizes)
-const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos"];
+// Categories that use single pricing (no sizes) - product_type: "simple"
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"];
+
+// Helper to determine product_type from category
+const getProductType = (category) => {
+  return SINGLE_PRICE_CATEGORIES.includes(category) ? "simple" : "sized";
+};
 
 export async function addItem(details) {
     // Validation
@@ -17,13 +22,14 @@ export async function addItem(details) {
     const isSinglePriceCategory = SINGLE_PRICE_CATEGORIES.includes(details.category.trim());
     
     if (isSinglePriceCategory) {
-        // For Candles/Combos - use single price field, no sizes
+        // For Candles/Combos/Balloons - use single price field, no sizes
         if (!details.price || details.price <= 0) {
             throw new Error("Price is required and must be greater than 0");
         }
         // Clear pricing object for single-price products
         details.pricing = { small: null, medium: null, large: null };
-        details.sizes = []; // No sizes for Candles/Combos
+        details.sizes = []; // No sizes for simple products
+        details.product_type = "simple";
     } else {
         // For other categories - require all 3 pricing tiers
         if (!details.pricing || !details.pricing.small || !details.pricing.medium || !details.pricing.large) {
@@ -34,6 +40,7 @@ export async function addItem(details) {
         }
         // Clear single price for sized products
         details.price = null;
+        details.product_type = "sized";
     }
     
     const existing = await productSchema.findOne({ name: details.name.trim() });
@@ -106,7 +113,7 @@ export async function updateItem(id, updateData) {
         throw new Error("Product not found");
     }
 
-    // Handle single-price categories (Candles, Combos)
+    // Handle single-price categories (Candles, Combos, Balloons)
     const category = updateData.category || existing.category;
     const isSinglePrice = SINGLE_PRICE_CATEGORIES.includes(category);
     
@@ -116,11 +123,13 @@ export async function updateItem(id, updateData) {
             updateData.pricing = { small: null, medium: null, large: null };
             updateData.sizes = [];
         }
+        updateData.product_type = "simple";
     } else {
         // For sized products - use pricing, clear price
         if (updateData.pricing) {
             updateData.price = null;
         }
+        updateData.product_type = "sized";
     }
 
     Object.assign(existing, updateData);
@@ -151,7 +160,8 @@ export async function getList() {
             description: item.description,
             category: item.category,
             subcategory: item.subcategory,
-            price: item.price, // Single price for Candles/Combos
+            product_type: item.product_type || (SINGLE_PRICE_CATEGORIES.includes(item.category) ? "simple" : "sized"),
+            price: item.price, // Single price for Candles/Combos/Balloons
             pricing: item.pricing, // Size-based pricing for other products
             sizes: item.sizes,
             stock: item.stock,

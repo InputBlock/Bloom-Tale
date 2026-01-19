@@ -4,8 +4,8 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
-// Categories that use single pricing (no sizes)
-const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos"];
+// Categories that use single pricing (no sizes) - product_type: "simple"
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"];
 
 const add_item = asyncHandler(async (req, res) => {
     let images_uri = [];
