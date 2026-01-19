@@ -2,21 +2,34 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import helmet from "helmet"
+import compression from "compression"
+// import { generalLimiter } from "./middlewares/rateLimiter.middleware.js"
 
 const app = express()
 
-//Configurations set
+// Security headers
+app.use(helmet())
+
+// Compression for responses
+app.use(compression())
+
+// Trust proxy (for rate limiting behind reverse proxy)
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1)
+}
+
+// CORS configuration
 app.use(cors({
-    origin:[process.env.CORS_ORIGIN, process.env.ADMIN_CORS_ORIGIN],
-    credentials:true
+    origin: [process.env.CORS_ORIGIN, process.env.ADMIN_CORS_ORIGIN].filter(Boolean),
+    credentials: true
 }))
 
-//  Apply general rate limiting to all requests
+// Rate limiting (enable in production)
 // app.use(generalLimiter)
 
-app.use(express.json({limit:"16kb"}))  //we accept json data
-// app.use(express.urlencoded())       data is from url's
-app.use(express.urlencoded({extended:true,limit:"16kb"}))
+app.use(express.json({ limit: "16kb" }))
+app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(express.static("public"))
 app.use(cookieParser())
 
@@ -52,6 +65,9 @@ app.use("/api/v1/testimonial", testimonialRoutes)
 
 import enquiry from "./route/enquiryForm.route.js"
 app.use("/api/v1/enquiry",enquiry)
+
+import deliveryRoutes from "./route/delivery.route.js"
+app.use("/api/v1/delivery", deliveryRoutes)
 
 // Global error handler - MUST be after all routes
 app.use((err, req, res, next) => {
