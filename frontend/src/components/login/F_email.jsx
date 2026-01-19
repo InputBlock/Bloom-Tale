@@ -43,7 +43,7 @@ export default function F_email({ onNext }) {
           className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
-          {loading ? "🌱 SENDING..." : "SEND OTP"}
+          {loading ? "Sending..." : "Send OTP"}
         </button>
       </form>
 

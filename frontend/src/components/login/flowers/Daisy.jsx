@@ -1,7 +1,8 @@
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 // Cute Eyes Component for Daisy with always visible mouth
-const DaisyEyes = ({ state, cursorAngle, size = 1 }) => {
+const DaisyEyes = ({ state = "idle", cursorAngle = 0, size = 1 }) => {
   const getEyeState = () => {
     switch (state) {
       case "shy":
@@ -15,7 +16,7 @@ const DaisyEyes = ({ state, cursorAngle, size = 1 }) => {
       case "bloom":
         return { eyeScale: 1.12, pupilY: -1, blush: true, sparkle: true, mouthType: "happy" };
       default:
-        return { eyeScale: 1, pupilY: 0, mouthType: "gentle" };
+        return { eyeScale: 1, pupilY: 0, blush: true, mouthType: "gentle" };
     }
   };
 
@@ -31,7 +32,8 @@ const DaisyEyes = ({ state, cursorAngle, size = 1 }) => {
   };
 
   const eyeState = getEyeState();
-  const pupilOffset = (cursorAngle / 30) * 2.5;
+  const safeCursorAngle = typeof cursorAngle === 'number' && !isNaN(cursorAngle) ? cursorAngle : 0;
+  const pupilOffset = (safeCursorAngle / 30) * 2.5;
 
   return (
     <div className="relative flex flex-col items-center justify-center" style={{ transform: `scale(${size})` }}>
@@ -58,19 +60,30 @@ const DaisyEyes = ({ state, cursorAngle, size = 1 }) => {
         ) : (
         <svg width="18" height={eyeState.squint ? 10 : 18} viewBox="0 0 20 20">
           <ellipse 
-            cx="10" cy="10" 
-            rx="8" ry={eyeState.squint ? 4 : 8} 
+            cx={10} cy={10} 
+            rx={8} ry={eyeState.squint ? 4 : 8} 
             fill="white" 
             stroke="#3a3a3a" 
             strokeWidth="1.5"
           />
           <motion.ellipse 
-            cx="10" cy="10" rx="4" ry="4"
+            cx={10 + (pupilOffset || 0)}
+            cy={10 + (eyeState.pupilY || 0)}
+            rx={4}
+            ry={4}
             fill="#3a3a3a"
-            animate={{ cx: 10 + pupilOffset, cy: 10 + eyeState.pupilY }}
+            animate={{ 
+              cx: 10 + (pupilOffset || 0), 
+              cy: 10 + (eyeState.pupilY || 0) 
+            }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           />
-          <circle cx={12 + pupilOffset} cy={8 + eyeState.pupilY} r="1.5" fill="white" />
+          <motion.circle 
+            cx={12 + (pupilOffset || 0)} 
+            cy={8 + (eyeState.pupilY || 0)} 
+            r={1.5} 
+            fill="white" 
+          />
         </svg>
         )}
         {eyeState.sad && (
@@ -102,19 +115,30 @@ const DaisyEyes = ({ state, cursorAngle, size = 1 }) => {
         ) : (
         <svg width="18" height={eyeState.squint ? 10 : 18} viewBox="0 0 20 20">
           <ellipse 
-            cx="10" cy="10" 
-            rx="8" ry={eyeState.squint ? 4 : 8} 
+            cx={10} cy={10} 
+            rx={8} ry={eyeState.squint ? 4 : 8} 
             fill="white" 
             stroke="#3a3a3a" 
             strokeWidth="1.5"
           />
           <motion.ellipse 
-            cx="10" cy="10" rx="4" ry="4"
+            cx={10 + (pupilOffset || 0)}
+            cy={10 + (eyeState.pupilY || 0)}
+            rx={4}
+            ry={4}
             fill="#3a3a3a"
-            animate={{ cx: 10 + pupilOffset, cy: 10 + eyeState.pupilY }}
+            animate={{ 
+              cx: 10 + (pupilOffset || 0), 
+              cy: 10 + (eyeState.pupilY || 0) 
+            }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           />
-          <circle cx={12 + pupilOffset} cy={8 + eyeState.pupilY} r="1.5" fill="white" />
+          <motion.circle 
+            cx={12 + (pupilOffset || 0)} 
+            cy={8 + (eyeState.pupilY || 0)} 
+            r={1.5} 
+            fill="white" 
+          />
         </svg>
         )}
         {eyeState.sad && (

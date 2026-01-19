@@ -110,7 +110,7 @@ export default function Services() {
     setIsSubmitting(true)
     
     try {
-      const response = await fetch("http://localhost:8000/api/v1/enquiry/createEnquiry", {
+      const response = await fetch("/api/v1/enquiry/createEnquiry",{
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -69,24 +69,12 @@ export default function F_otp({ email, onNext, onResend }) {
           ))}
         </div>
 
-        <div className="text-center mb-6">
-          <span className="text-gray-500 text-sm">Didn't receive the code? </span>
-          <button
-            type="button"
-            onClick={handleResend}
-            className="text-[#6B7C59] font-semibold text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={resending || loading}
-          >
-            {resending ? "🌱 Sending..." : "Resend OTP"}
-          </button>
-        </div>
-
         <button
           type="submit"
           className="w-full bg-[#6B7C59] hover:bg-[#5A6B4A] text-white font-medium py-3 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading || otp.join("").length !== 6}
         >
-          {loading ? "🔍 VERIFYING..." : "VERIFY OTP"}
+          {loading ? "Verifying..." : "Verify OTP"}
         </button>
       </form>
     </div>

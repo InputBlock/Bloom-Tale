@@ -1,6 +1,5 @@
 import React from 'react'
-import HeroSection from '../components/landing/HeroSection'
-import FlowerCarousel1 from '../components/landing/FlowerCarousel copy'
+import FlowerCarousel1 from '../components/landing/FlowerCarousel'
 function Landing() {
   return (
     <>
