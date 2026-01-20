@@ -4,6 +4,7 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react"
 import { motion } from "framer-motion"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
+import { orderAPI } from "../api"
 
 export default function RazorpayPayment() {
   const [loading, setLoading] = useState(true)
@@ -26,20 +27,8 @@ export default function RazorpayPayment() {
 
   const initiateRazorpayPayment = async () => {
     try {
-      const token = localStorage.getItem("token")
-      
       // Step 1: Create Razorpay order
-      const response = await fetch("/api/v1/order/payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({ orderId }),
-      })
-
-      const responseData = await response.json()
+      const { response, data: responseData } = await orderAPI.createPayment(orderId)
 
       if (!response.ok) {
         throw new Error(responseData.message || "Failed to create payment")
@@ -114,24 +103,12 @@ export default function RazorpayPayment() {
 
   const verifyPayment = async (paymentResponse) => {
     try {
-      const token = localStorage.getItem("token")
-
-      const response = await fetch("/api/v1/order/verify-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          orderId: orderId,
-          razorpay_order_id: paymentResponse.razorpay_order_id,
-          razorpay_payment_id: paymentResponse.razorpay_payment_id,
-          razorpay_signature: paymentResponse.razorpay_signature,
-        }),
+      const { response, data } = await orderAPI.verifyPayment({
+        orderId: orderId,
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
       })
-
-      const data = await response.json()
 
       if (!response.ok) {
         // Mark payment as failed in backend
@@ -151,17 +128,7 @@ export default function RazorpayPayment() {
 
   const markPaymentFailed = async () => {
     try {
-      const token = localStorage.getItem("token")
-      
-      await fetch("/api/v1/order/markPaymentFailed", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({ orderId }),
-      })
+      await orderAPI.markPaymentFailed(orderId)
     } catch (err) {
       console.error("Failed to mark payment as failed:", err)
     }

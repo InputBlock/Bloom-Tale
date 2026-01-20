@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
-import axios from "axios"
+import { authAPI } from "../api"
 
 export default function Login() {
   const navigate = useNavigate()
@@ -19,19 +19,13 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await axios.post("/api/v1/admin/login", {
-        email: formData.email,
-        password: formData.password,
-      })
-
-      // Store token in localStorage
-      localStorage.setItem("adminToken", response.data.token || "admin-authenticated")
-      localStorage.setItem("adminEmail", formData.email)
+      // Login with credentials - cookie will be set automatically by backend
+      await authAPI.login(formData.email, formData.password)
       
-      // Redirect to dashboard
+      // Redirect to dashboard - cookie auth handles the rest
       navigate("/")
     } catch (err) {
-      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to connect to server. Please try again."
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || "Failed to connect to server. Please try again."
       setError(errorMessage)
       console.error("Login error:", err)
     } finally {

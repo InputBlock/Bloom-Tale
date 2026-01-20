@@ -1,6 +1,18 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
+// 🔹 Combo sub-item schema (for combo orders)
+const comboSubItemSchema = new Schema(
+  {
+    product_id: String,
+    name: String,
+    size: String,
+    quantity: Number,
+    price: Number,
+  },
+  { _id: false }
+);
+
 // 🔹 Order Item = snapshot of cart item
 const orderItemSchema = new Schema({
   product: {
@@ -10,8 +22,20 @@ const orderItemSchema = new Schema({
   product_id: String,
   productName: String,
   productImage: String,
+  size: String,
   quantity: Number,
   price: Number,
+  // Combo-specific fields
+  isCombo: {
+    type: Boolean,
+    default: false,
+  },
+  comboName: String,
+  combo_items: [comboSubItemSchema],
+  // Price breakdown
+  subtotal: Number,
+  discount: Number,
+  discount_percentage: Number,
 });
 
 // 🔹 Embedded address snapshot
@@ -81,6 +105,10 @@ const orderSchema = new Schema(
     },
 
     deliverySlot: {
+      type: String,
+    },
+
+    deliveryPincode: {
       type: String,
     },
     

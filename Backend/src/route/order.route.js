@@ -22,10 +22,11 @@ router.patch(
 router.post("/payment", verifyJWT, createPaymentOrder);
 router.post("/verify-payment", verifyJWT, verifyPayment);
 
-// webhook (NO auth)
+// webhook (NO auth - Razorpay server-to-server call)
 router.post("/webhook", razorpayWebhook);
 
-router.post("/markPaymentFailed",markPaymentFailed)
+// Mark payment as failed - requires auth to prevent abuse
+router.post("/markPaymentFailed", verifyJWT, markPaymentFailed);
 
 router.get("/:orderId/orderSummary",verifyJWT,getOrderSummary)
 

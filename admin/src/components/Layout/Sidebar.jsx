@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { LayoutDashboard, Plus, List, Package, Users, LogOut, X, Menu, FileEdit, MapPin } from "lucide-react"
+import { authAPI } from "../../api"
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation()
@@ -17,9 +18,13 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   const isActive = (path) => location.pathname === path
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken")
-    localStorage.removeItem("adminEmail")
+  const handleLogout = async () => {
+    try {
+      // Call backend to clear httpOnly cookie
+      await authAPI.logout()
+    } catch {
+      // Ignore errors, redirect anyway
+    }
     navigate("/login")
   }
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 // Cute Eyes for Tulip (peeks from inside the tulip) with always visible mouth
-const TulipEyes = ({ state, cursorAngle, size = 1 }) => {
+const TulipEyes = ({ state = "idle", cursorAngle = 0, size = 1 }) => {
   const getEyeState = () => {
     switch (state) {
       case "shy": return { eyeScale: 0.7, pupilY: 3, blush: true, peeking: true, closedEyes: true, mouthType: "shy" };
@@ -9,12 +9,13 @@ const TulipEyes = ({ state, cursorAngle, size = 1 }) => {
       case "welcome": return { eyeScale: 1.1, pupilY: 0, blush: true, sparkle: true, mouthType: "smile" };
       case "private": return { eyeScale: 1, pupilY: 0, closedEyes: true, mouthType: "neutral" };
       case "bloom": return { eyeScale: 1.15, pupilY: -2, blush: true, mouthType: "happy" };
-      default: return { eyeScale: 1, pupilY: 0, mouthType: "gentle" };
+      default: return { eyeScale: 1, pupilY: 0, blush: true, mouthType: "gentle" };
     }
   };
 
   const eyeState = getEyeState();
-  const pupilOffset = (cursorAngle / 30) * 2;
+  const safeCursorAngle = typeof cursorAngle === 'number' && !isNaN(cursorAngle) ? cursorAngle : 0;
+  const pupilOffset = (safeCursorAngle / 30) * 2;
 
   const getMouthPath = () => {
     switch (eyeState.mouthType) {
@@ -50,13 +51,25 @@ const TulipEyes = ({ state, cursorAngle, size = 1 }) => {
           </svg>
         ) : (
         <svg width="14" height={eyeState.squint ? 8 : 14} viewBox="0 0 16 16">
-          <ellipse cx="8" cy="8" rx="6" ry={eyeState.squint ? 3 : 6} fill="white" stroke="#3a3a3a" strokeWidth="1.2" />
+          <ellipse cx={8} cy={8} rx={6} ry={eyeState.squint ? 3 : 6} fill="white" stroke="#3a3a3a" strokeWidth="1.2" />
           <motion.ellipse 
-            cx="8" cy="8" rx="3" ry="3" fill="#3a3a3a"
-            animate={{ cx: 8 + pupilOffset, cy: 8 + eyeState.pupilY * 0.5 }}
+            cx={8 + (pupilOffset || 0)}
+            cy={8 + ((eyeState.pupilY || 0) * 0.5)}
+            rx={3}
+            ry={3}
+            fill="#3a3a3a"
+            animate={{ 
+              cx: 8 + (pupilOffset || 0), 
+              cy: 8 + ((eyeState.pupilY || 0) * 0.5) 
+            }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           />
-          <circle cx={9 + pupilOffset} cy={6 + eyeState.pupilY * 0.3} r="1.2" fill="white" />
+          <motion.circle 
+            cx={9 + (pupilOffset || 0)} 
+            cy={6 + ((eyeState.pupilY || 0) * 0.3)} 
+            r={1.2} 
+            fill="white" 
+          />
         </svg>
         )}
       </motion.div>
@@ -81,13 +94,25 @@ const TulipEyes = ({ state, cursorAngle, size = 1 }) => {
           </svg>
         ) : (
         <svg width="14" height={eyeState.squint ? 8 : 14} viewBox="0 0 16 16">
-          <ellipse cx="8" cy="8" rx="6" ry={eyeState.squint ? 3 : 6} fill="white" stroke="#3a3a3a" strokeWidth="1.2" />
+          <ellipse cx={8} cy={8} rx={6} ry={eyeState.squint ? 3 : 6} fill="white" stroke="#3a3a3a" strokeWidth="1.2" />
           <motion.ellipse 
-            cx="8" cy="8" rx="3" ry="3" fill="#3a3a3a"
-            animate={{ cx: 8 + pupilOffset, cy: 8 + eyeState.pupilY * 0.5 }}
+            cx={8 + (pupilOffset || 0)}
+            cy={8 + ((eyeState.pupilY || 0) * 0.5)}
+            rx={3}
+            ry={3}
+            fill="#3a3a3a"
+            animate={{ 
+              cx: 8 + (pupilOffset || 0), 
+              cy: 8 + ((eyeState.pupilY || 0) * 0.5) 
+            }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           />
-          <circle cx={9 + pupilOffset} cy={6 + eyeState.pupilY * 0.3} r="1.2" fill="white" />
+          <motion.circle 
+            cx={9 + (pupilOffset || 0)} 
+            cy={6 + ((eyeState.pupilY || 0) * 0.3)} 
+            r={1.2} 
+            fill="white" 
+          />
         </svg>
         )}
       </motion.div>

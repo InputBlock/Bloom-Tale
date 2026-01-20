@@ -7,6 +7,7 @@ import DeliveryDetails from "./DeliveryDetails"
 import OrderSummary from "./OrderSummary"
 import Payment from "./Payment"
 import { useCart } from "../../context/CartContext"
+import { orderAPI } from "../../api"
 
 export default function Checkout() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -42,21 +43,14 @@ export default function Checkout() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleDeliverySubmit = async (orderId) => {
-    setOrderId(orderId)
+  const handleDeliverySubmit = async (newOrderId) => {
+    setOrderId(newOrderId)
     
     // Fetch order details
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/v1/order/${orderId}/orderSummary`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-      })
+      const { response, data } = await orderAPI.getSummary(newOrderId)
 
       if (response.ok) {
-        const data = await response.json()
         setOrderDetails(data.data)
       }
     } catch (error) {
@@ -236,7 +230,11 @@ export default function Checkout() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[#5e6043]">Shipping</span>
-                      <span className="text-[#3e4026] font-medium">Free</span>
+                      <span className="text-[#3e4026] font-medium">
+                        {(orderDetails?.deliveryFee || 0) > 0 
+                          ? `₹${orderDetails.deliveryFee.toLocaleString('en-IN')}` 
+                          : 'Free'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[#5e6043]">Tax</span>
@@ -248,7 +246,7 @@ export default function Checkout() {
                     <div className="flex justify-between items-center">
                       <span className="text-base font-semibold text-[#3e4026]">Total</span>
                       <span className="text-xl font-bold text-[#3e4026]">
-                        ₹{(orderDetails?.totalAmount || cartTotal).toLocaleString('en-IN')}
+                        ₹{((orderDetails?.totalAmount || cartTotal) + (orderDetails?.deliveryFee || 0)).toLocaleString('en-IN')}
                       </span>
                     </div>
                   </div>

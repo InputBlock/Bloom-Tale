@@ -1,8 +1,7 @@
 import { motion, useInView } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
 import { Heart, Sparkles, Gift, Play, Pause } from "lucide-react"
-
-const API_URL = import.meta.env.VITE_API_URL || ""
+import { contentAPI } from "../../api"
 
 export default function CategoryShowcase() {
   const sectionRef = useRef(null)
@@ -23,8 +22,7 @@ export default function CategoryShowcase() {
   useEffect(() => {
     const fetchHeroData = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/v1/admin/hero`)
-        const result = await response.json()
+        const { response, data: result } = await contentAPI.getHeroSections()
         // Handle ApiResponse format: { statusCode, data, message }
         const sections = result.data || result
         if (sections && sections.length > 0) {

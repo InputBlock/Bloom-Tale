@@ -25,7 +25,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Delivery address is required");
   }
 
-  const cart = await Cart.findOne({ user: userId });
+  const cart = await Cart.findOne({ user: userId }).populate('items.product', 'name images_uri');
   if (!cart || cart.items.length === 0) {
     throw new ApiError(400, "Cart is empty");
   }
@@ -75,12 +75,15 @@ export const createOrder = asyncHandler(async (req, res) => {
     customerEmail: user.email || address.email || "N/A",
     customerPhone: address.mobile || user.mobile || "N/A",
     items: cart.items.map((item) => ({
-      product: item.product,
+      product: item.product?._id || item.product,
       product_id: item.product_id,
-      name: item.name,
+      productName: item.isCombo ? item.comboName : (item.product?.name || item.comboName || "Product"),
+      productImage: !item.isCombo && item.product?.images_uri?.[0] ? item.product.images_uri[0] : null,
+      size: item.size || null,
       quantity: item.quantity,
       price: item.price,
-      isCombo: item.isCombo,
+      isCombo: item.isCombo || false,
+      comboName: item.comboName || null,
       combo_items: item.isCombo ? item.combo_items : undefined,
       subtotal: item.subtotal,
       discount: item.discount,
@@ -90,12 +93,13 @@ export const createOrder = asyncHandler(async (req, res) => {
     deliveryType: finalDeliveryType,
     deliveryFee: finalDeliveryFee,
     deliverySlot: finalDeliverySlot,
+    deliveryPincode: cartPincode || address.pincode || null,
     totalAmount,
     status: "PENDING", // payment not done yet
     paymentMethod: null,
   });
 
-  // // 🧹 Clear cart
+  // //  Clear cart
   // await Cart.findOneAndUpdate({ user: userId }, { items: [] });
 
   return res

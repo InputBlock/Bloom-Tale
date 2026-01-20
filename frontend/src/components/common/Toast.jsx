@@ -13,35 +13,39 @@ export default function Toast({ message, type = "success", onClose, duration = 3
   const configs = {
     success: {
       icon: CheckCircle,
-      bgColor: "bg-gradient-to-r from-green-50 to-emerald-50",
-      borderColor: "border-green-200",
-      iconColor: "text-green-500",
-      textColor: "text-green-800",
-      emoji: "🌸"
+      bgColor: "bg-white",
+      borderColor: "border-[#6B7C59]",
+      iconColor: "text-[#6B7C59]",
+      iconBg: "bg-[#6B7C59]/10",
+      textColor: "text-gray-800",
+      progressBar: "bg-[#6B7C59]"
     },
     error: {
       icon: XCircle,
-      bgColor: "bg-gradient-to-r from-red-50 to-rose-50",
-      borderColor: "border-red-200",
-      iconColor: "text-red-500",
-      textColor: "text-red-800",
-      emoji: "🥀"
+      bgColor: "bg-white",
+      borderColor: "border-rose-500",
+      iconColor: "text-rose-600",
+      iconBg: "bg-rose-50",
+      textColor: "text-gray-800",
+      progressBar: "bg-rose-500"
     },
     info: {
       icon: Info,
-      bgColor: "bg-gradient-to-r from-blue-50 to-sky-50",
-      borderColor: "border-blue-200",
-      iconColor: "text-blue-500",
-      textColor: "text-blue-800",
-      emoji: "🌼"
+      bgColor: "bg-white",
+      borderColor: "border-blue-500",
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-50",
+      textColor: "text-gray-800",
+      progressBar: "bg-blue-500"
     },
     loading: {
       icon: Loader2,
-      bgColor: "bg-gradient-to-r from-purple-50 to-pink-50",
-      borderColor: "border-purple-200",
-      iconColor: "text-purple-500",
-      textColor: "text-purple-800",
-      emoji: "🌺"
+      bgColor: "bg-white",
+      borderColor: "border-gray-400",
+      iconColor: "text-gray-600",
+      iconBg: "bg-gray-50",
+      textColor: "text-gray-800",
+      progressBar: "bg-gray-400"
     }
   }
 
@@ -50,30 +54,28 @@ export default function Toast({ message, type = "success", onClose, duration = 3
 
   return (
     <div className="animate-slide-in-right">
-      <div className={`${config.bgColor} ${config.borderColor} border-2 rounded-2xl shadow-2xl p-4 min-w-[320px] max-w-md backdrop-blur-sm`}>
+      <div className={`${config.bgColor} ${config.borderColor} border shadow-lg p-4 min-w-[340px] rounded-md`}>
         <div className="flex items-start gap-3">
-          <div className={`${config.iconColor} flex-shrink-0 ${type === 'loading' ? 'animate-spin' : 'animate-bounce'}`}>
-            <Icon size={24} />
+          <div className={`${config.iconBg} ${config.iconColor} flex-shrink-0 rounded p-2 ${type === 'loading' ? 'animate-spin' : ''}`}>
+            <Icon size={20} strokeWidth={2.5} />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-2xl">{config.emoji}</span>
-              <p className={`${config.textColor} font-medium text-sm leading-relaxed`}>
-                {message}
-              </p>
-            </div>
+          <div className="flex-1 min-w-0">
+            <p className={`${config.textColor} font-medium text-sm leading-relaxed`}>
+              {message}
+            </p>
           </div>
           <button
             onClick={onClose}
-            className={`${config.textColor} hover:opacity-70 transition-opacity flex-shrink-0`}
+            className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 ml-2"
+            aria-label="Close notification"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className="mt-2 h-1 bg-white/30 rounded-full overflow-hidden">
-          <div className={`h-full ${config.iconColor} bg-current animate-progress`} style={{ animationDuration: `${duration}ms` }}></div>
+        <div className="mt-3 h-1 bg-gray-100 rounded-sm overflow-hidden">
+          <div className={`h-full ${config.progressBar} animate-progress`} style={{ animationDuration: `${duration}ms` }}></div>
         </div>
       </div>
     </div>

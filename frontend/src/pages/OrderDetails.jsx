@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { ArrowLeft, Package, MapPin, Calendar, IndianRupee, ShoppingBag, Loader2, Truck, CheckCircle } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
+import { orderAPI } from "../api"
 
 export default function OrderDetails() {
   const { orderId } = useParams()
@@ -18,22 +19,9 @@ export default function OrderDetails() {
 
   const fetchOrderDetails = async () => {
     try {
-      const token = localStorage.getItem("token")
-      const headers = {
-        "Content-Type": "application/json",
-      }
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`
-      }
-
-      const response = await fetch("/api/v1/order/myOrder", {
-        method: "GET",
-        headers,
-        credentials: "include",
-      })
+      const { response, data } = await orderAPI.getMyOrders()
 
       if (response.ok) {
-        const data = await response.json()
         const ordersData = data.data || data.orders || data || []
         // Find the specific order
         const foundOrder = ordersData.find(o => o._id === orderId)
@@ -43,8 +31,7 @@ export default function OrderDetails() {
           setError("Order not found")
         }
       } else {
-        const errorData = await response.json()
-        setError(errorData.message || "Failed to fetch order details")
+        setError(data.message || "Failed to fetch order details")
       }
     } catch (err) {
       console.error("Error fetching order details:", err)

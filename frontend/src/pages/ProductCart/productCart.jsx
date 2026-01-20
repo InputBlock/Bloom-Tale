@@ -47,7 +47,11 @@ export default function ProductCart() {
     return 0
   })
 
-  const deliveryCharge = 25
+  // Calculate delivery charge from cart items (use max delivery charge among items)
+  const deliveryCharge = cartItems.reduce((maxCharge, item) => {
+    const itemCharge = item.delivery_charge || item.deliveryFee || 0
+    return Math.max(maxCharge, itemCharge)
+  }, 0)
   const totalAmount = getCartTotal() + deliveryCharge
 
   const handleQuantityChange = (product_id, currentQuantity, type) => {

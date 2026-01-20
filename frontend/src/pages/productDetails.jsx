@@ -6,6 +6,7 @@ import Footer from "../components/common/Footer"
 import ProductImages from "../components/productDetails/ProductImages"
 import ProductInfo from "../components/productDetails/ProductInfo"
 import ProductDetails from "../components/productDetails/ProductDetails"
+import { productsAPI } from "../api"
 
 export default function ProductDetailsPage() {
   const { productId } = useParams()
@@ -19,14 +20,7 @@ export default function ProductDetailsPage() {
         setLoading(true)
         setError(null)
         
-        const response = await fetch(`/api/v1/getProductDetail/${productId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        
-        const data = await response.json()
+        const { response, data } = await productsAPI.getDetails(productId)
         
         if (data.success && data.data) {
           setProduct(data.data)

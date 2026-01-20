@@ -5,6 +5,7 @@ import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
 import ComboSidebar from "../components/combo/ComboSidebar"
 import { useCombo } from "../context/ComboContext"
+import { productsAPI } from "../api"
 
 export default function ComboProductDetails() {
   const { id } = useParams()
@@ -40,11 +41,7 @@ export default function ComboProductDetails() {
   const fetchProduct = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/v1/getProductDetail/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      const data = await response.json()
+      const { response, data } = await productsAPI.getDetails(id)
       
       if (data.success && data.data) {
         setProduct(data.data)

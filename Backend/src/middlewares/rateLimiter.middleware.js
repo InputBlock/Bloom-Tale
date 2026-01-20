@@ -65,3 +65,5 @@ const orderLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+export { generalLimiter, authLimiter, otpLimiter, cartLimiter, orderLimiter };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { API_ENDPOINTS } from "../../config/api"
+import { heroAPI } from "../../api"
 
 export default function HeroSectionForm({ editingSection, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({
@@ -65,27 +65,16 @@ export default function HeroSectionForm({ editingSection, onSuccess, onCancel })
         formDataToSend.append("media", media)
       }
 
-      const url = editingSection
-        ? API_ENDPOINTS.UPDATE_HERO_SECTION(editingSection._id)
-        : API_ENDPOINTS.ADD_HERO_SECTION
-
-      const method = editingSection ? "PUT" : "POST"
-
-      const response = await fetch(url, {
-        method,
-        credentials: "include",
-        body: formDataToSend,
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to save hero section")
+      if (editingSection) {
+        await heroAPI.update(editingSection._id, formDataToSend)
+      } else {
+        await heroAPI.add(formDataToSend)
       }
 
       resetForm()
       onSuccess()
     } catch (err) {
-      setError(err.message)
+      setError(err.response?.data?.message || err.message || "Failed to save hero section")
     } finally {
       setLoading(false)
     }

@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { createContext, useContext, useState } from "react"
+import { cartAPI, authAPI } from "../api"
 
 const CartContext = createContext()
 
@@ -16,22 +16,9 @@ export const CartProvider = ({ children }) => {
   const [loading, setLoading] = useState(false)
   const [totalAmount, setTotalAmount] = useState(0)
 
-  // Get auth headers (token from localStorage for Google auth, cookies for normal login)
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token")
-    const headers = {
-      "Content-Type": "application/json",
-    }
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`
-    }
-    return headers
-  }
-
   // Check if user is logged in
   const isLoggedIn = () => {
-    const user = localStorage.getItem("user")
-    return !!user
+    return authAPI.isAuthenticated()
   }
 
   // Fetch cart from backend
@@ -44,13 +31,16 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true)
-      const response = await fetch("/api/v1/cart/getCart", {
-        method: "POST",
-        headers: getAuthHeaders(),
-        credentials: "include", // Important for cookies
-      })
+      const { response, data } = await cartAPI.get()
 
-      const data = await response.json()
+      // Check if response is 401/403 (token expired) - auto-handled by api utility
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          // Token expired - user will be redirected automatically
+          return
+        }
+        throw new Error(data.message || 'Failed to fetch cart')
+      }
 
       if (data.success && data.data.cart) {
         setCartItems(data.data.cart.items || [])
@@ -106,14 +96,16 @@ export const CartProvider = ({ children }) => {
         pincode: product.pincode || null,
       }
 
-      const response = await fetch("/api/v1/cart/addToCart", {
-        method: "POST",
-        headers: getAuthHeaders(),
-        credentials: "include",
-        body: JSON.stringify(requestBody),
-      })
+      const { response, data } = await cartAPI.add(requestBody)
 
-      const data = await response.json()
+      // Check for auth errors (auto-handled by api utility)
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          // Token expired - user will be redirected automatically
+          return { success: false, message: "Session expired. Please login again." }
+        }
+        return { success: false, message: data.message || "Failed to add to cart" }
+      }
 
       if (data.success) {
         // Refresh cart after adding

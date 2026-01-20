@@ -6,6 +6,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom"
 import { useCart } from "../../context/CartContext"
 import { motion, AnimatePresence } from "framer-motion"
 import SearchBar from "./SearchBar"
+import { logout } from "../../utils/api"
 
 export default function Header() {
   const navigate = useNavigate()
@@ -60,25 +61,18 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/v1/logout", {
-        method: "POST",
-        credentials: "include",
-      })
-      
-      localStorage.removeItem("user")
-      localStorage.removeItem("token")
-      clearCart()
-      navigate("/home")
-      window.location.reload()
+      clearCart();
+      await logout(); // Uses centralized logout from api.js
+      // No need for manual cleanup or navigation - handled by logout()
     } catch (error) {
-      console.error("Logout error:", error)
-      localStorage.removeItem("user")
-      localStorage.removeItem("token")
-      clearCart()
-      navigate("/home")
-      window.location.reload()
+      // Fallback: still clear and redirect even if API fails
+      clearCart();
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      navigate("/home");
+      window.location.reload();
     }
-  }
+  };
 
   const getFirstLetter = () => {
     return userEmail ? userEmail.charAt(0).toUpperCase() : "U"

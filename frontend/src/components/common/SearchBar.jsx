@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { Search, ChevronDown } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
+import { productsAPI } from "../../api"
 
 export default function SearchBar({ scrolled, isHomePage }) {
   const navigate = useNavigate()
@@ -15,11 +16,7 @@ export default function SearchBar({ scrolled, isHomePage }) {
     // Fetch all products for search suggestions
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/v1/getProduct/list', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        })
-        const data = await response.json()
+        const { response, data } = await productsAPI.getList()
         if (data.success && data.data) {
           setAllProducts(data.data)
         }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import Rose from "./Rose";
 import Daisy from "./Daisy";
@@ -8,7 +9,13 @@ import Butterfly from "./Butterfly";
 import { SparkleGroup } from "./Sparkle";
 
 // Background grass blades - Softer muted greens
-const GrassBlade = ({ x, delay = 0, height = 40, colorIndex = 0 }) => {
+const GrassBlade = ({ x = 0, delay = 0, height = 40, colorIndex = 0 }) => {
+  // Validate inputs
+  const validX = typeof x === 'number' && !isNaN(x) ? x : 0;
+  const validHeight = typeof height === 'number' && !isNaN(height) && height > 0 ? height : 40;
+  const validDelay = typeof delay === 'number' && !isNaN(delay) ? delay : 0;
+  const validColorIndex = typeof colorIndex === 'number' && !isNaN(colorIndex) ? colorIndex : 0;
+  
   // Predefined grass colors - softer pastel greens
   const grassColors = [
     "hsl(115, 40%, 45%)", "hsl(120, 38%, 47%)", "hsl(118, 42%, 43%)",
@@ -20,16 +27,16 @@ const GrassBlade = ({ x, delay = 0, height = 40, colorIndex = 0 }) => {
   return (
     <motion.div
       className="absolute bottom-0"
-      style={{ left: `${x}%` }}
+      style={{ left: `${validX}%` }}
       initial={{ scaleY: 0 }}
       animate={{ scaleY: 1 }}
-      transition={{ duration: 0.5, delay }}
+      transition={{ duration: 0.5, delay: validDelay }}
     >
-      <svg width="8" height={height} viewBox={`0 0 8 ${height}`}>
+      <svg width={8} height={validHeight} viewBox={`0 0 8 ${validHeight}`}>
         <path 
-          d={`M4 ${height} Q2 ${height * 0.6} 3 ${height * 0.3} Q4 0 4 0 Q4 0 5 ${height * 0.3} Q6 ${height * 0.6} 4 ${height}`}
-          fill={grassColors[colorIndex % grassColors.length]}
-          opacity="0.85"
+          d={`M4 ${validHeight} Q2 ${validHeight * 0.6} 3 ${validHeight * 0.3} Q4 0 4 0 Q4 0 5 ${validHeight * 0.3} Q6 ${validHeight * 0.6} 4 ${validHeight}`}
+          fill={grassColors[validColorIndex % grassColors.length]}
+          opacity={0.85}
         />
       </svg>
     </motion.div>
@@ -37,64 +44,84 @@ const GrassBlade = ({ x, delay = 0, height = 40, colorIndex = 0 }) => {
 };
 
 // Static background flowers (small, decorative)
-const SmallFlower = ({ x, y, color = "#ffb6c1", size = 12 }) => (
-  <div className="absolute" style={{ left: `${x}%`, bottom: `${y}px` }}>
-    <svg width={size} height={size} viewBox="0 0 20 20">
-      {[0, 72, 144, 216, 288].map((angle, i) => (
-        <ellipse 
-          key={i} 
-          cx="10" cy="5" rx="3" ry="4" 
-          fill={color} 
-          transform={`rotate(${angle} 10 10)`}
-          opacity="0.8"
-        />
-      ))}
-      <circle cx="10" cy="10" r="2.5" fill="#ffe066" />
-    </svg>
-  </div>
-);
+const SmallFlower = ({ x, y, color = "#ffb6c1", size = 12 }) => {
+  // Ensure all props have valid default values
+  const validX = typeof x === 'number' && !isNaN(x) ? x : 0;
+  const validY = typeof y === 'number' && !isNaN(y) ? y : 0;
+  const validSize = typeof size === 'number' && !isNaN(size) && size > 0 ? size : 12;
+  const validColor = color || "#ffb6c1";
+
+  return (
+    <div className="absolute" style={{ left: `${validX}%`, bottom: `${validY}px` }}>
+      <svg width={validSize} height={validSize} viewBox="0 0 20 20">
+        {[0, 72, 144, 216, 288].map((angle, i) => (
+          <ellipse 
+            key={i} 
+            cx={10} 
+            cy={5} 
+            rx={3} 
+            ry={4} 
+            fill={validColor} 
+            transform={`rotate(${angle} 10 10)`}
+            opacity={0.8}
+          />
+        ))}
+        <circle cx={10} cy={10} r={2.5} fill="#ffe066" />
+      </svg>
+    </div>
+  );
+};
 
 // Decorative mushroom
-const Mushroom = ({ x, flip = false }) => (
-  <motion.div 
-    className="absolute bottom-0" 
-    style={{ left: `${x}%`, transform: flip ? "scaleX(-1)" : "none" }}
-    initial={{ scale: 0, y: 10 }}
-    animate={{ scale: 1, y: 0 }}
-    transition={{ duration: 0.4, delay: 0.3 }}
-  >
-    <svg width="25" height="30" viewBox="0 0 25 30">
-      {/* Stem */}
-      <rect x="9" y="18" width="7" height="12" rx="2" fill="#f5e6d3" />
-      {/* Cap */}
-      <ellipse cx="12.5" cy="16" rx="12" ry="10" fill="#e07a5f" />
-      {/* Spots */}
-      <circle cx="8" cy="13" r="2" fill="#f5e6d3" opacity="0.8" />
-      <circle cx="15" cy="11" r="1.5" fill="#f5e6d3" opacity="0.8" />
-      <circle cx="11" cy="18" r="1" fill="#f5e6d3" opacity="0.8" />
-    </svg>
-  </motion.div>
-);
+const Mushroom = ({ x, flip = false }) => {
+  const validX = typeof x === 'number' && !isNaN(x) ? x : 0;
+  
+  return (
+    <motion.div 
+      className="absolute bottom-0" 
+      style={{ left: `${validX}%`, transform: flip ? "scaleX(-1)" : "none" }}
+      initial={{ scale: 0, y: 10 }}
+      animate={{ scale: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.3 }}
+    >
+      <svg width={25} height={30} viewBox="0 0 25 30">
+        {/* Stem */}
+        <rect x={9} y={18} width={7} height={12} rx={2} fill="#f5e6d3" />
+        {/* Cap */}
+        <ellipse cx={12.5} cy={16} rx={12} ry={10} fill="#e07a5f" />
+        {/* Spots */}
+        <circle cx={8} cy={13} r={2} fill="#f5e6d3" opacity={0.8} />
+        <circle cx={15} cy={11} r={1.5} fill="#f5e6d3" opacity={0.8} />
+        <circle cx={11} cy={18} r={1} fill="#f5e6d3" opacity={0.8} />
+      </svg>
+    </motion.div>
+  );
+};
 
 // Small ladybug
-const Ladybug = ({ x, y }) => (
-  <motion.div 
-    className="absolute" 
-    style={{ left: `${x}%`, bottom: `${y}px` }}
-    animate={{ x: [0, 3, -2, 0], rotate: [0, 5, -5, 0] }}
-    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-  >
-    <svg width="12" height="10" viewBox="0 0 12 10">
-      <ellipse cx="6" cy="5" rx="5" ry="4" fill="#e53935" />
-      <line x1="6" y1="1" x2="6" y2="9" stroke="#222" strokeWidth="0.8" />
-      <circle cx="3.5" cy="4" r="1" fill="#222" />
-      <circle cx="8.5" cy="4" r="1" fill="#222" />
-      <circle cx="5" cy="6.5" r="0.8" fill="#222" />
-      <circle cx="7" cy="6.5" r="0.8" fill="#222" />
-      <circle cx="6" cy="1.5" r="1.5" fill="#222" />
-    </svg>
-  </motion.div>
-);
+const Ladybug = ({ x, y }) => {
+  const validX = typeof x === 'number' && !isNaN(x) ? x : 0;
+  const validY = typeof y === 'number' && !isNaN(y) ? y : 0;
+  
+  return (
+    <motion.div 
+      className="absolute" 
+      style={{ left: `${validX}%`, bottom: `${validY}px` }}
+      animate={{ x: [0, 3, -2, 0], rotate: [0, 5, -5, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+    >
+      <svg width={12} height={10} viewBox="0 0 12 10">
+        <ellipse cx={6} cy={5} rx={5} ry={4} fill="#e53935" />
+        <line x1={6} y1={1} x2={6} y2={9} stroke="#222" strokeWidth={0.8} />
+        <circle cx={3.5} cy={4} r={1} fill="#222" />
+        <circle cx={8.5} cy={4} r={1} fill="#222" />
+        <circle cx={5} cy={6.5} r={0.8} fill="#222" />
+        <circle cx={7} cy={6.5} r={0.8} fill="#222" />
+        <circle cx={6} cy={1.5} r={1.5} fill="#222" />
+      </svg>
+    </motion.div>
+  );
+};
 
 // Orchestrates all flower animations based on login form state
 const FlowerScene = ({ 
@@ -180,10 +207,10 @@ const FlowerScene = ({
         animate={{ x: [0, 20, 0] }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       >
-        <svg width="120" height="40" viewBox="0 0 120 40">
-          <ellipse cx="30" cy="25" rx="25" ry="15" fill="white" />
-          <ellipse cx="55" cy="20" rx="30" ry="18" fill="white" />
-          <ellipse cx="85" cy="25" rx="25" ry="14" fill="white" />
+        <svg width={120} height={40} viewBox="0 0 120 40">
+          <ellipse cx={30} cy={25} rx={25} ry={15} fill="white" />
+          <ellipse cx={55} cy={20} rx={30} ry={18} fill="white" />
+          <ellipse cx={85} cy={25} rx={25} ry={14} fill="white" />
         </svg>
       </motion.div>
 
@@ -192,10 +219,10 @@ const FlowerScene = ({
         animate={{ x: [0, 30, 0] }}
         transition={{ duration: 25, repeat: Infinity, ease: "linear", delay: 2 }}
       >
-        <svg width="100" height="35" viewBox="0 0 100 35">
-          <ellipse cx="25" cy="22" rx="22" ry="13" fill="white" />
-          <ellipse cx="50" cy="18" rx="25" ry="15" fill="white" />
-          <ellipse cx="75" cy="22" rx="20" ry="12" fill="white" />
+        <svg width={100} height={35} viewBox="0 0 100 35">
+          <ellipse cx={25} cy={22} rx={22} ry={13} fill="white" />
+          <ellipse cx={50} cy={18} rx={25} ry={15} fill="white" />
+          <ellipse cx={75} cy={22} rx={20} ry={12} fill="white" />
         </svg>
       </motion.div>
 
@@ -262,8 +289,14 @@ const FlowerScene = ({
         <motion.div
           className="relative -mr-6"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          animate={{ 
+            opacity: 1, 
+            y: [0, -4, 0],
+          }}
+          transition={{ 
+            opacity: { duration: 0.6, delay: 0.5 },
+            y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+          }}
         >
           <LeafCompanion 
             cursorAngle={cursorAngle} 
@@ -275,8 +308,16 @@ const FlowerScene = ({
         <motion.div
           className="relative -mr-4 z-10"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          animate={{ 
+            opacity: 1, 
+            y: [0, -6, 0],
+            rotate: [0, 2, 0, -2, 0]
+          }}
+          transition={{ 
+            opacity: { duration: 0.6, delay: 0.3 },
+            y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 },
+            rotate: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }
+          }}
         >
           <Daisy 
             cursorAngle={cursorAngle} 
@@ -288,8 +329,16 @@ const FlowerScene = ({
         <motion.div
           className="relative z-20"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0 }}
+          animate={{ 
+            opacity: 1, 
+            y: [0, -8, 0],
+            scale: [1, 1.02, 1]
+          }}
+          transition={{ 
+            opacity: { duration: 0.7, delay: 0 },
+            y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+          }}
         >
           <Rose 
             cursorAngle={cursorAngle} 
@@ -301,8 +350,16 @@ const FlowerScene = ({
         <motion.div
           className="relative -ml-4 z-10"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          animate={{ 
+            opacity: 1, 
+            y: [0, -5, 0],
+            rotate: [0, -2, 0, 2, 0]
+          }}
+          transition={{ 
+            opacity: { duration: 0.6, delay: 0.4 },
+            y: { duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 },
+            rotate: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+          }}
         >
           <Tulip 
             cursorAngle={cursorAngle} 

@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router-dom"
 import { weddingServicesData, weddingGalleryData } from "./WeddingServices"
 import { socialServicesData, socialGalleryData } from "./SocialEvents"
 import { corporateServicesData, corporateGalleryData } from "./CorporateEvents"
+import { enquiryAPI } from "../../api"
 
 export default function Services() {
   const [searchParams] = useSearchParams()
@@ -101,23 +102,16 @@ export default function Services() {
     setIsSubmitting(true)
     
     try {
-      const response = await fetch("http://localhost:8000/api/v1/enquiry/createEnquiry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          subject: formData.subject,
-          message: formData.message,
-          service: selectedService?.title
-        }),
+      const { response, data } = await enquiryAPI.submit({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+        service: selectedService?.title
       })
 
       if (response.ok) {
-        const data = await response.json()
         setIsSubmitting(false)
         setIsSuccess(true)
         
