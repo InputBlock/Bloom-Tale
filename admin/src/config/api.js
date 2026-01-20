@@ -24,7 +24,10 @@ export const API_ENDPOINTS = {
   UPDATE_ORDER_STATUS: (id) => `${API_BASE_URL}/api/v1/admin/orders/${id}/status`,
   
   // Users
-  GET_USERS: `${API_BASE_URL}/api/v1/admin/user_list`,
+  GET_USERS: `${API_BASE_URL}/api/v1/admin/users`,
+  GET_USER_STATS: `${API_BASE_URL}/api/v1/admin/users/stats`,
+  GET_USER_BY_ID: (id) => `${API_BASE_URL}/api/v1/admin/users/${id}`,
+  DELETE_USER: (id) => `${API_BASE_URL}/api/v1/admin/users/${id}`,
   
   // Hero Sections
   GET_HERO_SECTIONS: `${API_BASE_URL}/api/v1/admin/hero`,
