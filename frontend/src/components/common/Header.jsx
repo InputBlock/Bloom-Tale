@@ -179,17 +179,17 @@ export default function Header() {
           </nav>
 
           {/* Right Icons */}
-          <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0 ml-auto">
 
             {/* Cart */}
             <button 
               onClick={handleCartClick}
-              className={`relative p-2.5 md:p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
+              className={`relative p-2 hover:bg-white/10 rounded-full transition-all duration-300 ${iconColor}`}
               aria-label="Cart"
             >
-              <ShoppingCart size={22} className="md:w-5 md:h-5" strokeWidth={1.5} />
+              <ShoppingCart size={20} strokeWidth={1.8} />
               {getCartCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#3e4026] text-white text-[10px] md:text-[10px] w-5 h-5 md:w-5 md:h-5 flex items-center justify-center rounded-full font-semibold">
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                   {getCartCount()}
                 </span>
               )}
@@ -205,15 +205,17 @@ export default function Header() {
                     setShowLogout(!showLogout)
                   }
                 }}
-                className={`p-2.5 md:p-2 ${iconColor} hover:opacity-70 transition-all duration-300`}
+                className={`hover:opacity-80 transition-all duration-300`}
                 aria-label="Account"
               >
                 {isLoggedIn() ? (
-                  <div className="w-9 h-9 md:w-9 md:h-9 rounded-full bg-[#3e4026] flex items-center justify-center text-white text-sm font-medium border-2 border-white shadow-md">
+                  <div className="w-8 h-8 rounded-full bg-[#3e4026] flex items-center justify-center text-white text-sm font-semibold border-2 border-current shadow-sm">
                     {getFirstLetter()}
                   </div>
                 ) : (
-                  <User size={22} className="md:w-5 md:h-5" strokeWidth={1.5} />
+                  <div className={`p-2 hover:bg-white/10 rounded-full transition-all duration-300 ${iconColor}`}>
+                    <User size={20} strokeWidth={1.8} />
+                  </div>
                 )}
               </button>
               
@@ -256,10 +258,10 @@ export default function Header() {
             {/* Mobile Menu Toggle */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`md:hidden p-2.5 ${iconColor} hover:opacity-70 transition-all duration-300`}
+              className={`md:hidden p-2 hover:bg-white/10 rounded-full transition-all duration-300 ${iconColor}`}
               aria-label="Menu"
             >
-              {mobileMenuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
+              {mobileMenuOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
             </button>
           </div>
         </div>
@@ -274,13 +276,13 @@ export default function Header() {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-white border-t shadow-lg"
           >
-            <nav className="max-w-7xl mx-auto px-4 py-4">
+            <nav className="max-w-7xl mx-auto px-4 py-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block py-4 px-3 text-[#3e4026] text-base font-medium border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors"
+                  className="block py-3 px-3 text-[#3e4026] text-base font-medium border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors"
                 >
                   {link.name}
                 </Link>

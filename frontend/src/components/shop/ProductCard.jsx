@@ -14,6 +14,12 @@ export default function ProductCard({
 }) {
   const isHovered = hoveredId === product._id
 
+  const handleClick = (e) => {
+    // Ensure click works on both desktop and mobile
+    e.preventDefault()
+    onClick?.(product.product_id, product)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -21,8 +27,16 @@ export default function ProductCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       onMouseEnter={() => onHover?.(product._id)}
       onMouseLeave={() => onLeave?.()}
-      onClick={() => onClick?.(product.product_id, product)}
-      className="group cursor-pointer"
+      onClick={handleClick}
+      onTouchEnd={(e) => {
+        // Handle touch events for mobile
+        if (e.cancelable) {
+          e.preventDefault()
+        }
+        handleClick(e)
+      }}
+      className="group cursor-pointer touch-manipulation"
+      style={{ WebkitTapHighlightColor: 'transparent' }}
     >
       {/* Product Image */}
       <div className="relative overflow-hidden mb-3 sm:mb-4 aspect-[3/4] bg-[#f9f8f6] rounded-sm">
