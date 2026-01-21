@@ -39,6 +39,11 @@ export default function SearchBar({ scrolled, isHomePage }) {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Don't handle click outside when mobile overlay is expanded
+      // Mobile overlay has its own navigation handling
+      if (isExpanded) {
+        return
+      }
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowSearchSuggestions(false)
       }
@@ -46,7 +51,7 @@ export default function SearchBar({ scrolled, isHomePage }) {
 
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  }, [isExpanded])
 
   const handleExpandSearch = () => {
     setIsExpanded(true)
@@ -163,7 +168,7 @@ export default function SearchBar({ scrolled, isHomePage }) {
             transition={{ duration: 0.15 }}
             className="md:hidden fixed inset-0 bg-white z-50"
           >
-            <div className="flex items-center gap-3 p-4 border-b border-gray-200" ref={searchRef}>
+            <div className="flex items-center gap-3 p-4 border-b border-gray-200">
               <button
                 onClick={handleCollapseSearch}
                 className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -199,57 +204,105 @@ export default function SearchBar({ scrolled, isHomePage }) {
                   Search Results
                 </h4>
                 {searchSuggestions.map((suggestion, index) => (
-                  <button
+                  <div
                     key={index}
+                    role="button"
+                    tabIndex={0}
+                    onTouchEnd={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      // Get navigation path
+                      let path = ''
+                      if (suggestion.type === 'product' && suggestion.productId) {
+                        path = `/product/${suggestion.productId}`
+                      } else if (suggestion.type === 'product') {
+                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                      } else if (suggestion.type === 'category') {
+                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                      } else if (suggestion.type === 'price') {
+                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                      }
+                      // Close overlay first
+                      setIsExpanded(false)
+                      setShowSearchSuggestions(false)
+                      setSearchQuery("")
+                      // Navigate immediately
+                      if (path) {
+                        navigate(path)
+                      }
+                    }}
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      handleSuggestionClick(suggestion)
+                      // Get navigation path
+                      let path = ''
+                      if (suggestion.type === 'product' && suggestion.productId) {
+                        path = `/product/${suggestion.productId}`
+                      } else if (suggestion.type === 'product') {
+                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                      } else if (suggestion.type === 'category') {
+                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                      } else if (suggestion.type === 'price') {
+                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                      }
+                      // Close overlay first
+                      setIsExpanded(false)
+                      setShowSearchSuggestions(false)
+                      setSearchQuery("")
+                      // Navigate immediately
+                      if (path) {
+                        navigate(path)
+                      }
                     }}
-                    type="button"
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-all duration-200 text-left border-b border-gray-100 last:border-0 cursor-pointer touch-manipulation"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleSuggestionClick(suggestion)
+                      }
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-all duration-200 text-left border-b border-gray-100 last:border-0 cursor-pointer select-none"
                   >
                     {suggestion.type === 'product' ? (
                       <>
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 pointer-events-none">
                           {suggestion.image ? (
-                            <img src={suggestion.image} alt="" className="w-full h-full object-cover" />
+                            <img src={suggestion.image} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 pointer-events-none">
                               <Search size={16} />
                             </div>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 pointer-events-none">
                           <p className="text-sm font-medium text-gray-900 truncate">{suggestion.text}</p>
                           <p className="text-xs text-gray-500 truncate">{suggestion.category}</p>
                         </div>
                         {suggestion.price && (
-                          <span className="text-sm font-semibold text-gray-900 flex-shrink-0">₹{suggestion.price}</span>
+                          <span className="text-sm font-semibold text-gray-900 flex-shrink-0 pointer-events-none">₹{suggestion.price}</span>
                         )}
                       </>
                     ) : suggestion.type === 'category' ? (
                       <>
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 pointer-events-none">
                           <ChevronDown size={18} className="text-gray-600 -rotate-90" />
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 pointer-events-none">
                           <p className="text-sm font-medium text-gray-900">{suggestion.text}</p>
                           <p className="text-xs text-gray-500">Category</p>
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 pointer-events-none">
                           <span className="text-gray-600 font-bold text-sm">₹</span>
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 pointer-events-none">
                           <p className="text-sm font-medium text-gray-900">{suggestion.text}</p>
                           <p className="text-xs text-gray-500">Price range</p>
                         </div>
                       </>
                     )}
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
