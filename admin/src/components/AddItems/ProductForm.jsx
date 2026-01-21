@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react"
-import { productsAPI } from "../../api"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
+
+// Mock API for demo
+const productsAPI = {
+  add: async (formData) => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    console.log('Form data:', Object.fromEntries(formData))
+    return { success: true }
+  }
+}
 
 // Categories that use single pricing (no sizes) - product_type: "simple"
 const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"]
 
-export default function ProductForm({ images, setImages }) {
+export default function ProductForm({ images = [], setImages = () => {} }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -17,8 +26,10 @@ export default function ProductForm({ images, setImages }) {
       medium: "",
       large: ""
     },
+    discount_percentage: "", // Discount percentage for display
     inStock: true,
     sameDayDelivery: false,
+    bestSeller: false, // NEW: Best Seller field
     isActive: true,
   })
   const [loading, setLoading] = useState(false)
@@ -58,6 +69,7 @@ export default function ProductForm({ images, setImages }) {
       formDataToSend.append("category", formData.type)
       formDataToSend.append("stock", formData.inStock ? 100 : 0)
       formDataToSend.append("same_day_delivery", formData.sameDayDelivery)
+      formDataToSend.append("bestSeller", formData.bestSeller) // NEW: Include bestSeller
       formDataToSend.append("is_active", formData.isActive)
       
       // Send price or pricing based on category
@@ -68,6 +80,9 @@ export default function ProductForm({ images, setImages }) {
         // For other categories - send pricing object
         formDataToSend.append("pricing", JSON.stringify(formData.pricing))
       }
+      
+      // Send discount percentage
+      formDataToSend.append("discount_percentage", formData.discount_percentage || 0)
       
       // Append all image files - first image will be the main image
       if (images.length > 0) {
@@ -92,8 +107,10 @@ export default function ProductForm({ images, setImages }) {
           medium: "",
           large: ""
         },
+        discount_percentage: "",
         inStock: true,
         sameDayDelivery: false,
+        bestSeller: false, // Reset bestSeller
         isActive: true,
       })
       // Clear images
@@ -310,6 +327,56 @@ export default function ProductForm({ images, setImages }) {
         )}
       </div>
 
+      {/* Discount Percentage Field */}
+      <div>
+        <label className="block text-gray-900 font-medium mb-2">
+          Discount Percentage <span className="text-gray-500 text-sm font-normal">(Optional)</span>
+        </label>
+        <div className="relative max-w-md">
+          <input
+            type="number"
+            value={formData.discount_percentage}
+            onChange={(e) => {
+              const value = e.target.value === "" ? "" : Math.min(100, Math.max(0, parseFloat(e.target.value) || 0))
+              setFormData({ ...formData, discount_percentage: value })
+            }}
+            placeholder="0"
+            min="0"
+            max="100"
+            step="1"
+            className="w-full pr-10 pl-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">%</span>
+        </div>
+        <p className="mt-2 text-sm text-gray-500">
+          Enter discount percentage to show as crossed-out original price (0-100%). Leave at 0 for no discount display.
+        </p>
+        {formData.discount_percentage > 0 && (
+          <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+            <p className="text-sm font-medium text-blue-900 mb-1">💡 Preview:</p>
+            {SINGLE_PRICE_CATEGORIES.includes(formData.type) ? (
+              formData.price && (
+                <p className="text-sm text-blue-800">
+                  Customer will see: <span className="line-through text-gray-500">₹{(parseFloat(formData.price) * (1 + parseFloat(formData.discount_percentage) / 100)).toFixed(0)}</span>{" "}
+                  <strong className="text-green-700">₹{parseFloat(formData.price).toFixed(0)}</strong>{" "}
+                  <span className="text-green-600 font-semibold">({formData.discount_percentage}% OFF)</span>
+                </p>
+              )
+            ) : (
+              <p className="text-sm text-blue-800">
+                Customer will see all size prices with <strong>{formData.discount_percentage}% markup</strong> crossed out
+                {formData.pricing.medium && (
+                  <span className="block mt-1">
+                    Example (Medium): <span className="line-through text-gray-500">₹{(parseFloat(formData.pricing.medium) * (1 + parseFloat(formData.discount_percentage) / 100)).toFixed(0)}</span>{" "}
+                    <strong className="text-green-700">₹{parseFloat(formData.pricing.medium).toFixed(0)}</strong>
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
           <label htmlFor="isActive" className="text-gray-900 font-medium cursor-pointer select-none">
@@ -326,6 +393,7 @@ export default function ProductForm({ images, setImages }) {
             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
           </label>
         </div>
+        
         <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <input
             type="checkbox"
@@ -338,6 +406,7 @@ export default function ProductForm({ images, setImages }) {
             In Stock
           </label>
         </div>
+        
         <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <input
             type="checkbox"
@@ -348,6 +417,28 @@ export default function ProductForm({ images, setImages }) {
           />
           <label htmlFor="sameDayDelivery" className="text-gray-900 font-medium cursor-pointer select-none">
             Same Day Delivery Available
+          </label>
+        </div>
+
+        {/* NEW: Best Seller Toggle */}
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border-2 border-amber-200">
+          <div className="flex items-center gap-2">
+            <label htmlFor="bestSeller" className="text-gray-900 font-medium cursor-pointer select-none">
+              ⭐ Best Seller
+            </label>
+            <span className="text-xs text-amber-600 font-medium px-2 py-0.5 bg-amber-100 rounded-full">
+              Featured
+            </span>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              id="bestSeller"
+              checked={formData.bestSeller}
+              onChange={(e) => setFormData({ ...formData, bestSeller: e.target.checked })}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
           </label>
         </div>
       </div>

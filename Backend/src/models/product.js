@@ -23,6 +23,14 @@ const productSchema = new mongoose.Schema(
       medium : {type :Number, default: null},
       large : {type : Number, default: null}
     },
+    // Discount percentage for display purposes (shows as increased original price)
+    discount_percentage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+      description: "Discount percentage to show as original price increase for marketing"
+    },
     sizes: [String],
     bestSeller: { type: Boolean,default: false,
     },
