@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useGlobalPincode } from "../../context/PincodeContext"
 import { deliveryAPI } from "../../api"
+import { DELIVERY_CONSTANTS } from "../../constants/delivery"
 
 export default function DeliveryCheck({ 
   onDeliveryStatusChange, 
   sameDayDelivery = false,
   productPrice = 0 
 }) {
-  // Free delivery for orders >= 1500, otherwise ₹150
-  const STANDARD_DELIVERY_CHARGE = 150
-  const FREE_DELIVERY_THRESHOLD = 1500
+  // Use centralized delivery constants
+  const { STANDARD_DELIVERY_CHARGE, FREE_DELIVERY_THRESHOLD } = DELIVERY_CONSTANTS
   const isFreeDelivery = productPrice >= FREE_DELIVERY_THRESHOLD
 
   // Use global pincode context for session persistence

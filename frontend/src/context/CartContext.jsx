@@ -3,6 +3,47 @@ import { cartAPI, authAPI } from "../api"
 
 const CartContext = createContext()
 
+// Storage keys
+const CART_STORAGE_KEY = 'bloomtale_cart'
+const CART_TOTAL_KEY = 'bloomtale_cart_total'
+
+// Helper to get cached cart from storage
+const getCachedCart = () => {
+  try {
+    const cached = sessionStorage.getItem(CART_STORAGE_KEY)
+    return cached ? JSON.parse(cached) : []
+  } catch {
+    return []
+  }
+}
+
+const getCachedTotal = () => {
+  try {
+    const cached = sessionStorage.getItem(CART_TOTAL_KEY)
+    return cached ? parseFloat(cached) : 0
+  } catch {
+    return 0
+  }
+}
+
+// Save cart to storage
+const saveCartToStorage = (items, total) => {
+  try {
+    sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+    sessionStorage.setItem(CART_TOTAL_KEY, total.toString())
+  } catch (e) {
+    console.error('Failed to save cart to storage:', e)
+  }
+}
+
+// Clear cart from storage
+const clearCartStorage = () => {
+  try {
+    sessionStorage.removeItem(CART_STORAGE_KEY)
+    sessionStorage.removeItem(CART_TOTAL_KEY)
+  } catch {}
+}
+
 export const useCart = () => {
   const context = useContext(CartContext)
   if (!context) {
@@ -12,20 +53,27 @@ export const useCart = () => {
 }
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([])
+  // Initialize from cache - instant data on refresh!
+  const [cartItems, setCartItems] = useState(() => getCachedCart())
+  const [totalAmount, setTotalAmount] = useState(() => getCachedTotal())
   const [loading, setLoading] = useState(false)
-  const [totalAmount, setTotalAmount] = useState(0)
 
   // Check if user is logged in
   const isLoggedIn = () => {
     return authAPI.isAuthenticated()
   }
 
-  // Fetch cart from backend
+  // Update cart state and cache
+  const updateCartState = (items, total) => {
+    setCartItems(items)
+    setTotalAmount(total)
+    saveCartToStorage(items, total)
+  }
+
+  // Fetch cart from backend and sync with cache
   const fetchCart = async () => {
     if (!isLoggedIn()) {
-      setCartItems([])
-      setTotalAmount(0)
+      updateCartState([], 0)
       return
     }
 
@@ -33,36 +81,31 @@ export const CartProvider = ({ children }) => {
       setLoading(true)
       const { response, data } = await cartAPI.get()
 
-      // Check if response is 401/403 (token expired) - auto-handled by api utility
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
-          // Token expired - user will be redirected automatically
+          clearCartStorage()
           return
         }
         throw new Error(data.message || 'Failed to fetch cart')
       }
 
       if (data.success && data.data.cart) {
-        setCartItems(data.data.cart.items || [])
-        setTotalAmount(data.data.totalAmount || 0)
+        const items = data.data.cart.items || []
+        const total = data.data.totalAmount || 0
+        updateCartState(items, total)
       } else {
-        setCartItems([])
-        setTotalAmount(0)
+        updateCartState([], 0)
       }
     } catch (error) {
       console.error("Error fetching cart:", error)
-      setCartItems([])
-      setTotalAmount(0)
+      // Keep cached data on error - don't clear
     } finally {
       setLoading(false)
     }
   }
 
-  // Don't load cart automatically on mount - only when user accesses cart page or adds to cart
-
   const addToCart = async (product) => {
     if (!isLoggedIn()) {
-      // Redirect to login with return URL to come back after login
       const currentPath = window.location.pathname + window.location.search
       window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
       return { success: false, message: "Please login to add items to cart" }
@@ -145,12 +188,10 @@ export const CartProvider = ({ children }) => {
       const { response, data } = await cartAPI.remove(product_id)
       
       if (response.ok && data.success) {
-        // Update local state after successful backend deletion
-        setCartItems((prevItems) => 
-          prevItems.filter((item) => item.product_id !== product_id)
-        )
-        // Refresh cart to get updated total
-        await fetchCart()
+        // Update local state AND cache after successful backend deletion
+        const updatedItems = cartItems.filter((item) => item.product_id !== product_id)
+        const newTotal = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        updateCartState(updatedItems, newTotal)
       } else {
         console.error("Failed to remove item from cart:", data.message)
       }
@@ -164,11 +205,14 @@ export const CartProvider = ({ children }) => {
 
     try {
       // Update locally first for immediate feedback
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.product_id === product_id ? { ...item, quantity: newQuantity } : item
-        )
+      const updatedItems = cartItems.map((item) =>
+        item.product_id === product_id ? { ...item, quantity: newQuantity } : item
       )
+      // Calculate new total
+      const newTotal = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      
+      // Update state AND cache together
+      updateCartState(updatedItems, newTotal)
       
       // Then sync with backend
       // Note: You'll need to implement updateQuantity endpoint in backend
@@ -178,8 +222,8 @@ export const CartProvider = ({ children }) => {
   }
 
   const clearCart = () => {
-    setCartItems([])
-    setTotalAmount(0)
+    updateCartState([], 0)
+    clearCartStorage()
   }
 
   const getCartTotal = () => {

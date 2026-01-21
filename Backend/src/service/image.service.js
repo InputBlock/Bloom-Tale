@@ -14,8 +14,11 @@ const imagekit = new ImageKit({
 // Upload image
 const uploadImage = async (file, fileName, folder = "bloomtalestatus") => {
     try {
+        // Convert buffer to base64 if needed
+        const fileData = Buffer.isBuffer(file) ? file.toString('base64') : file;
+        
         const response = await imagekit.upload({
-            file: file,
+            file: fileData,
             fileName: fileName,
             folder: folder
         })

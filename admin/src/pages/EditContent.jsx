@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { heroAPI } from "../api"
 import HeroSectionForm from "../components/EditContent/HeroSectionForm"
 import HeroSectionList from "../components/EditContent/HeroSectionList"
+import AboutSectionForm from "../components/EditContent/AboutSectionForm"
 
 export default function EditContent() {
   const [heroSections, setHeroSections] = useState([])
@@ -64,6 +65,11 @@ export default function EditContent() {
             onDelete={fetchHeroSections}
           />
         </div>
+      </div>
+
+      {/* About Section */}
+      <div className="mt-6 lg:mt-8">
+        <AboutSectionForm />
       </div>
     </div>
   )

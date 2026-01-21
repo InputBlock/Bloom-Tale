@@ -10,7 +10,7 @@ const heroSlides = [
     title: "Bloom Tale",
     description: "Every bouquet holds a story you can’t put into words.",
     buttonText: "Shop Now",
-    image: "/annivarsary-carousel.jpg",
+    image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80",
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ const heroSlides = [
     title: "Your Perfect Day",
     description: "Elegant arrangements to make your celebration unforgettable",
     buttonText: "Explore Wedding",
-    image: "/wedding-blooms-carousel.jpg",
+    image: "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1920&q=80",
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ const heroSlides = [
     title: "Spring Blooms",
     description: "Discover the beauty of nature's freshest flowers",
     buttonText: "View Collection",
-    image: "/seasonal-carousel.jpg",
+    image: "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1920&q=80",
   },
 ]
 

@@ -77,9 +77,9 @@ export default function Checkout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           
           {/* Page Title */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-light text-[#3e4026] tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>Checkout</h1>
-            <div className="flex items-center gap-2 mt-2 text-sm text-[#5e6043]">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-2xl font-light text-[#3e4026] tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>Checkout</h1>
+            <div className="flex items-center gap-2 mt-2 text-xs sm:text-sm text-[#5e6043]">
               <Lock size={14} />
               <span>Secure checkout</span>
             </div>
@@ -107,7 +107,7 @@ export default function Checkout() {
                           disabled={step.id > currentStep}
                           className="flex flex-col items-center gap-2 group"
                         >
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                             isCompleted 
                               ? "bg-[#3e4026] text-white shadow-lg shadow-[#3e4026]/20" 
                               : isCurrent 
@@ -172,7 +172,7 @@ export default function Checkout() {
             </div>
 
             {/* Right Column - Order Summary Sidebar */}
-            <div className="lg:w-[400px] shrink-0">
+            <div className="lg:w-[340px] xl:w-[400px] shrink-0">
               <div className="bg-white rounded-2xl shadow-sm border border-[#EDE8E0] sticky top-24 overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-5 bg-gradient-to-r from-[#3e4026] to-[#5e6043]">

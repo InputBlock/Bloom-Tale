@@ -401,6 +401,19 @@ export const contentAPI = {
 };
 
 // ============================================
+// ABOUT SECTION API
+// ============================================
+export const aboutAPI = {
+  get: async () => {
+    const response = await apiFetch('/api/v1/admin/about', {
+      method: 'GET',
+      skipAuth: true,
+    });
+    return { response, data: await parseResponse(response) };
+  },
+};
+
+// ============================================
 // ENQUIRY API - Contact Form
 // ============================================
 export const enquiryAPI = {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Search, ChevronDown, ArrowLeft } from "lucide-react"
+import { Search, ChevronDown, X } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { productsAPI } from "../../api"
@@ -159,170 +159,167 @@ export default function SearchBar({ scrolled, isHomePage }) {
         </button>
       )}
 
-      {/* Mobile: Expanded search bar overlay */}
+      {/* Mobile: Expanded search bar - inline like desktop */}
       <AnimatePresence mode="wait">
         {isExpanded && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="md:hidden fixed inset-0 bg-white z-50"
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: 'auto' }}
+            exit={{ opacity: 0, width: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden flex-1 max-w-[200px] relative"
+            ref={searchRef}
           >
-            <div className="flex items-center gap-3 p-4 border-b border-gray-200">
+            <form onSubmit={handleSearch} className="w-full relative">
+              <input
+                ref={inputRef}
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                onFocus={() => searchQuery.trim() && setShowSearchSuggestions(true)}
+                placeholder="Search..."
+                style={{ borderRadius: '9999px' }}
+                className={`w-full px-3 py-2 pr-8 text-sm border transition-colors duration-300 focus:outline-none ${
+                  scrolled || !isHomePage 
+                    ? "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500" 
+                    : "bg-white/10 border-white/30 text-white placeholder-white/70"
+                }`}
+              />
               <button
+                type="button"
                 onClick={handleCollapseSearch}
-                className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                style={{ borderRadius: '9999px' }}
+                className={`absolute right-1 top-1/2 -translate-y-1/2 p-1 transition-all ${
+                  scrolled || !isHomePage 
+                    ? "text-gray-500 hover:text-gray-700" 
+                    : "text-white/70 hover:text-white"
+                }`}
                 aria-label="Close search"
               >
-                <ArrowLeft size={20} strokeWidth={2} />
+                <X size={16} strokeWidth={2} />
               </button>
-              
-              <form onSubmit={handleSearch} className="flex-1 relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearchInputChange}
-                  onFocus={() => searchQuery.trim() && setShowSearchSuggestions(true)}
-                  placeholder="Search flowers..."
-                  className="w-full px-4 py-2.5 pr-12 text-base rounded-full border bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-gray-300 transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-all"
-                  aria-label="Search"
-                >
-                  <Search size={18} strokeWidth={2} />
-                </button>
-              </form>
-            </div>
+            </form>
 
-            {/* Search Suggestions for Mobile Expanded View */}
-            {showSearchSuggestions && searchSuggestions.length > 0 && (
-              <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 72px)' }}>
-                <h4 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">
-                  Search Results
-                </h4>
-                {searchSuggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    role="button"
-                    tabIndex={0}
-                    onTouchStart={(e) => {
-                      // Record touch start position to detect scroll vs tap
-                      const touch = e.touches[0]
-                      touchStartRef.current = { x: touch.clientX, y: touch.clientY }
-                    }}
-                    onTouchEnd={(e) => {
-                      // Calculate how far the touch moved
-                      const touch = e.changedTouches[0]
-                      const deltaX = Math.abs(touch.clientX - touchStartRef.current.x)
-                      const deltaY = Math.abs(touch.clientY - touchStartRef.current.y)
-                      
-                      // If moved more than 10px, it's a scroll - don't navigate
-                      if (deltaX > 10 || deltaY > 10) {
-                        return
-                      }
-                      
-                      e.preventDefault()
-                      e.stopPropagation()
-                      
-                      // Get navigation path
-                      let path = ''
-                      if (suggestion.type === 'product' && suggestion.productId) {
-                        path = `/product/${suggestion.productId}`
-                      } else if (suggestion.type === 'product') {
-                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
-                      } else if (suggestion.type === 'category') {
-                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
-                      } else if (suggestion.type === 'price') {
-                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
-                      }
-                      // Close overlay first
-                      setIsExpanded(false)
-                      setShowSearchSuggestions(false)
-                      setSearchQuery("")
-                      // Navigate immediately
-                      if (path) {
-                        navigate(path)
-                      }
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      // Get navigation path
-                      let path = ''
-                      if (suggestion.type === 'product' && suggestion.productId) {
-                        path = `/product/${suggestion.productId}`
-                      } else if (suggestion.type === 'product') {
-                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
-                      } else if (suggestion.type === 'category') {
-                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
-                      } else if (suggestion.type === 'price') {
-                        path = `/shop?search=${encodeURIComponent(suggestion.text)}`
-                      }
-                      // Close overlay first
-                      setIsExpanded(false)
-                      setShowSearchSuggestions(false)
-                      setSearchQuery("")
-                      // Navigate immediately
-                      if (path) {
-                        navigate(path)
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        handleSuggestionClick(suggestion)
-                      }
-                    }}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-all duration-200 text-left border-b border-gray-100 last:border-0 cursor-pointer select-none"
-                  >
-                    {suggestion.type === 'product' ? (
-                      <>
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 pointer-events-none">
-                          {suggestion.image ? (
-                            <img src={suggestion.image} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 pointer-events-none">
-                              <Search size={16} />
+            {/* Search Suggestions dropdown */}
+            <AnimatePresence>
+              {showSearchSuggestions && searchSuggestions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full left-0 right-0 mt-2 rounded-2xl shadow-2xl border border-white/20 max-h-[60vh] overflow-hidden z-50"
+                  style={{ 
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    minWidth: '280px',
+                    right: 'auto'
+                  }}
+                >
+                  <div className="p-2 max-h-[60vh] overflow-y-auto">
+                    <h4 className="text-[9px] font-semibold text-white/60 uppercase tracking-wider mb-1 px-2">
+                      Search Results
+                    </h4>
+                    {searchSuggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        role="button"
+                        tabIndex={0}
+                        onTouchStart={(e) => {
+                          const touch = e.touches[0]
+                          touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+                        }}
+                        onTouchEnd={(e) => {
+                          const touch = e.changedTouches[0]
+                          const deltaX = Math.abs(touch.clientX - touchStartRef.current.x)
+                          const deltaY = Math.abs(touch.clientY - touchStartRef.current.y)
+                          if (deltaX > 10 || deltaY > 10) return
+                          e.preventDefault()
+                          e.stopPropagation()
+                          let path = ''
+                          if (suggestion.type === 'product' && suggestion.productId) {
+                            path = `/product/${suggestion.productId}`
+                          } else if (suggestion.type === 'product') {
+                            path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                          } else if (suggestion.type === 'category') {
+                            path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                          } else if (suggestion.type === 'price') {
+                            path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                          }
+                          setIsExpanded(false)
+                          setShowSearchSuggestions(false)
+                          setSearchQuery("")
+                          if (path) navigate(path)
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          let path = ''
+                          if (suggestion.type === 'product' && suggestion.productId) {
+                            path = `/product/${suggestion.productId}`
+                          } else if (suggestion.type === 'product') {
+                            path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                          } else if (suggestion.type === 'category') {
+                            path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                          } else if (suggestion.type === 'price') {
+                            path = `/shop?search=${encodeURIComponent(suggestion.text)}`
+                          }
+                          setIsExpanded(false)
+                          setShowSearchSuggestions(false)
+                          setSearchQuery("")
+                          if (path) navigate(path)
+                        }}
+                        className="w-full flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-white/10 active:bg-white/15 transition-all duration-200 text-left cursor-pointer select-none"
+                      >
+                        {suggestion.type === 'product' ? (
+                          <>
+                            <div className="w-9 h-9 bg-white/20 rounded-lg overflow-hidden shrink-0">
+                              {suggestion.image ? (
+                                <img src={suggestion.image} alt="" className="w-full h-full object-cover" draggable={false} />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white/60">
+                                  <Search size={12} />
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0 pointer-events-none">
-                          <p className="text-sm font-medium text-gray-900 truncate">{suggestion.text}</p>
-                          <p className="text-xs text-gray-500 truncate">{suggestion.category}</p>
-                        </div>
-                        {suggestion.price && (
-                          <span className="text-sm font-semibold text-gray-900 flex-shrink-0 pointer-events-none">₹{suggestion.price}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-white truncate">{suggestion.text}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="text-[10px] text-white/60 truncate">{suggestion.category}</p>
+                                {suggestion.price && (
+                                  <span className="text-[10px] font-medium text-white">₹{suggestion.price}</span>
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        ) : suggestion.type === 'category' ? (
+                          <>
+                            <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
+                              <ChevronDown size={14} className="text-white/80 -rotate-90" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs font-medium text-white">{suggestion.text}</p>
+                              <p className="text-[10px] text-white/60">Category</p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
+                              <span className="text-white/80 font-bold text-xs">₹</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs font-medium text-white">{suggestion.text}</p>
+                              <p className="text-[10px] text-white/60">Price range</p>
+                            </div>
+                          </>
                         )}
-                      </>
-                    ) : suggestion.type === 'category' ? (
-                      <>
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 pointer-events-none">
-                          <ChevronDown size={18} className="text-gray-600 -rotate-90" />
-                        </div>
-                        <div className="flex-1 pointer-events-none">
-                          <p className="text-sm font-medium text-gray-900">{suggestion.text}</p>
-                          <p className="text-xs text-gray-500">Category</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 pointer-events-none">
-                          <span className="text-gray-600 font-bold text-sm">₹</span>
-                        </div>
-                        <div className="flex-1 pointer-events-none">
-                          <p className="text-sm font-medium text-gray-900">{suggestion.text}</p>
-                          <p className="text-xs text-gray-500">Price range</p>
-                        </div>
-                      </>
-                    )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>

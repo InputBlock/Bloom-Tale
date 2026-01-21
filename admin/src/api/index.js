@@ -142,6 +142,30 @@ export const heroAPI = {
 };
 
 // ============================================
+// ABOUT SECTION API
+// ============================================
+export const aboutAPI = {
+  get: () => 
+    api.get('/api/v1/admin/about'),
+  
+  getAll: () => 
+    api.get('/api/v1/admin/about/all'),
+  
+  create: (formData) => 
+    api.post('/api/v1/admin/about', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  
+  update: (id, formData) => 
+    api.put(`/api/v1/admin/about/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  
+  delete: (id) => 
+    api.delete(`/api/v1/admin/about/${id}`),
+};
+
+// ============================================
 // DELIVERY ZONES API
 // ============================================
 export const deliveryAPI = {

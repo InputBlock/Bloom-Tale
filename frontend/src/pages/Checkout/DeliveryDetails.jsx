@@ -318,23 +318,6 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
                 </div>
               </div>
 
-              {/* Country */}
-              <div>
-                <label className="block text-xs font-medium text-[#5e6043] uppercase tracking-wide mb-2">
-                  Delivery Country <span className="text-red-400">*</span>
-                </label>
-                <select
-                  value={formData.country}
-                  onChange={(e) => handleInputChange('country', e.target.value)}
-                  className="w-full px-4 py-3 border border-[#EDE8E0] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#3e4026]/10 focus:border-[#3e4026] text-sm text-[#3e4026] transition-all"
-                  required
-                >
-                  <option value="India">🇮🇳 India</option>
-                  <option value="United States">🇺🇸 United States</option>
-                  <option value="United Kingdom">🇬🇧 United Kingdom</option>
-                </select>
-              </div>
-
               {/* Street Address */}
               <div>
                 <label className="block text-xs font-medium text-[#5e6043] uppercase tracking-wide mb-2">

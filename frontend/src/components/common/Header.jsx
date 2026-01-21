@@ -271,22 +271,41 @@ export default function Header() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t shadow-lg"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="md:hidden absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-gray-200/50 overflow-hidden"
+            style={{ backdropFilter: 'blur(20px)' }}
           >
-            <nav className="max-w-7xl mx-auto px-4 py-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3 px-3 text-[#3e4026] text-base font-medium border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors"
-                >
-                  {link.name}
-                </Link>
-              ))}
+            <nav className="p-3">
+              {/* Home Link */}
+              <Link
+                to="/home"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-4 py-3 rounded-lg text-base font-medium text-[#3e4026] hover:bg-[#3e4026]/5 transition-all duration-300"
+              >
+                <span>Home</span>
+                <ChevronDown size={16} className="-rotate-90 opacity-40" />
+              </Link>
+              
+              {/* Services Section */}
+              <div className="mt-2">
+                <h4 className="text-[10px] font-semibold text-[#3e4026]/50 uppercase tracking-wider px-4 mb-2">Our Services</h4>
+                <div className="space-y-0.5">
+                  {serviceCategories.map((service) => (
+                    <Link
+                      key={service.path}
+                      to={service.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-medium text-[#3e4026] hover:bg-[#3e4026]/5 transition-all duration-300 group"
+                    >
+                      <span>{service.name}</span>
+                      <ChevronDown size={14} className="-rotate-90 opacity-40 group-hover:opacity-70 group-hover:translate-x-0.5 transition-all duration-300" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </nav>
           </motion.div>
         )}
