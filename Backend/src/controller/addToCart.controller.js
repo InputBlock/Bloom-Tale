@@ -8,7 +8,7 @@ import Cart from "../models/cart.model.js";
 
 export const addToCart = asyncHandler(async (req, res) => {
   const userId = req.user._id; // from auth middleware
-  const { product_id, size, quantity, deliveryType, deliveryFee, deliverySlot, pincode } = req.body;
+  const { product_id, size, color, quantity, deliveryType, deliveryFee, deliverySlot, pincode } = req.body;
 
   const user = await User.findById(userId);
   if (!user) {
@@ -73,9 +73,9 @@ export const addToCart = asyncHandler(async (req, res) => {
     cart.email = user.email;
   }
 
-  // check if product already in cart
+  // check if product already in cart (match by product_id, size AND color)
   const itemIndex = cart.items.findIndex(
-    (item) =>  !item.isCombo && item.product_id === product_id && item.size === size
+    (item) =>  !item.isCombo && item.product_id === product_id && item.size === size && item.color === color
   );
 
   if (itemIndex > -1) {
@@ -90,6 +90,7 @@ export const addToCart = asyncHandler(async (req, res) => {
       product: product._id,
       product_id: product.product_id,
       size: size || null,
+      color: color || null,
       quantity,
       price, // ✅ DB-derived snapshot
       isCombo: false,

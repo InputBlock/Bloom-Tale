@@ -67,7 +67,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     $set: { addresses: [address] },
   });
 
-  // 📦 Create order (CART → ORDER snapshot)
+  //  Create order (CART → ORDER snapshot)
   const order = await Order.create({
     order_id: generateOrderId(),
     user: userId,
@@ -80,6 +80,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       productName: item.isCombo ? item.comboName : (item.product?.name || item.comboName || "Product"),
       productImage: !item.isCombo && item.product?.images_uri?.[0] ? item.product.images_uri[0] : null,
       size: item.size || null,
+      color: item.color || null,
       quantity: item.quantity,
       price: item.price,
       isCombo: item.isCombo || false,
