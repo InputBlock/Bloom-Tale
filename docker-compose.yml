@@ -10,21 +10,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - MONGODB_URI=${MONGODB_URI}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
-      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
-      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
-      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
-      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASS=${EMAIL_PASS}
-      - FRONTEND_URL=${FRONTEND_URL:-https://bloomtale.cloud}
-      - ADMIN_URL=${ADMIN_URL:-https://admin.bloomtale.cloud}
+    env_file:
+      - ./Backend/.env
     networks:
       - bloom-network
     healthcheck:
@@ -42,6 +29,8 @@ services:
     restart: always
     ports:
       - "3001:80"
+    env_file:
+      - ./frontend/.env
     depends_on:
       - backend
     networks:
@@ -61,6 +50,8 @@ services:
     restart: always
     ports:
       - "3002:80"
+    env_file:
+      - ./admin/.env
     depends_on:
       - backend
     networks:
