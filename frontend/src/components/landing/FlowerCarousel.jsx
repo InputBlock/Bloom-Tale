@@ -103,7 +103,7 @@ const categories = [
 ];
 
 const FlowerCarousel = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(2);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [petals, setPetals] = useState([]);
   const containerRef = useRef(null);

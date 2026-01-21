@@ -4,7 +4,9 @@ export default function FilterSidebar({
   categories,
   priceRanges,
   selectedCategory,
+  selectedPriceRange,
   onCategoryChange,
+  onPriceRangeChange,
   openFilters,
   onToggleFilter 
 }) {
@@ -59,7 +61,12 @@ export default function FilterSidebar({
           {priceRanges.map((r) => (
             <button
               key={r.id}
-              className="block text-[11px] sm:text-[12px] tracking-[0.1em] text-[#8b8b8b] hover:text-[#3e4026] active:scale-95 transition-all cursor-pointer">
+              onClick={() => onPriceRangeChange(r.id)}
+              className={`block text-[11px] sm:text-[12px] tracking-[0.1em] active:scale-95 transition-all cursor-pointer ${
+                selectedPriceRange === r.id 
+                  ? 'text-[#3e4026] font-medium' 
+                  : 'text-[#3e4026]/50 hover:text-[#3e4026]'
+              }`}>
               {r.name}
             </button>
           ))}

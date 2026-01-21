@@ -232,6 +232,7 @@ export default function ProductInfo({ product }) {
         <DeliveryCheck 
           onDeliveryStatusChange={handleDeliveryStatusChange}
           sameDayDelivery={product.same_day_delivery}
+          productPrice={getCurrentPrice() * quantity}
         />
       </div>
 

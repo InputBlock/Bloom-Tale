@@ -21,6 +21,7 @@ export default function Shop() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
+  const [selectedPriceRange, setSelectedPriceRange] = useState(searchParams.get('price') || null)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [sortBy, setSortBy] = useState('featured')
   const [hoveredId, setHoveredId] = useState(null)
@@ -65,11 +66,36 @@ export default function Shop() {
 
   // Price ranges
   const priceRanges = [
-    { id: 'under-500', name: 'UNDER ₹500' },
-    { id: '500-1000', name: '₹500 - ₹1,000' },
-    { id: '1000-2000', name: '₹1,000 - ₹2,000' },
-    { id: 'above-2000', name: 'ABOVE ₹2,000' },
+    { id: 'all', name: 'ALL PRICES', min: 0, max: Infinity },
+    { id: 'under-500', name: 'UNDER ₹500', min: 0, max: 500 },
+    { id: '500-1000', name: '₹500 - ₹1,000', min: 500, max: 1000 },
+    { id: '1000-2000', name: '₹1,000 - ₹2,000', min: 1000, max: 2000 },
+    { id: 'above-2000', name: 'ABOVE ₹2,000', min: 2000, max: Infinity },
   ]
+
+  // Filter by price range
+  const filterByPriceRange = (products, priceRangeId) => {
+    if (!priceRangeId || priceRangeId === 'all') return products
+    const range = priceRanges.find(r => r.id === priceRangeId)
+    if (!range) return products
+    return products.filter(product => {
+      const price = getProductPrice(product)
+      return price >= range.min && price < range.max
+    })
+  }
+
+  // Handle price range change
+  const handlePriceRangeChange = (priceId) => {
+    const newPriceRange = selectedPriceRange === priceId ? null : priceId
+    setSelectedPriceRange(newPriceRange)
+    // Update URL params
+    if (newPriceRange && newPriceRange !== 'all') {
+      searchParams.set('price', newPriceRange)
+    } else {
+      searchParams.delete('price')
+    }
+    setSearchParams(searchParams)
+  }
 
   // Get page title based on selected category
   const getPageTitle = () => {
@@ -215,6 +241,9 @@ export default function Shop() {
             sortedProducts.sort((a, b) => (b.bestSeller ? 1 : 0) - (a.bestSeller ? 1 : 0))
           }
           
+          // Apply price range filter
+          sortedProducts = filterByPriceRange(sortedProducts, selectedPriceRange)
+          
           setProducts(sortedProducts)
         }
       } catch (error) {
@@ -225,7 +254,7 @@ export default function Shop() {
     }
 
     fetchProducts()
-  }, [selectedCategory, sortBy, searchQuery])
+  }, [selectedCategory, sortBy, searchQuery, selectedPriceRange])
 
   // Update URL when category changes
   useEffect(() => {
@@ -313,12 +342,9 @@ export default function Shop() {
                 {getPageTitle()}
               </h1>
               <p className="text-[#7a7a7a] text-[14px] leading-relaxed max-w-xl">
-                Send extraordinary <span className="text-[#3e4026] underline underline-offset-2 cursor-pointer hover:no-underline">flowers</span> and{' '}
-                <span className="text-[#3e4026] underline underline-offset-2 cursor-pointer hover:no-underline">luxury bouquets</span>, whatever the moment.
+                Send extraordinary <span className="text-[#3e4026]">flowers</span> and{' '}
+                <span className="text-[#3e4026]">luxury bouquets</span>, whatever the moment.
               </p>
-              <button className="text-[11px] tracking-[0.12em] text-[#3e4026] underline underline-offset-4 mt-3 hover:no-underline transition-all">
-                READ MORE
-              </button>
             </>
           )}
         </div>
@@ -334,7 +360,9 @@ export default function Shop() {
                   categories={categories}
                   priceRanges={priceRanges}
                   selectedCategory={selectedCategory}
+                  selectedPriceRange={selectedPriceRange}
                   onCategoryChange={setSelectedCategory}
+                  onPriceRangeChange={handlePriceRangeChange}
                   openFilters={openFilters}
                   onToggleFilter={toggleFilter}
                 />
