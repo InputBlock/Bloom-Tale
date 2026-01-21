@@ -84,6 +84,7 @@ export const CartProvider = ({ children }) => {
             product_id: item.product_id,
             name: item.name,
             size: item.size || item.selectedSize || null,
+            color: item.color || item.selectedColor || null, // Add color for balloons/candles
             quantity: item.quantity,
             price: item.price
           })),

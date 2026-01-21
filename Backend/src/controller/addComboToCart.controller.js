@@ -35,17 +35,26 @@ export const addComboToCart = asyncHandler(async (req, res) => {
                           SINGLE_PRICE_CATEGORIES.includes(product.category);
 
     // 🔹 DB-based price calculation
-    if (!isSinglePrice && product.product_type === "sized") {
-      // Flowers and other sized products - need size selection
-      const sizeKey = item.size?.toLowerCase();
-      if (!sizeKey || !product.pricing[sizeKey]) {
-        throw new ApiError(400, `Invalid size for ${product.name}`);
-      }
-      price = product.pricing[sizeKey];
-    } else {
+    if (isSinglePrice) {
       // Balloons, Candles, Combos - use single price
       // Fallback: if price is not set, try to use pricing.medium or pricing.small
       price = product.price || product.pricing?.medium || product.pricing?.small || product.pricing?.large;
+    } else if (item.size) {
+      // Product has size selected - use sized pricing
+      const sizeKey = item.size.toLowerCase();
+      if (product.pricing?.[sizeKey]) {
+        price = product.pricing[sizeKey];
+      } else {
+        throw new ApiError(400, `Invalid size '${item.size}' for ${product.name}`);
+      }
+    } else if (product.price) {
+      // Fallback to single price if no size and price exists
+      price = product.price;
+    } else if (product.pricing?.medium) {
+      // Fallback to medium pricing if available
+      price = product.pricing.medium;
+    } else {
+      throw new ApiError(400, `No valid price configuration for ${product.name}`);
     }
 
     if (!price) {

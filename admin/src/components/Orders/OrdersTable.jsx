@@ -174,7 +174,8 @@ export default function OrdersTable() {
                             price: item.price || 0,
                             quantity: item.quantity || 1,
                             isCombo: item.isCombo || false,
-                            color: item.color || null
+                            color: item.color || null,
+                            comboItems: item.combo_items || [] // Pass combo sub-items for details view
                           })) || [],
                           subtotal: order.totalAmount || 0,
                           tax: 0,
