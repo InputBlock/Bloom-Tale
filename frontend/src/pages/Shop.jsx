@@ -152,16 +152,8 @@ export default function Shop() {
     return filtered
   }
 
-  // Open sidebar when items are added to combo (mobile only)
-  useEffect(() => {
-    if (selectedCategory === 'combos' && comboItems.length > 0) {
-      // Only auto-open on mobile
-      const isMobile = window.innerWidth < 768
-      if (isMobile) {
-        setShowComboSidebar(true)
-      }
-    }
-  }, [comboItems.length, selectedCategory])
+  // REMOVED: Auto-open sidebar on reload - now user clicks the floating button
+  // Keep sidebar closed by default on mobile for better UX
 
   // Fetch products
   useEffect(() => {
@@ -362,13 +354,24 @@ export default function Shop() {
                   {products.length} PRODUCT{products.length !== 1 ? 'S' : ''}
                 </p>
                 
-                {selectedCategory === 'combos' && comboItems.length > 0 && (
+                {selectedCategory === 'combos' && (
                   <button
                     onClick={() => setShowComboSidebar(!showComboSidebar)}
-                    className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#3e4026] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-[#2d2f1c] transition-all md:hidden whitespace-nowrap"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all md:hidden whitespace-nowrap shadow-lg active:scale-95 ${
+                      comboItems.length > 0 
+                        ? 'bg-gradient-to-r from-[#3e4026] to-[#5a5c3d] text-white animate-pulse hover:shadow-xl' 
+                        : 'bg-gray-100 text-gray-500 border border-gray-200'
+                    }`}
                   >
-                    <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span>View Combo ({comboItems.length})</span>
+                    <div className="relative">
+                      <ShoppingBag className="w-4 h-4" />
+                      {comboItems.length > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                          {comboItems.length}
+                        </span>
+                      )}
+                    </div>
+                    <span>{comboItems.length > 0 ? 'View Combo' : 'Combo Empty'}</span>
                   </button>
                 )}
               </div>
@@ -435,19 +438,59 @@ export default function Shop() {
         </>
       )}
 
-      {/* Floating Action Button - Mobile (Combo Mode) */}
+      {/* Floating Action Button - Mobile (Combo Mode) - Premium Design */}
       {selectedCategory === 'combos' && !showComboSidebar && (
-        <button
-          onClick={() => setShowComboSidebar(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-[#3e4026] to-[#5a5c3d] text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all z-30 md:hidden"
-        >
-          <div className="relative">
-            <ShoppingBag className="w-6 h-6" />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-              {comboItems.length}
-            </span>
-          </div>
-        </button>
+        <div className="fixed bottom-6 left-4 right-4 md:hidden z-30">
+          <button
+            onClick={() => setShowComboSidebar(true)}
+            className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl shadow-2xl transition-all active:scale-[0.98] ${
+              comboItems.length > 0
+                ? 'bg-gradient-to-r from-[#3e4026] via-[#4a4c2d] to-[#3e4026] text-white'
+                : 'bg-white border-2 border-dashed border-[#3e4026]/30 text-[#3e4026]'
+            }`}
+            style={{
+              boxShadow: comboItems.length > 0 
+                ? '0 10px 40px -10px rgba(62, 64, 38, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.1)' 
+                : '0 4px 20px -5px rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center ${
+                comboItems.length > 0 ? 'bg-white/20' : 'bg-[#3e4026]/10'
+              }`}>
+                <ShoppingBag className="w-6 h-6" />
+                {comboItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center shadow-lg">
+                    {comboItems.length}
+                  </span>
+                )}
+              </div>
+              <div className="text-left">
+                <p className={`font-semibold text-base ${
+                  comboItems.length > 0 ? 'text-white' : 'text-[#3e4026]'
+                }`}>
+                  {comboItems.length > 0 ? 'Your Combo Cart' : 'Start Your Combo'}
+                </p>
+                <p className={`text-xs ${
+                  comboItems.length > 0 ? 'text-white/70' : 'text-[#3e4026]/60'
+                }`}>
+                  {comboItems.length > 0 
+                    ? `${comboItems.length} item${comboItems.length !== 1 ? 's' : ''} • Save 20%` 
+                    : 'Add items to get 20% off'
+                  }
+                </p>
+              </div>
+            </div>
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm ${
+              comboItems.length > 0 
+                ? 'bg-white text-[#3e4026]' 
+                : 'bg-[#3e4026] text-white'
+            }`}>
+              <span>{comboItems.length > 0 ? 'View' : 'Browse'}</span>
+              <Package className="w-4 h-4" />
+            </div>
+          </button>
+        </div>
       )}
 
       {/* Success Modal */}

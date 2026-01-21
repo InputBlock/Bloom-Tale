@@ -14,6 +14,7 @@ export default function SearchBar({ scrolled, isHomePage }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const searchRef = useRef(null)
   const inputRef = useRef(null)
+  const touchStartRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     // Fetch all products for search suggestions
@@ -208,9 +209,25 @@ export default function SearchBar({ scrolled, isHomePage }) {
                     key={index}
                     role="button"
                     tabIndex={0}
+                    onTouchStart={(e) => {
+                      // Record touch start position to detect scroll vs tap
+                      const touch = e.touches[0]
+                      touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+                    }}
                     onTouchEnd={(e) => {
+                      // Calculate how far the touch moved
+                      const touch = e.changedTouches[0]
+                      const deltaX = Math.abs(touch.clientX - touchStartRef.current.x)
+                      const deltaY = Math.abs(touch.clientY - touchStartRef.current.y)
+                      
+                      // If moved more than 10px, it's a scroll - don't navigate
+                      if (deltaX > 10 || deltaY > 10) {
+                        return
+                      }
+                      
                       e.preventDefault()
                       e.stopPropagation()
+                      
                       // Get navigation path
                       let path = ''
                       if (suggestion.type === 'product' && suggestion.productId) {
