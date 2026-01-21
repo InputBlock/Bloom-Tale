@@ -1,5 +1,4 @@
 import { motion } from "framer-motion"
-import { Heart } from "lucide-react"
 
 export default function ProductCard({ 
   product, 
@@ -9,7 +8,6 @@ export default function ProductCard({
   onHover,
   onLeave,
   onClick,
-  onAddToCart,
   isComboMode = false
 }) {
   const isHovered = hoveredId === product._id
@@ -46,7 +44,7 @@ export default function ProductCard({
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
 
         {/* Quick Add Button */}
-        {!isComboMode && onAddToCart && (
+        {!isComboMode && (
           <motion.button
             initial={{ opacity: 0, y: 10 }}
             animate={{
@@ -56,11 +54,11 @@ export default function ProductCard({
             transition={{ duration: 0.3 }}
             onClick={(e) => {
               e.stopPropagation()
-              onAddToCart?.(e, product)
+              onClick?.(product.product_id, product)
             }}
-            className="absolute bottom-4 left-4 right-4 bg-white py-3 text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white transition-colors duration-300"
+            className="absolute cursor-pointer bottom-4 left-4 right-4 bg-white py-3 text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white transition-colors duration-300"
           >
-            Add to Cart
+            Buy Now
           </motion.button>
         )}
         
@@ -82,11 +80,6 @@ export default function ProductCard({
             Customize & Add to Combo
           </motion.button>
         )}
-
-        {/* Wishlist Icon */}
-        <div className="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <Heart size={16} className="sm:w-[18px] sm:h-[18px] text-[#3e4026]" />
-        </div>
 
         {/* Category Badge */}
         {product.category && (

@@ -159,4 +159,17 @@ export const api = {
   }),
 };
 
+/**
+ * CHANGE BY FARAAZ - Cart API endpoints
+ * Backend base URL: http://localhost:8000/api/v1/cart
+ */
+export const cartEndpoints = {
+  GET_CART: '/api/v1/cart/getCart',
+  ADD_TO_CART: '/api/v1/cart/addToCart',
+  ADD_COMBO_TO_CART: '/api/v1/cart/addComboToCart',
+  REMOVE_FROM_CART: '/api/v1/cart/removeFromCart',
+  UPDATE_QUANTITY: '/api/v1/cart/updateQuantity',
+  CLEAR_CART: '/api/v1/cart/clearCart',
+};
+
 export default api;
