@@ -180,6 +180,11 @@ export default function Shop() {
         if (data.success && data.data) {
           let sortedProducts = [...data.data]
           
+          // DEBUG: Log all products and their combo values
+          console.log('All products:', sortedProducts.map(p => ({ name: p.name, combo: p.combo, category: p.category, is_active: p.is_active })))
+          console.log('Products with combo=true:', sortedProducts.filter(p => p.combo === true).map(p => p.name))
+          console.log('Selected category:', selectedCategory)
+          
           // Apply search filter first if search query exists
           if (searchQuery) {
             sortedProducts = filterBySearch(sortedProducts, searchQuery)
@@ -190,13 +195,9 @@ export default function Shop() {
                 // Filter by same_day_delivery flag
                 sortedProducts = sortedProducts.filter(p => p.same_day_delivery === true)
               } else if (selectedCategory === 'combos') {
-                // For combos, show flowers + balloons + candles
+                // For combos, show products with category "Combos" OR combo flag true
                 sortedProducts = sortedProducts.filter(p => 
-                  p.category?.toLowerCase().includes('flower') ||
-                  p.category?.toLowerCase().includes('balloon') ||
-                  p.category?.toLowerCase().includes('candle') ||
-                  p.name?.toLowerCase().includes('balloon') ||
-                  p.name?.toLowerCase().includes('candle')
+                  p.category?.toLowerCase() === 'combos' || p.combo === true
                 )
               } else {
                 // Filter by category name (convert id to match backend format)

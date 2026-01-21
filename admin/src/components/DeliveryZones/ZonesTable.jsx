@@ -137,17 +137,17 @@ export default function ZonesTable() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="flex items-center justify-center py-12 sm:py-20">
+        <Loader2 className="w-6 sm:w-8 h-6 sm:h-8 animate-spin text-gray-400" />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="text-center py-20">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button onClick={fetchZones} className="px-4 py-2 bg-black text-white rounded">
+      <div className="text-center py-12 sm:py-20">
+        <p className="text-red-500 mb-4 text-sm sm:text-base">{error}</p>
+        <button onClick={fetchZones} className="px-3 sm:px-4 py-2 bg-black text-white rounded text-sm sm:text-base">
           Retry
         </button>
       </div>
@@ -157,21 +157,21 @@ export default function ZonesTable() {
   return (
     <>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
         <div>
-          <p className="text-gray-500">{zones.length} zones configured</p>
+          <p className="text-gray-500 text-sm sm:text-base">{zones.length} zones configured</p>
         </div>
         <button
           onClick={() => { setEditingZone(null); setShowModal(true); }}
-          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          className="flex items-center justify-center gap-2 bg-black text-white px-3 sm:px-4 py-2 rounded hover:bg-gray-800 text-sm sm:text-base w-full sm:w-auto"
         >
-          <Plus size={18} />
+          <Plus size={16} />
           Add Zone
         </button>
       </div>
 
       {/* Zones List */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {zones.map((zone) => (
           <ZoneCard
             key={zone.id}
@@ -189,9 +189,9 @@ export default function ZonesTable() {
       </div>
 
       {zones.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-lg border">
-          <MapPin size={40} className="mx-auto text-gray-300 mb-3" />
-          <p className="text-gray-500">No delivery zones yet</p>
+        <div className="text-center py-12 sm:py-16 bg-white rounded-lg border">
+          <MapPin size={32} className="mx-auto text-gray-300 mb-2 sm:mb-3" />
+          <p className="text-gray-500 text-sm sm:text-base">No delivery zones yet</p>
         </div>
       )}
 

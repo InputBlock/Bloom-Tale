@@ -4,7 +4,7 @@ import SalesChart from "../components/Dashboard/SalesChart"
 import OrdersChart from "../components/Dashboard/OrdersChart"
 import RecentOrders from "../components/Dashboard/RecentOrders"
 import { DollarSign, ShoppingCart, Users, TrendingUp } from "lucide-react"
-import { API_ENDPOINTS } from "../config/api"
+import { ordersAPI, usersAPI } from "../api"
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -21,17 +21,14 @@ export default function Dashboard() {
 
   const fetchDashboardStats = async () => {
     try {
-      // Fetch order stats
-      const orderResponse = await fetch(API_ENDPOINTS.GET_ORDER_STATS, {
-        credentials: 'include'
-      })
-      const orderData = await orderResponse.json()
+      // Fetch order stats and user stats using centralized API
+      const [orderResponse, userResponse] = await Promise.all([
+        ordersAPI.getStats(),
+        usersAPI.getStats()
+      ])
 
-      // Fetch user stats
-      const userResponse = await fetch(API_ENDPOINTS.GET_USER_STATS, {
-        credentials: 'include'
-      })
-      const userData = await userResponse.json()
+      const orderData = orderResponse.data
+      const userData = userResponse.data
 
       if (orderData.success && userData.success) {
         const totalRevenue = orderData.data.totalRevenue || 0
@@ -76,9 +73,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5 lg:space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <StatCard
           title="Total Sales"
           value={formatCurrency(stats.totalSales)}
@@ -106,7 +103,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
         <SalesChart />
         <OrdersChart />
       </div>

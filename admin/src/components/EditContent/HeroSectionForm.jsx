@@ -86,38 +86,38 @@ export default function HeroSectionForm({ editingSection, onSuccess, onCancel })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
       {error && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+        <div className="bg-red-50 text-red-600 p-2.5 sm:p-3 rounded-lg text-xs sm:text-sm">
           {error}
         </div>
       )}
 
       {/* Media Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
           Media (Image or Video) {!editingSection && <span className="text-red-500">*</span>}
         </label>
         <input
           type="file"
           accept="image/*,video/*"
           onChange={handleMediaChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required={!editingSection}
         />
         {preview && (
-          <div className="mt-3">
+          <div className="mt-2 sm:mt-3">
             {isVideo(preview) ? (
               <video
                 src={preview}
                 controls
-                className="w-full h-40 object-cover rounded-lg"
+                className="w-full h-32 sm:h-40 object-cover rounded-lg"
               />
             ) : (
               <img
                 src={preview}
                 alt="Preview"
-                className="w-full h-40 object-cover rounded-lg"
+                className="w-full h-32 sm:h-40 object-cover rounded-lg"
               />
             )}
           </div>
@@ -126,7 +126,7 @@ export default function HeroSectionForm({ editingSection, onSuccess, onCancel })
 
       {/* Surprise Text */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
           Surprise Text <span className="text-red-500">*</span>
         </label>
         <input
@@ -135,14 +135,14 @@ export default function HeroSectionForm({ editingSection, onSuccess, onCancel })
           value={formData.surprise_text}
           onChange={handleInputChange}
           placeholder="e.g., Surprise Your Valentine!"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required
         />
       </div>
 
       {/* Sub Text */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
           Sub Text <span className="text-red-500">*</span>
         </label>
         <input
@@ -151,14 +151,14 @@ export default function HeroSectionForm({ editingSection, onSuccess, onCancel })
           value={formData.sub_text}
           onChange={handleInputChange}
           placeholder="e.g., Let us arrange a smile."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required
         />
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
           Description <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -166,18 +166,18 @@ export default function HeroSectionForm({ editingSection, onSuccess, onCancel })
           value={formData.description}
           onChange={handleInputChange}
           placeholder="Enter description..."
-          rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+          rows={3}
+          className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none sm:rows-[4]"
           required
         />
       </div>
 
       {/* Buttons */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400"
+          className="flex-1 bg-green-600 text-white py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400"
         >
           {loading ? "Saving..." : editingSection ? "Update" : "Add Hero Section"}
         </button>
@@ -185,7 +185,7 @@ export default function HeroSectionForm({ editingSection, onSuccess, onCancel })
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>

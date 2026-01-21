@@ -8,6 +8,7 @@ import Orders from './pages/Orders'
 import Users from './pages/Users'
 import EditContent from './pages/EditContent'
 import DeliveryZones from './pages/DeliveryZones'
+import Enquiries from './pages/Enquiries'
 import Login from './pages/Login'
 import './App.css'
 
@@ -64,6 +65,13 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<EditContent />} />
+        </Route>
+        <Route path="/enquiries" element={
+          <ProtectedRoute>
+            <Layout title="Enquiries" subtitle="View and manage customer enquiries" />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Enquiries />} />
         </Route>
       </Routes>
     </Router>

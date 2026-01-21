@@ -41,52 +41,52 @@ export default function HeroSectionList({ sections, loading, onEdit, onDelete })
   }
 
   return (
-    <div className="space-y-4 max-h-[600px] overflow-y-auto">
+    <div className="space-y-3 sm:space-y-4 max-h-[400px] sm:max-h-[600px] overflow-y-auto">
       {sections.map((section) => (
         <div
           key={section._id}
-          className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+          className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow"
         >
           {/* Media Preview */}
-          <div className="mb-3">
+          <div className="mb-2 sm:mb-3">
             {isVideo(section.media_uri) ? (
               <video
                 src={section.media_uri}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-24 sm:h-32 object-cover rounded-lg"
                 muted
               />
             ) : (
               <img
                 src={section.media_uri}
                 alt={section.surprise_text}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-24 sm:h-32 object-cover rounded-lg"
               />
             )}
           </div>
 
           {/* Content */}
-          <div className="space-y-1">
-            <h3 className="font-semibold text-gray-800 truncate">
+          <div className="space-y-0.5 sm:space-y-1">
+            <h3 className="font-semibold text-sm sm:text-base text-gray-800 truncate">
               {section.surprise_text}
             </h3>
-            <p className="text-sm text-gray-600 truncate">{section.sub_text}</p>
+            <p className="text-xs sm:text-sm text-gray-600 truncate">{section.sub_text}</p>
             <p className="text-xs text-gray-500 line-clamp-2">
               {section.description}
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-3 sm:mt-4">
             <button
               onClick={() => onEdit(section)}
-              className="flex-1 px-3 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+              className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
             >
               Edit
             </button>
             <button
               onClick={() => handleDelete(section._id)}
               disabled={deleting === section._id}
-              className="flex-1 px-3 py-2 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+              className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
             >
               {deleting === section._id ? "Deleting..." : "Delete"}
             </button>
