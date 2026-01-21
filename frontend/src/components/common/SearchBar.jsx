@@ -102,7 +102,7 @@ export default function SearchBar({ scrolled, isHomePage }) {
   }
 
   return (
-    <div className="flex flex-1 max-w-xl mx-2 sm:mx-4" ref={searchRef}>
+    <div className="flex flex-1 max-w-xl mx-2 md:mx-4" ref={searchRef}>
       <form onSubmit={handleSearch} className="w-full relative">
         <input
           type="text"
@@ -139,58 +139,58 @@ export default function SearchBar({ scrolled, isHomePage }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-black/30 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 max-h-[400px] overflow-hidden"
+              className="absolute top-full left-0 right-0 mt-2 bg-black/30 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 max-h-[300px] md:max-h-[400px] overflow-hidden z-50"
               style={{ 
                 backdropFilter: 'blur(20px)',
               }}
             >
-              <div className="p-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                <div className="mb-2">
-                  <h4 className="text-[10px] font-semibold text-white/60 uppercase tracking-wider px-2">Search Results</h4>
+              <div className="p-2 md:p-3 max-h-[300px] md:max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                <div className="mb-1 md:mb-2">
+                  <h4 className="text-[9px] md:text-[10px] font-semibold text-white/60 uppercase tracking-wider px-2">Search Results</h4>
                 </div>
                 {searchSuggestions.map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/20 hover:shadow-md transition-all duration-200 text-left group"
+                    className="w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg hover:bg-white/20 hover:shadow-md transition-all duration-200 text-left group"
                   >
                     {suggestion.type === 'product' ? (
                       <>
-                        <div className="w-10 h-10 bg-white/20 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg overflow-hidden flex-shrink-0">
                           {suggestion.image ? (
                             <img src={suggestion.image} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-white/60">
-                              <Search size={16} />
+                              <Search size={14} className="md:w-4 md:h-4" />
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{suggestion.text}</p>
-                          <p className="text-xs text-white/60">{suggestion.category}</p>
+                          <p className="text-xs md:text-sm font-medium text-white truncate">{suggestion.text}</p>
+                          <p className="text-[10px] md:text-xs text-white/60 truncate">{suggestion.category}</p>
                         </div>
                         {suggestion.price && (
-                          <span className="text-xs font-medium text-white">₹{suggestion.price}</span>
+                          <span className="text-[10px] md:text-xs font-medium text-white flex-shrink-0">₹{suggestion.price}</span>
                         )}
                       </>
                     ) : suggestion.type === 'category' ? (
                       <>
-                        <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <ChevronDown size={16} className="text-white -rotate-90" />
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <ChevronDown size={14} className="md:w-4 md:h-4 text-white -rotate-90" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-white">{suggestion.text}</p>
-                          <p className="text-xs text-white/60">Category</p>
+                          <p className="text-xs md:text-sm font-medium text-white">{suggestion.text}</p>
+                          <p className="text-[10px] md:text-xs text-white/60">Category</p>
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <span className="text-white font-bold text-xs">₹</span>
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-bold text-[10px] md:text-xs">₹</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-white">{suggestion.text}</p>
-                          <p className="text-xs text-white/60">Price range</p>
+                          <p className="text-xs md:text-sm font-medium text-white">{suggestion.text}</p>
+                          <p className="text-[10px] md:text-xs text-white/60">Price range</p>
                         </div>
                       </>
                     )}

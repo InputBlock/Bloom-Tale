@@ -81,7 +81,6 @@ export default function Header() {
   const navLinks = [
     { name: "Home", path: "/home" },
     { name: "Services", path: "/services", hasDropdown: true },
-    { name: "Contact", path: "/contact" },
   ]
 
   const serviceCategories = [
