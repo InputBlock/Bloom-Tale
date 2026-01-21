@@ -13,6 +13,7 @@ export default function ComboProductDetail({ product, onClose }) {
   const [pincodeInput, setPincodeInput] = useState("")
   const [pincodeChecking, setPincodeChecking] = useState(false)
   const [pincodeMessage, setPincodeMessage] = useState(null)
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
   // Available sizes for flowers
   const flowerSizes = [
@@ -164,19 +165,51 @@ export default function ComboProductDetail({ product, onClose }) {
 
           {/* Content */}
           <div className="p-6 space-y-6">
-            {/* Product Image */}
-            <div className="aspect-[4/3] bg-[#f9f8f6] rounded-xl overflow-hidden">
-              {product.image?.[0] || product.image ? (
-                <img
-                  src={product.image?.[0] || product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#3e4026]/30">
-                  <div className="text-center">
-                    <div className="text-6xl mb-2">🌸</div>
-                    <p className="text-sm">No image available</p>
+            {/* Product Images Gallery */}
+            <div className="space-y-3">
+              {/* Main Image */}
+              <div className="aspect-[4/3] bg-[#f9f8f6] rounded-xl overflow-hidden">
+                {product.image && (Array.isArray(product.image) ? product.image[selectedImageIndex] : product.image) ? (
+                  <img
+                    src={Array.isArray(product.image) ? product.image[selectedImageIndex] : product.image}
+                    alt={`${product.name} - Image ${selectedImageIndex + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[#3e4026]/30">
+                    <div className="text-center">
+                      <div className="text-6xl mb-2">🌸</div>
+                      <p className="text-sm">No image available</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Thumbnail Gallery - Horizontal Scroll */}
+              {product.image && Array.isArray(product.image) && product.image.length > 1 && (
+                <div className="relative">
+                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    {product.image.map((img, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                          selectedImageIndex === index
+                            ? 'border-[#3e4026] ring-2 ring-[#3e4026]/30'
+                            : 'border-[#3e4026]/20 hover:border-[#3e4026]/40'
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`${product.name} - Thumbnail ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  {/* Image Counter */}
+                  <div className="absolute bottom-4 right-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
+                    {selectedImageIndex + 1} / {product.image.length}
                   </div>
                 </div>
               )}

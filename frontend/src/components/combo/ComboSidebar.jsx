@@ -5,7 +5,7 @@ import { useCart } from "../../context/CartContext"
 import { useNavigate } from "react-router-dom"
 import SuccessModal from "../common/SuccessModal"
 
-export default function ComboSidebar() {
+export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
   const { 
     comboItems, 
     removeFromCombo, 
@@ -27,6 +27,23 @@ export default function ComboSidebar() {
   const [pincodeMessage, setPincodeMessage] = useState(null)
   const [addingToCart, setAddingToCart] = useState(false)
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
+
+  // Close sidebar on scroll (mobile only)
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpen && window.innerWidth < 768) {
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [isOpen, onClose])
 
   const DELIVERY_CHARGE = 199
 
@@ -121,17 +138,31 @@ export default function ComboSidebar() {
   }
 
   return (
-    <div className="fixed right-0 top-[78px] h-[calc(100vh-73px)] w-full md:w-[320px] bg-white border-l border-gray-200 z-40 flex flex-col hidden md:flex overflow-hidden">
+    <div className={`fixed left-0 right-0 bottom-0 md:right-0 md:left-auto md:top-[78px] md:bottom-auto h-[80vh] md:h-[calc(100vh-73px)] w-full md:w-[320px] bg-white border-t md:border-t-0 md:border-l border-gray-200 z-50 flex flex-col overflow-hidden transition-transform duration-300 ease-out rounded-t-3xl md:rounded-none ${
+      isOpen ? 'translate-y-0' : 'translate-y-full'
+    } md:translate-y-0 md:translate-x-0`}>
+      {/* Drag Handle - Mobile Only */}
+      <div className="md:hidden w-12 h-1 bg-gray-200 rounded-full mx-auto mt-2 mb-1"></div>
+      
       {/* Header */}
-      <div className="bg-[#3e4026] p-4 text-white flex-shrink-0">
+      <div className="p-4 text- flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Package className="w-5 h-5" />
-            <h2 className="text-lg font-semibold">Your Combo</h2>
+            <h2 className="text-lg font-semibold text-[#3e4026]">Your Combo</h2>
           </div>
-          <span className="bg-white/20 px-2.5 py-1 rounded-full text-xs font-semibold">
-            {comboItems.length} {comboItems.length === 1 ? 'item' : 'items'}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="bg-white/20 px-2.5 py-1 rounded-full text-xs font-semibold">
+              {comboItems.length} {comboItems.length === 1 ? 'item' : 'items'}
+            </span>
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -141,22 +172,22 @@ export default function ComboSidebar() {
         <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <MapPin className="w-4 h-4 text-[#3e4026]" />
-            <h3 className="text-sm font-semibold text-[#3e4026]">Delivery Pincode</h3>
+            <h3 className="text-sm font-medium text-[#3e4026]">Delivery Pincode</h3>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex items-stretch gap-2">
             <input
               type="text"
               value={pincodeInput}
               onChange={(e) => setPincodeInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
               placeholder="Enter pincode"
-              className="flex-1 px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:border-[#3e4026] focus:ring-2 focus:ring-[#3e4026]/20 focus:outline-none transition-all"
+              className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-[#3e4026] focus:ring-1 focus:ring-[#3e4026]/20 focus:outline-none transition-all"
               maxLength={6}
             />
             <button
               onClick={handleVerifyPincode}
               disabled={pincodeInput.length !== 6}
-              className="px-5 py-2.5 text-sm bg-[#3e4026] text-white rounded-lg font-semibold hover:bg-[#2d2f1c] transition-all disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm"
+              className="flex-shrink-0 px-4 py-2 text-sm bg-[#3e4026] text-white rounded-md font-medium hover:bg-[#2d2f1c] transition-all disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
             >
               Check
             </button>
@@ -187,8 +218,8 @@ export default function ComboSidebar() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-sm font-bold text-[#3e4026]">Standard Delivery</h3>
-                  <span className="text-sm font-bold text-[#3e4026]">₹{DELIVERY_CHARGE}</span>
+                  <h3 className="text-sm font-medium text-[#3e4026]">Standard Delivery</h3>
+                  <span className="text-sm font-medium text-[#3e4026]">₹{DELIVERY_CHARGE}</span>
                 </div>
                 <p className="text-xs text-[#3e4026]/60 leading-relaxed">
                   Expected delivery in 2-3 business days
@@ -201,7 +232,7 @@ export default function ComboSidebar() {
         {/* Combo Items */}
         {comboItems.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-[#3e4026]">Items in Combo</h3>
+            <h3 className="text-sm text-[#3e4026]">Items in Combo</h3>
             {comboItems.map((item) => (
               <div key={`${item.product_id}-${item.selectedSize || item.selectedColor?.id}`} className="flex gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
@@ -215,7 +246,7 @@ export default function ComboSidebar() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-[#3e4026] truncate leading-tight">{item.name}</h4>
+                  <h4 className="text-sm font-medium text-[#3e4026] truncate leading-tight">{item.name}</h4>
                   <div className="flex items-center gap-2 mt-1.5">
                     {item.selectedSize && (
                       <span className="text-[10px] px-2 py-0.5 bg-[#3e4026]/5 border border-[#3e4026]/20 rounded-full font-medium text-[#3e4026]">
@@ -232,7 +263,7 @@ export default function ComboSidebar() {
                       </div>
                     )}
                   </div>
-                  <p className="text-sm font-bold text-[#3e4026] mt-1.5">₹{item.price.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-[#3e4026] mt-1.5">₹{item.price.toLocaleString()}</p>
                 </div>
 
                 <div className="flex flex-col items-end justify-between">
@@ -272,19 +303,19 @@ export default function ComboSidebar() {
             <div className="space-y-2.5 mb-4">
               <div className="flex justify-between text-sm">
                 <span className="text-[#3e4026]/70">Subtotal</span>
-                <span className="font-semibold text-[#3e4026]">₹{calculateTotal().toFixed(2)}</span>
+                <span className="text-[#3e4026]">₹{calculateTotal().toFixed(2)}</span>
               </div>
               
               {isPincodeVerified && (
                 <div className="flex justify-between text-sm">
                   <span className="text-[#3e4026]/70">Delivery</span>
-                  <span className="font-semibold text-[#3e4026]">₹{DELIVERY_CHARGE.toFixed(2)}</span>
+                  <span className="text-[#3e4026]">₹{DELIVERY_CHARGE.toFixed(2)}</span>
                 </div>
               )}
               
               <div className="flex justify-between text-sm">
-                <span className="text-green-600 font-semibold">Discount (20%)</span>
-                <span className="font-bold text-green-600">-₹{calculateDiscount().toFixed(2)}</span>
+                <span className="text-green-600">Discount (20%)</span>
+                <span className="text-green-600">-₹{calculateDiscount().toFixed(2)}</span>
               </div>
               
               <div className="pt-2.5 border-t-2 border-gray-300">

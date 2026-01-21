@@ -27,8 +27,8 @@ export default function Shop() {
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
   
-  // Combo-specific state
-  const [showComboSidebar, setShowComboSidebar] = useState(searchParams.get('category') === 'combos')
+  // Combo-specific state - start closed on mobile
+  const [showComboSidebar, setShowComboSidebar] = useState(false)
   
   // Filter accordion states
   const [openFilters, setOpenFilters] = useState({
@@ -152,14 +152,16 @@ export default function Shop() {
     return filtered
   }
 
-  // Show combo sidebar always when in combos category
+  // Open sidebar when items are added to combo (mobile only)
   useEffect(() => {
-    if (selectedCategory === 'combos') {
-      setShowComboSidebar(true)
-    } else {
-      setShowComboSidebar(false)
+    if (selectedCategory === 'combos' && comboItems.length > 0) {
+      // Only auto-open on mobile
+      const isMobile = window.innerWidth < 768
+      if (isMobile) {
+        setShowComboSidebar(true)
+      }
     }
-  }, [selectedCategory])
+  }, [comboItems.length, selectedCategory])
 
   // Fetch products
   useEffect(() => {
@@ -306,15 +308,15 @@ export default function Shop() {
         </div>
 
         {/* Page Header */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 mb-3 sm:mb-4">
           {selectedCategory === 'combos' ? (
-            <div className="flex items-center justify-between">
-              <h1 className="text-[32px] md:text-[42px] font-bold text-[#3e4026] tracking-tight">
+            <div className="flex flex-row items-center gap-2 sm:gap-4">
+              <h1 className="text-[28px] sm:text-[32px] md:text-[42px] font-bold text-[#3e4026] tracking-tight">
                 COMBOS
               </h1>
-              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded mr-50">
-                <span className="text-lg font-bold text-green-600 ">20% OFF</span>
-                <span className="text-xs text-green-700">Build & Save</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-50 border border-green-200 rounded flex-shrink-0">
+                <span className="text-base sm:text-lg font-bold text-green-600">20% OFF</span>
+                <span className="text-[10px] sm:text-xs text-green-700">Build & Save</span>
               </div>
             </div>
           ) : (
@@ -334,8 +336,8 @@ export default function Shop() {
         </div>
 
         {/* Main Content with Sidebar */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
-          <div className={`flex gap-0 transition-all duration-300 ${selectedCategory === 'combos' ? 'pr-0 md:pr-[220px]' : 'gap-16'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 pb-16 sm:pb-24">
+          <div className={`flex gap-0 transition-all duration-300 ${selectedCategory === 'combos' ? 'pr-0 md:pr-[220px]' : 'gap-8 lg:gap-16'}`}>
             
             {/* Left Sidebar - Filters (Sticky) */}
             <div className="hidden lg:block w-52 shrink-0">
@@ -352,45 +354,45 @@ export default function Shop() {
             </div>
 
             {/* Right - Products */}
-            <div className={`flex-1 ml-5 ${selectedCategory === 'combos' ? 'pr-0' : ''}`} ref={sectionRef}>
+            <div className={`flex-1 ml-0 lg:ml-5 ${selectedCategory === 'combos' ? 'pr-0' : ''}`} ref={sectionRef}>
               {/* Products Count with Combo Button */}
-              <div className="mb-6 flex items-center justify-between">
-                <p className="text-[13px] tracking-[0.2em] text-[#3e4026] font-medium">
-                  {products.length} PRODUCTS
+              <div className="mb-4 sm:mb-6 flex items-center justify-between gap-3">
+                <p className="text-[11px] sm:text-[13px] tracking-[0.15em] sm:tracking-[0.2em] text-[#3e4026] font-medium">
+                  {products.length} PRODUCT{products.length !== 1 ? 'S' : ''}
                 </p>
                 
                 {selectedCategory === 'combos' && comboItems.length > 0 && (
                   <button
                     onClick={() => setShowComboSidebar(!showComboSidebar)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#3e4026] text-white rounded-lg font-semibold hover:bg-[#2d2f1c] transition-all md:hidden"
+                    className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#3e4026] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-[#2d2f1c] transition-all md:hidden whitespace-nowrap"
                   >
-                    <ShoppingBag className="w-4 h-4" />
+                    <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span>View Combo ({comboItems.length})</span>
                   </button>
                 )}
               </div>
               
               {selectedCategory === 'combos' && (
-                <div className="mb-4 p-2.5 bg-[#f9f8f6] rounded border border-gray-200">
-                  <div className="flex items-center gap-4">
-                    <div className="w-6 h-6 bg-[#3e4026] rounded flex items-center justify-center shrink-0">
-                      <Package className="w-3.5 h-3.5 text-white" />
+                <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-[#f9f8f6] rounded border border-gray-200">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-4">
+                    <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-[#3e4026] rounded flex items-center justify-center shrink-0">
+                        <Package className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
+                      </div>
+                      <h3 className="text-[11px] sm:text-xs font-semibold text-[#3e4026]">How to Build Your Combo</h3>
                     </div>
-                    <div className="flex items-center gap-6 flex-1">
-                      <h3 className="text-xs font-semibold text-[#3e4026]">How to Build Your Combo</h3>
-                      <div className="flex items-center gap-4 text-[11px] text-[#3e4026]/70">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[9px]">1</span>
-                          <span>Click product to customize</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[9px]">2</span>
-                          <span>Verify pincode in sidebar</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[9px]">3</span>
-                          <span>Select delivery & save 20%</span>
-                        </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] text-[#3e4026]/70 pl-7 sm:pl-0 w-full sm:w-auto">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[8px] sm:text-[9px] shrink-0">1</span>
+                        <span>Click product to customize</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[8px] sm:text-[9px] shrink-0">2</span>
+                        <span>Verify pincode in sidebar</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-3.5 h-3.5 bg-[#3e4026] text-white rounded-full flex items-center justify-center text-[8px] sm:text-[9px] shrink-0">3</span>
+                        <span>Select delivery & save 20%</span>
                       </div>
                     </div>
                   </div>
@@ -420,15 +422,15 @@ export default function Shop() {
       {selectedCategory === 'combos' && (
         <>
           {/* Mobile Overlay */}
-          {!showComboSidebar && (
+          {showComboSidebar && (
             <div
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
-              onClick={() => setShowComboSidebar(true)}
+              onClick={() => setShowComboSidebar(false)}
             />
           )}
           
           {/* Sidebar */}
-          <ComboSidebar />
+          <ComboSidebar isOpen={showComboSidebar} onClose={() => setShowComboSidebar(false)} />
         </>
       )}
 

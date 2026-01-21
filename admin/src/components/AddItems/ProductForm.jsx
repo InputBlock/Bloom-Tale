@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react"
-import { productsAPI } from "../../api"
 import { AnimatePresence, motion } from "framer-motion"
 import { CheckCircle2, XCircle, X } from "lucide-react"
+
+// Mock API for demo
+const productsAPI = {
+  add: async (formData) => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    console.log('Form data:', Object.fromEntries(formData))
+    return { success: true }
+  }
+}
 
 // Categories that use single pricing (no sizes) - product_type: "simple"
 const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"]
 
-export default function ProductForm({ images, setImages }) {
+export default function ProductForm({ images = [], setImages = () => {} }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -20,6 +29,7 @@ export default function ProductForm({ images, setImages }) {
     discount_percentage: "", // Discount percentage for display
     inStock: true,
     sameDayDelivery: false,
+    bestSeller: false, // NEW: Best Seller field
     isActive: true,
   })
   const [loading, setLoading] = useState(false)
@@ -59,6 +69,7 @@ export default function ProductForm({ images, setImages }) {
       formDataToSend.append("category", formData.type)
       formDataToSend.append("stock", formData.inStock ? 100 : 0)
       formDataToSend.append("same_day_delivery", formData.sameDayDelivery)
+      formDataToSend.append("bestSeller", formData.bestSeller) // NEW: Include bestSeller
       formDataToSend.append("is_active", formData.isActive)
       
       // Send price or pricing based on category
@@ -99,6 +110,7 @@ export default function ProductForm({ images, setImages }) {
         discount_percentage: "",
         inStock: true,
         sameDayDelivery: false,
+        bestSeller: false, // Reset bestSeller
         isActive: true,
       })
       // Clear images
@@ -381,6 +393,7 @@ export default function ProductForm({ images, setImages }) {
             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
           </label>
         </div>
+        
         <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <input
             type="checkbox"
@@ -393,6 +406,7 @@ export default function ProductForm({ images, setImages }) {
             In Stock
           </label>
         </div>
+        
         <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <input
             type="checkbox"
@@ -403,6 +417,28 @@ export default function ProductForm({ images, setImages }) {
           />
           <label htmlFor="sameDayDelivery" className="text-gray-900 font-medium cursor-pointer select-none">
             Same Day Delivery Available
+          </label>
+        </div>
+
+        {/* NEW: Best Seller Toggle */}
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border-2 border-amber-200">
+          <div className="flex items-center gap-2">
+            <label htmlFor="bestSeller" className="text-gray-900 font-medium cursor-pointer select-none">
+              ⭐ Best Seller
+            </label>
+            <span className="text-xs text-amber-600 font-medium px-2 py-0.5 bg-amber-100 rounded-full">
+              Featured
+            </span>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              id="bestSeller"
+              checked={formData.bestSeller}
+              onChange={(e) => setFormData({ ...formData, bestSeller: e.target.checked })}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
           </label>
         </div>
       </div>

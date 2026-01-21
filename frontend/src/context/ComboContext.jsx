@@ -93,7 +93,7 @@ const ComboProvider = ({ children }) => {
       const existingIndex = prev.findIndex(item => 
         item.product_id === product.product_id && 
         item.selectedSize === product.selectedSize &&
-        item.selectedColor === product.selectedColor
+        item.selectedColor?.id === product.selectedColor?.id
       )
 
       if (existingIndex >= 0) {
@@ -109,25 +109,25 @@ const ComboProvider = ({ children }) => {
   }
 
   // Remove item from combo
-  const removeFromCombo = (productId, selectedSize, selectedColor) => {
+  const removeFromCombo = (productId, selectedSize, selectedColorId) => {
     setComboItems(prev => prev.filter(item => 
       !(item.product_id === productId && 
         item.selectedSize === selectedSize && 
-        item.selectedColor === selectedColor)
+        item.selectedColor?.id === selectedColorId)
     ))
   }
 
   // Update item quantity
-  const updateQuantity = (productId, selectedSize, selectedColor, newQuantity) => {
+  const updateQuantity = (productId, selectedSize, selectedColorId, newQuantity) => {
     if (newQuantity < 1) {
-      removeFromCombo(productId, selectedSize, selectedColor)
+      removeFromCombo(productId, selectedSize, selectedColorId)
       return
     }
 
     setComboItems(prev => prev.map(item => 
       item.product_id === productId && 
       item.selectedSize === selectedSize && 
-      item.selectedColor === selectedColor
+      item.selectedColor?.id === selectedColorId
         ? { ...item, quantity: newQuantity }
         : item
     ))
