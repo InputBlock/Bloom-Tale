@@ -16,6 +16,7 @@ import Orders from './pages/Orders'
 import OrderDetails from './pages/OrderDetails'
 import { CartProvider } from './context/CartContext'
 import { ComboProvider } from './context/ComboContext'
+import { PincodeProvider } from './context/PincodeContext'
 import ToastContainer from './components/common/ToastContainer'
 import AuthCallback from './pages/AuthCallback'
 
@@ -23,32 +24,34 @@ import './App.css'
 
 function App() {
   return (
-    <CartProvider>
-      <ComboProvider>
-        <Router>
-          <ToastContainer />
-          <Routes>
-            <Route path="/" element={<Landing/>} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/wedding" element={<WeddingServices />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/productDetails" element={<ProductDetailsPage />} />
-            <Route path="/product/:productId" element={<ProductDetailsPage />} />
-            <Route path="/combo-product/:id" element={<ComboProductDetails />} />
-            <Route path="/cart" element={<ProductCart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/razorpay-payment" element={<RazorpayPayment />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/orders/:orderId" element={<OrderDetails />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-          </Routes>
-        </Router>
-      </ComboProvider>
-    </CartProvider>
+    <PincodeProvider>
+      <CartProvider>
+        <ComboProvider>
+          <Router>
+            <ToastContainer />
+            <Routes>
+              <Route path="/" element={<Landing/>} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/services/wedding" element={<WeddingServices />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/productDetails" element={<ProductDetailsPage />} />
+              <Route path="/product/:productId" element={<ProductDetailsPage />} />
+              <Route path="/combo-product/:id" element={<ComboProductDetails />} />
+              <Route path="/cart" element={<ProductCart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/razorpay-payment" element={<RazorpayPayment />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:orderId" element={<OrderDetails />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+            </Routes>
+          </Router>
+        </ComboProvider>
+      </CartProvider>
+    </PincodeProvider>
   )
 }
 

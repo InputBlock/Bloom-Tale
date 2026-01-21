@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, Home, Plus, Phone, MapPin, User, ChevronRight } from "lucide-react"
-import { orderAPI } from "../../api"
+import { Loader2, Home, Plus, Phone, MapPin, User, ChevronRight, CheckCircle } from "lucide-react"
+import { orderAPI, deliveryAPI } from "../../api"
+import { useGlobalPincode } from "../../context/PincodeContext"
 
 export default function DeliveryDetails({ formData, handleInputChange, onSubmit }) {
   const [loading, setLoading] = useState(false)
@@ -10,6 +11,16 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
   const [loadingAddresses, setLoadingAddresses] = useState(true)
   const [selectedAddressId, setSelectedAddressId] = useState(null)
   const [showNewAddressForm, setShowNewAddressForm] = useState(false)
+  
+  // Get session pincode
+  const { pincode: sessionPincode, isPincodeVerified } = useGlobalPincode()
+  
+  // Pre-fill pincode from session on mount
+  useEffect(() => {
+    if (sessionPincode && !formData.pincode) {
+      handleInputChange('pincode', sessionPincode)
+    }
+  }, [sessionPincode])
 
   // Fetch saved addresses on component mount
   useEffect(() => {
@@ -360,14 +371,26 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
                   <label className="block text-xs font-medium text-[#5e6043] uppercase tracking-wide mb-2">
                     Pincode <span className="text-red-400">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={formData.pincode}
-                    onChange={(e) => handleInputChange('pincode', e.target.value)}
-                    placeholder="000000"
-                    className="w-full px-4 py-3 border border-[#EDE8E0] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#3e4026]/10 focus:border-[#3e4026] text-sm text-[#3e4026] transition-all placeholder:text-[#5e6043]/50"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={formData.pincode}
+                      onChange={(e) => handleInputChange('pincode', e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000"
+                      className={`w-full px-4 py-3 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#3e4026]/10 focus:border-[#3e4026] text-sm text-[#3e4026] transition-all placeholder:text-[#5e6043]/50 ${
+                        isPincodeVerified && formData.pincode === sessionPincode 
+                          ? 'border-green-400 bg-green-50/30' 
+                          : 'border-[#EDE8E0]'
+                      }`}
+                      required
+                    />
+                    {isPincodeVerified && formData.pincode === sessionPincode && (
+                      <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
+                    )}
+                  </div>
+                  {isPincodeVerified && formData.pincode === sessionPincode && (
+                    <p className="text-[10px] text-green-600 mt-1">✓ Verified for delivery</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#5e6043] uppercase tracking-wide mb-2">

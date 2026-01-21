@@ -1,12 +1,44 @@
 import { motion, useInView } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
-import { ArrowLeft, ArrowRight, Quote } from "lucide-react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
+import { contentAPI } from "../../api"
 
 export default function Testimonials() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+
+  // Featured testimonials (always show first)
+  const featuredTestimonials = [
+    {
+      id: "featured-1",
+      name: "Raja Kumari",
+      title: "Global artist/rapper",
+      rating: 5,
+      text: "You guys are so good at this - it's unreal. Capturing moments outdoors like this feels so pure and real. It honestly reminded me of my mom, which made it even more special. Keep creating magic like this. I'll definitely see you again.",
+      image: "/raja-kumari.jpg",
+    },
+    {
+      id: "featured-2",
+      name: "Priya Sharma",
+      title: "Verified Customer",
+      rating: 5,
+      text: "The most beautiful flowers I've ever received. Fresh, fragrant, and absolutely stunning. The attention to detail in the arrangement was remarkable.",
+      image: null,
+    },
+    {
+      id: "featured-3",
+      name: "Rahul Verma",
+      title: "Regular Customer",
+      rating: 5,
+      text: "Same-day delivery saved our anniversary! The roses were incredibly fresh and the premium packaging made it feel truly special.",
+      image: null,
+    },
+  ]
+
+  const [testimonials, setTestimonials] = useState(featuredTestimonials)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -17,43 +49,36 @@ export default function Testimonials() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const testimonials = [
-    {
-      id: 1,
-      name: "Raja Kumari",
-      title: "Global artist/rapper",
-      rating: 5,
-      text: "You guys are so good at this—it’s unreal. Capturing moments outdoors like this feels so pure and real. It honestly reminded me of my mom, which made it even more special. Keep creating magic like this. I’ll definitely see you again.",
-      image: "/raja-kumari.jpg",
-    },
-    {
-      id: 2,
-      name: "Priya Sharma",
-      title: "Verified Customer",
-      rating: 5,
-      text: "The most beautiful flowers I've ever received. Fresh, fragrant, and absolutely stunning. The attention to detail in the arrangement was remarkable.",
-      image: "/priya-sharma.jpg",
-    },
-    {
-      id: 3,
-      name: "Rahul Verma",
-      title: "Regular Customer",
-      rating: 5,
-      text: "Same-day delivery saved our anniversary! The roses were incredibly fresh and the premium packaging made it feel truly special.",
-      image: "/rahul-verma.jpg",
-    },
-    {
-      id: 4,
-      name: "Ananya Patel",
-      title: "Wedding Client",
-      rating: 5,
-      text: "They handled all the flowers for my sister's wedding. Professional, creative, and exceeded every expectation. Absolutely recommend!",
-      image: "/ananya-patel.jpg",
-    },
-  ]
+  // Fetch testimonials from backend API
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const { response, data } = await contentAPI.getTestimonials()
+        if (response.ok && data.success && data.data) {
+          const backendTestimonials = data.data.map((item, index) => ({
+            id: item._id || `backend-${index}`,
+            name: item.name || "Customer",
+            title: "Verified Customer",
+            rating: item.rating || 5,
+            text: item.testimonial,
+            image: item.profile_picture || "/default-avatar.jpg",
+          }))
+          setTestimonials([...featuredTestimonials, ...backendTestimonials])
+        } else {
+          setTestimonials(featuredTestimonials)
+        }
+      } catch (error) {
+        console.error("Failed to fetch testimonials:", error)
+        setTestimonials(featuredTestimonials)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchTestimonials()
+  }, [])
 
   const itemsPerPage = isMobile ? 1 : 2
-  const totalPages = Math.ceil(testimonials.length / itemsPerPage)
+  const totalPages = Math.ceil(testimonials.length / itemsPerPage) || 1
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % totalPages)
@@ -133,19 +158,27 @@ export default function Testimonials() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col"
               >
-                {/* Image */}
-                <div className="h-48 sm:h-56 md:h-64 overflow-hidden">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name}
-                    className="w-full h-full object-cover"
-                  />
+                {/* Image or Avatar */}
+                <div className="h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-100">
+                  {testimonial.image ? (
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#3e4026] flex items-center justify-center">
+                      <span className="text-white text-6xl sm:text-7xl md:text-8xl font-semibold">
+                        {testimonial.name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Content */}
-                <div className="p-6 flex flex-col flex-grow">
+                <div className="p-6 flex flex-col grow">
                   {/* Text */}
-                  <p className="text-gray-700 text-sm sm:text-base mb-6 leading-relaxed flex-grow">
+                  <p className="text-gray-700 text-sm sm:text-base mb-6 leading-relaxed grow">
                     {testimonial.text}
                   </p>
 
