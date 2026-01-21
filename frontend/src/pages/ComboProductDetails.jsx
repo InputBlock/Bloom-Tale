@@ -19,7 +19,7 @@ export default function ComboProductDetails() {
   const [quantity, setQuantity] = useState(1)
   const [currentPrice, setCurrentPrice] = useState(0)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [showComboSidebar, setShowComboSidebar] = useState(true)
+  const [showComboSidebar, setShowComboSidebar] = useState(false)
 
   // Color options for balloons/candles
   const colors = [
@@ -170,13 +170,9 @@ export default function ComboProductDetails() {
     <div className="min-h-screen bg-white">
       <Header />
       
-      <main className={`transition-all duration-300 pt-24 pb-12 ${
-        showComboSidebar 
-          ? 'max-w-7xl mx-auto pl-0 pr-6 md:pl-0 md:pr-[350px]'
-          : 'max-w-7xl mx-auto pl-0 pr-6 md:pl-0 md:pr-12'
-      }`}>
+      <main className="transition-all duration-300 pt-24 pb-12 max-w-7xl mx-auto px-6 md:px-12 md:pr-[340px]">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-[11px] tracking-[0.12em] text-[#9a9a9a] mb-8 md:mb-12 pl-6 md:pl-12">
+        <nav className="flex items-center gap-2 text-[11px] tracking-[0.12em] text-[#9a9a9a] mb-8 md:mb-12">
           <Link to="/home" className="hover:text-[#3e4026] transition-colors">HOME</Link>
           <ChevronRight size={10} className="text-[#c4c4c4]" />
           <Link to="/shop?category=combos" className="hover:text-[#3e4026] transition-colors">COMBOS</Link>
@@ -188,7 +184,8 @@ export default function ComboProductDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left - Product Images */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <div className="flex gap-4">
+            {/* Desktop: Side-by-side layout */}
+            <div className="hidden lg:flex gap-4">
               {/* Thumbnails */}
               {product.images_uri && product.images_uri.length > 1 && (
                 <div className="flex flex-col gap-3 order-1">
@@ -236,6 +233,56 @@ export default function ComboProductDetails() {
                 </div>
               </div>
             </div>
+
+            {/* Mobile: Stacked layout with main image on top, thumbnails below */}
+            <div className="lg:hidden space-y-3">
+              {/* Main Image */}
+              <div className="relative aspect-[3/4] bg-[#f9f8f6] overflow-hidden rounded-lg">
+                {product.images_uri?.[currentImageIndex] ? (
+                  <img
+                    src={product.images_uri[currentImageIndex]}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <p className="text-gray-400">No image available</p>
+                  </div>
+                )}
+
+                {/* Image Counter */}
+                {product.images_uri && product.images_uri.length > 1 && (
+                  <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1.5 rounded-md text-xs font-medium">
+                    {currentImageIndex + 1} / {product.images_uri.length}
+                  </div>
+                )}
+              </div>
+
+              {/* Thumbnails - Horizontal Scroll */}
+              {product.images_uri && product.images_uri.length > 1 && (
+                <div className="overflow-x-auto scrollbar-hide pb-2">
+                  <div className="flex gap-2">
+                    {product.images_uri.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`flex-shrink-0 w-20 h-20 border-2 transition-all overflow-hidden bg-[#f9f8f6] rounded-lg ${
+                          currentImageIndex === index
+                            ? 'border-[#3e4026] ring-2 ring-[#3e4026]/30'
+                            : 'border-transparent hover:border-gray-300'
+                        }`}
+                      >
+                        <img
+                          src={image}
+                          alt={`${product.name} ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right - Product Info */}
@@ -255,32 +302,28 @@ export default function ComboProductDetails() {
               {product.name}
             </h1>
 
-            {/* Price and Quantity Section */}
-            <div className="flex items-start justify-between gap-8">
-              <div className="flex-1">
-                <div className="text-3xl md:text-4xl font-light text-[#3e4026]">
-                  ₹ {currentPrice?.toLocaleString()}
-                </div>
+            {/* Price */}
+            <div className="flex items-center justify-between pb-4 border-b border-gray-200">
+              <div className="text-3xl md:text-4xl font-light text-[#3e4026]">
+                ₹ {currentPrice?.toLocaleString()}
               </div>
               
-              {/* Quantity on the right */}
-              <div className="flex flex-col items-end">
-                <div className="inline-flex items-center border border-gray-300 bg-white">
-                  <button
-                    onClick={() => handleQuantityChange("decrement")}
-                    className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    disabled={quantity <= 1}
-                  >
-                    <Minus size={16} className="text-[#3e4026]" />
-                  </button>
-                  <span className="w-16 text-center text-[#3e4026] font-medium">{quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange("increment")}
-                    className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors"
-                  >
-                    <Plus size={16} className="text-[#3e4026]" />
-                  </button>
-                </div>
+              {/* Quantity Selector */}
+              <div className="inline-flex items-center border border-gray-300 bg-white">
+                <button
+                  onClick={() => handleQuantityChange("decrement")}
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  disabled={quantity <= 1}
+                >
+                  <Minus size={16} className="text-gray-600" />
+                </button>
+                <span className="w-12 text-center text-[#3e4026] font-medium">{quantity}</span>
+                <button
+                  onClick={() => handleQuantityChange("increment")}
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                >
+                  <Plus size={16} className="text-gray-600" />
+                </button>
               </div>
             </div>
 
@@ -314,16 +357,16 @@ export default function ComboProductDetails() {
             {/* Color Selection for Balloons/Candles */}
             {!isFlower && (
               <div>
-                <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-3 font-medium">Select Color</p>
+                <p className="text-xs tracking-[0.2em] uppercase text-gray-500 mb-3 font-medium">Select Color</p>
                 <div className="flex gap-3 flex-wrap">
                   {colors.map((color) => (
                     <button
                       key={color.id}
                       onClick={() => setSelectedColor(color)}
-                      className={`w-10 h-10 rounded-full border-2 transition-all relative ${
+                      className={`w-11 h-11 rounded-full border-2 transition-all relative ${
                         selectedColor?.id === color.id
-                          ? 'border-[#3e4026] scale-110'
-                          : 'border-gray-300 hover:border-[#3e4026]'
+                          ? 'border-[#3e4026] scale-105 shadow-md'
+                          : 'border-gray-300 hover:border-gray-400'
                       }`}
                       style={{ backgroundColor: color.hex }}
                       title={color.name}
@@ -341,37 +384,37 @@ export default function ComboProductDetails() {
 
             {/* Description */}
             {product.description && (
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-3 font-medium">
+              <div className="pt-6">
+                <h3 className="text-xs tracking-[0.2em] uppercase text-gray-500 mb-3 font-medium">
                   Description
                 </h3>
-                <p className="text-sm text-[#3e4026]/70 leading-relaxed break-words overflow-wrap-anywhere max-w-full">
+                <p className="text-sm text-gray-600 leading-relaxed break-words overflow-wrap-anywhere max-w-full">
                   {product.description}
                 </p>
               </div>
             )}
 
             {/* Add to Combo Button */}
-            <div className="space-y-4 pt-4">
+            <div className="space-y-3 pt-6">
               <button
                 onClick={handleAddToCombo}
-                className="w-full bg-[#3e4026] text-white py-4 text-sm font-medium tracking-wider uppercase hover:bg-[#2d2f1c] transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#4a4d2e] text-white py-4 text-sm font-semibold tracking-wide uppercase hover:bg-[#3e4026] transition-all flex items-center justify-center gap-2 shadow-sm"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <Package className="w-4 h-4" />
                 Add to Combo
               </button>
 
               {/* Combo Info */}
-              <div className="bg-[#f9f8f6] border border-[#3e4026]/10 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="bg-[#f0fdf4] border border-green-200 p-3 rounded-sm">
+                <div className="flex items-start gap-2">
+                  <div className="flex-shrink-0 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mt-0.5">
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-[#3e4026] font-medium mb-1">
+                    <p className="text-sm text-gray-800 font-medium">
                       🎉 Get 20% OFF on your complete combo!
                     </p>
-                    <p className="text-xs text-[#3e4026]/60">
+                    <p className="text-xs text-gray-600 mt-0.5">
                       Add more items to maximize your savings
                     </p>
                   </div>
@@ -381,7 +424,7 @@ export default function ComboProductDetails() {
               {/* Current Combo Items Count */}
               {comboItems.length > 0 && (
                 <div className="text-center">
-                  <p className="text-xs text-[#3e4026]/60">
+                  <p className="text-xs text-gray-500">
                     {comboItems.length} {comboItems.length === 1 ? 'item' : 'items'} in your combo
                   </p>
                 </div>
@@ -426,18 +469,10 @@ export default function ComboProductDetails() {
           
           {/* Sidebar */}
           <div className="md:hidden fixed right-0 top-0 h-full w-full sm:w-[380px] z-50">
-            <div className="relative h-full">
-              {/* Close Button */}
-              <button
-                onClick={() => setShowComboSidebar(false)}
-                className="absolute top-4 left-4 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-              >
-                <svg className="w-5 h-5 text-[#3e4026]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <ComboSidebar />
-            </div>
+            <ComboSidebar 
+              isOpen={showComboSidebar} 
+              onClose={() => setShowComboSidebar(false)} 
+            />
           </div>
         </>
       )}
