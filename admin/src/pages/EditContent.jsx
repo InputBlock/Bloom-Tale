@@ -41,10 +41,10 @@ export default function EditContent() {
 
   return (
     <div className="max-w-6xl">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
         {/* Form Section */}
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6">
+        <div className="bg-white rounded-xl p-4 sm:p-6 lg:p-8 shadow-sm border border-gray-100">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
             {editingSection ? "Edit Hero Section" : "Add Hero Section"}
           </h2>
           <HeroSectionForm
@@ -55,8 +55,8 @@ export default function EditContent() {
         </div>
 
         {/* List Section */}
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-6">Hero Sections</h2>
+        <div className="bg-white rounded-xl p-4 sm:p-6 lg:p-8 shadow-sm border border-gray-100">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Hero Sections</h2>
           <HeroSectionList
             sections={heroSections}
             loading={loading}

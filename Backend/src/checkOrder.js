@@ -13,7 +13,7 @@ const checkOrder = async () => {
     const order = await Order.findOne({ order_id: "KJ5S72Z0" });
     
     if (order) {
-      console.log("\n📦 Order found:");
+      console.log("\n Order found:");
       console.log("Order ID:", order.order_id);
       console.log("MongoDB _id:", order._id);
       console.log("Status (payment):", order.status);
@@ -21,7 +21,7 @@ const checkOrder = async () => {
       console.log("Payment Method:", order.paymentMethod);
       console.log("Total Amount:", order.totalAmount);
     } else {
-      console.log("❌ Order not found with order_id: KJ5S72Z0");
+      console.log("order not found with order_id: KJ5S72Z0");
       
       // List all orders
       const allOrders = await Order.find().select("order_id status order_status paymentMethod");

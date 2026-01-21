@@ -39,6 +39,7 @@ const add_item = asyncHandler(async (req, res) => {
         image_public: image_public,
         stock: parseInt(req.body.stock) || 0,
         bestSeller: req.body.bestSeller === 'true' || req.body.bestSeller === true,
+        combo: req.body.combo === 'true' || req.body.combo === true,
         same_day_delivery: req.body.same_day_delivery === 'true' || req.body.same_day_delivery === true,
         is_active: req.body.is_active === 'true' || req.body.is_active === true || req.body.is_active === undefined
     };

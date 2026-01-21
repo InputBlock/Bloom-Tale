@@ -36,11 +36,11 @@ export default function UploadImages({ images, setImages }) {
 
   return (
     <div>
-      <label className="block text-gray-900 font-medium mb-3">Upload Images</label>
+      <label className="block text-gray-900 font-medium mb-2 sm:mb-3 text-sm sm:text-base">Upload Images</label>
       <p className="text-xs text-gray-500 mb-2">First image will be the main display image</p>
       
       {/* Upload Area */}
-      <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-gray-400 transition cursor-pointer">
+      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:border-gray-400 transition cursor-pointer">
         <input
           type="file"
           accept="image/*"
@@ -50,28 +50,30 @@ export default function UploadImages({ images, setImages }) {
           multiple
         />
         <label htmlFor="image-upload" className="cursor-pointer">
-          <Upload className="mx-auto text-gray-400 mb-2" size={32} />
-          <p className="text-gray-500 text-sm">Click to upload or drag and drop</p>
-          <p className="text-gray-400 text-xs mt-1">PNG, JPG, WEBP (max. 5 images)</p>
+          <Upload className="mx-auto text-gray-400 mb-2" size={28} />
+          <p className="text-gray-500 text-xs sm:text-sm">Click to upload or drag and drop</p>
+          <p className="text-gray-400 text-[10px] sm:text-xs mt-1">PNG, JPG, WEBP (max. 5 images)</p>
         </label>
       </div>
 
       {/* Image Preview Grid */}
       {images.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mt-3 sm:mt-4">
           {images.map((image, index) => (
             <div key={image.id} className="relative group">
               <img 
                 src={image.url} 
                 alt="Product" 
-                className={`w-full h-32 object-cover rounded-lg border-2 ${
+                className={`w-full h-24 sm:h-28 lg:h-32 object-cover rounded-lg border-2 ${
                   index === 0 ? 'border-green-500' : 'border-gray-200'
                 }`}
               />
               {/* Main image badge */}
               {index === 0 && (
-                <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                  <Star size={12} fill="white" /> Main
+                <div className="absolute top-1 left-1 sm:top-2 sm:left-2 bg-green-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex items-center gap-0.5 sm:gap-1">
+                  <Star size={10} fill="white" className="sm:hidden" />
+                  <Star size={12} fill="white" className="hidden sm:block" />
+                  <span className="hidden sm:inline">Main</span>
                 </div>
               )}
               {/* Set as main button (for non-main images) */}
@@ -79,17 +81,19 @@ export default function UploadImages({ images, setImages }) {
                 <button
                   type="button"
                   onClick={() => setAsMain(image.id)}
-                  className="absolute top-2 left-2 bg-white text-gray-700 text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow hover:bg-gray-100"
+                  className="absolute top-1 left-1 sm:top-2 sm:left-2 bg-white text-gray-700 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow hover:bg-gray-100"
                 >
-                  Set as main
+                  <span className="hidden sm:inline">Set as main</span>
+                  <span className="sm:hidden">Main</span>
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => removeImage(image.id)}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
+                className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full p-0.5 sm:p-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
               >
-                <X size={16} />
+                <X size={12} className="sm:hidden" />
+                <X size={16} className="hidden sm:block" />
               </button>
             </div>
           ))}
@@ -98,7 +102,7 @@ export default function UploadImages({ images, setImages }) {
 
       {/* Image Count */}
       {images.length > 0 && (
-        <p className="text-sm text-gray-600 mt-2">
+        <p className="text-xs sm:text-sm text-gray-600 mt-2">
           {images.length} image{images.length !== 1 ? 's' : ''} selected (max 5)
         </p>
       )}

@@ -34,6 +34,8 @@ const productSchema = new mongoose.Schema(
     sizes: [String],
     bestSeller: { type: Boolean,default: false,
     },
+    combo: { type: Boolean, default: false,
+    },
     images_uri: [String],
     image_public:[String],
     stock: {

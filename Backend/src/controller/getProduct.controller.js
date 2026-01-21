@@ -45,6 +45,27 @@ export const getBestSellerProducts = asyncHandler(async (req, res) => {
   );
 });
 
+
+export const getComboProducts = asyncHandler(async (req, res) => {
+  const { category, subcategory } = req.query;
+
+  const filter = { combo: true };
+
+  if (category) filter.category = category;
+  if (subcategory) filter.subcategory = subcategory;
+
+  const products = await Product.find(filter);
+
+  if (!products.length) {
+    throw new ApiError(404, "No combo products found");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, products, "Combo products fetched")
+  );
+});
+
+
 // Get all active products for public display
 export const getActiveProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({ is_active: true });

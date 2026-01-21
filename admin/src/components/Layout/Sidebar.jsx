@@ -1,8 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { LayoutDashboard, Plus, List, Package, Users, LogOut, X, Menu, FileEdit, MapPin } from "lucide-react"
+import { LayoutDashboard, Plus, List, Package, Users, LogOut, X, Menu, FileEdit, MapPin, MessageSquare } from "lucide-react"
 import { authAPI } from "../../api"
 
-export default function Sidebar({ isOpen, setIsOpen }) {
+export default function Sidebar({ isOpen, setIsOpen, isMobile }) {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -12,6 +12,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     { icon: List, label: "List Items", path: "/list-items" },
     { icon: Package, label: "Orders", path: "/orders" },
     { icon: Users, label: "Users", path: "/users" },
+    { icon: MessageSquare, label: "Enquiries", path: "/enquiries" },
     { icon: MapPin, label: "Delivery Zones", path: "/delivery-zones" },
     { icon: FileEdit, label: "Edit Content", path: "/edit-content" },
   ]
@@ -28,21 +29,30 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     navigate("/login")
   }
 
+  const handleNavClick = () => {
+    // Close sidebar on mobile after clicking a nav item
+    if (isMobile) {
+      setIsOpen(false)
+    }
+  }
+
   return (
     <>
       {/* Mobile Overlay */}
-      {isOpen && (
+      {isOpen && isMobile && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Expanded Sidebar */}
+      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-screen bg-black text-white z-50 transition-all duration-300 ${
-          isOpen ? "w-64" : "w-16"
-        } lg:translate-x-0`}
+          isMobile 
+            ? (isOpen ? "w-64 translate-x-0" : "-translate-x-full w-64")
+            : (isOpen ? "w-64" : "w-16")
+        }`}
       >
         {/* Header */}
         <div className={`p-4 flex items-center border-b border-gray-800 ${isOpen ? "justify-between" : "justify-center"}`}>
@@ -77,6 +87,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={handleNavClick}
                 className={`flex items-center gap-3 px-3 py-3 rounded-lg mb-1 transition-all duration-200 ${
                   isOpen ? "" : "justify-center"
                 } ${

@@ -90,6 +90,9 @@ export const ordersAPI = {
   getAll: () => 
     api.get('/api/v1/admin/orders'),
   
+  getRecent: (limit = 5) => 
+    api.get(`/api/v1/admin/orders?limit=${limit}`),
+  
   getById: (orderId) => 
     api.get(`/api/v1/admin/orders/${orderId}`),
   
@@ -164,6 +167,26 @@ export const deliveryAPI = {
   
   deleteZone: (zoneId) => 
     api.delete(`/api/v1/delivery/zones/${zoneId}`),
+};
+
+// ============================================
+// ENQUIRIES API
+// ============================================
+export const enquiriesAPI = {
+  getAll: (params = {}) => 
+    api.get('/api/v1/admin/enquiries', { params }),
+  
+  getById: (enquiryId) => 
+    api.get(`/api/v1/admin/enquiries/${enquiryId}`),
+  
+  getStats: () => 
+    api.get('/api/v1/admin/enquiries/stats'),
+  
+  updateStatus: (enquiryId, status) => 
+    api.patch(`/api/v1/admin/enquiries/${enquiryId}/status`, { status }),
+  
+  delete: (enquiryId) => 
+    api.delete(`/api/v1/admin/enquiries/${enquiryId}`),
 };
 
 // Export the raw api instance for custom requests
