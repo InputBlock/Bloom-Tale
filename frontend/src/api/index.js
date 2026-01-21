@@ -172,7 +172,9 @@ export const authAPI = {
     return { response, data: await parseResponse(response) };
   },
   
-  googleLogin: () => {
+  googleLogin: (redirectUrl = '/home') => {
+    // Store redirect URL for after OAuth callback
+    localStorage.setItem('authRedirect', redirectUrl);
     window.location.href = '/api/v1/google';
   },
   

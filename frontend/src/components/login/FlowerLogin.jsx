@@ -366,8 +366,8 @@ export default function FlowerLogin() {
   }, [email, password, navigate, redirectUrl]);
 
   const handleGoogleLogin = useCallback(() => {
-    authAPI.googleLogin();
-  }, []);
+    authAPI.googleLogin(redirectUrl);
+  }, [redirectUrl]);
 
   return (
     <div className="min-h-screen flex bg-[#f5f2ed]">

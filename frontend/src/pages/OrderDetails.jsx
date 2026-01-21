@@ -191,7 +191,7 @@ export default function OrderDetails() {
                 className="bg-white rounded-sm shadow-lg p-5 sm:p-6 md:p-8 flex flex-col"
               >
                 <div className="flex items-center gap-2 mb-4 sm:mb-6">
-                  <ShoppingBag className="text-[#3e4026]" size={20} className="sm:w-6 sm:h-6" />
+                  <ShoppingBag className="text-[#3e4026] w-5 h-5 sm:w-6 sm:h-6" />
                   <h2 
                     className="text-lg sm:text-xl text-[#3e4026] font-semibold"
                     style={{ fontFamily: 'Playfair Display, serif' }}
@@ -295,7 +295,7 @@ export default function OrderDetails() {
                 className="bg-white rounded-sm shadow-lg p-5 sm:p-6 md:p-8 lg:sticky lg:top-24 flex flex-col"
               >
                 <div className="flex items-center gap-2 mb-4 sm:mb-6">
-                  <MapPin className="text-[#3e4026]" size={20} className="sm:w-6 sm:h-6" />
+                  <MapPin className="text-[#3e4026] w-5 h-5 sm:w-6 sm:h-6" />
                   <h2 
                     className="text-lg sm:text-xl text-[#3e4026] font-semibold"
                     style={{ fontFamily: 'Playfair Display, serif' }}

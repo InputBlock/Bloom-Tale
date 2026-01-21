@@ -1,4 +1,5 @@
 import { motion } from "framer-motion"
+import { useRef } from "react"
 
 export default function ProductCard({ 
   product, 
@@ -11,11 +12,36 @@ export default function ProductCard({
   isComboMode = false
 }) {
   const isHovered = hoveredId === product._id
+  const touchStartRef = useRef({ x: 0, y: 0 })
 
   const handleClick = (e) => {
     // Ensure click works on both desktop and mobile
     e.preventDefault()
     onClick?.(product.product_id, product)
+  }
+
+  const handleTouchStart = (e) => {
+    // Record touch start position to detect scroll vs tap
+    const touch = e.touches[0]
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const handleTouchEnd = (e) => {
+    // Calculate how far the touch moved
+    const touch = e.changedTouches[0]
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x)
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y)
+    
+    // If moved more than 10px, it's a scroll - don't navigate
+    if (deltaX > 10 || deltaY > 10) {
+      return
+    }
+    
+    // It's a tap - navigate
+    if (e.cancelable) {
+      e.preventDefault()
+    }
+    handleClick(e)
   }
 
   return (
@@ -26,14 +52,9 @@ export default function ProductCard({
       onMouseEnter={() => onHover?.(product._id)}
       onMouseLeave={() => onLeave?.()}
       onClick={handleClick}
-      onTouchEnd={(e) => {
-        // Handle touch events for mobile
-        if (e.cancelable) {
-          e.preventDefault()
-        }
-        handleClick(e)
-      }}
-      className="group cursor-pointer touch-manipulation"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="group cursor-pointer touch-manipulation select-none"
       style={{ WebkitTapHighlightColor: 'transparent' }}
     >
       {/* Product Image */}
