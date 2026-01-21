@@ -84,6 +84,7 @@ export const CartProvider = ({ children }) => {
             product_id: item.product_id,
             name: item.name,
             size: item.size || item.selectedSize || null,
+            color: item.color || item.selectedColor || null, // Add color for balloons/candles
             quantity: item.quantity,
             price: item.price
           })),
@@ -98,7 +99,8 @@ export const CartProvider = ({ children }) => {
         const requestBody = {
           product_id: product.product_id,
           quantity: product.quantity || 1,
-          size: product.size || "medium",
+          size: product.size || null,
+          color: product.color || null,
           // Delivery info
           deliveryType: product.deliveryType || 'standard',
           deliveryFee: product.deliveryFee || 0,

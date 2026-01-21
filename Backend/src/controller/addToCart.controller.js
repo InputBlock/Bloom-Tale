@@ -8,7 +8,7 @@ import Cart from "../models/cart.model.js";
 
 export const addToCart = asyncHandler(async (req, res) => {
   const userId = req.user._id; // from auth middleware
-  const { product_id, size, quantity, deliveryType, deliveryFee, deliverySlot, pincode } = req.body;
+  const { product_id, size, color, quantity, deliveryType, deliveryFee, deliverySlot, pincode } = req.body;
 
   const user = await User.findById(userId);
   if (!user) {
@@ -44,18 +44,26 @@ export const addToCart = asyncHandler(async (req, res) => {
   // }
   
   // 🔹 Price calculation ONLY from DB
+  // Categories that use single pricing (no sizes)
+  const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"];
+  const isSinglePrice = product.product_type === "simple" || 
+                        SINGLE_PRICE_CATEGORIES.includes(product.category);
 
   let price;
-  if (product.product_type === "sized") {
-    if (!size || !product.pricing[size]) {
-      throw new ApiError(400, "Invalid size selected");
-    }
-    price = product.pricing[size];
-  } else {
-    if (!product.price) {
+  
+  if (isSinglePrice) {
+    // Single price products (Balloons, Candles, Combos)
+    price = product.price || product.pricing?.medium || product.pricing?.small || product.pricing?.large;
+    if (!price) {
       throw new ApiError(400, "Product price not available");
     }
-    price = product.price;
+  } else {
+    // Sized products (Flowers, etc.) - need size selection
+    const sizeKey = size?.toLowerCase();
+    if (!sizeKey || !product.pricing?.[sizeKey]) {
+      throw new ApiError(400, "Invalid size selected");
+    }
+    price = product.pricing[sizeKey];
   }
 
   let cart = await Cart.findOne({ user: userId });
@@ -73,9 +81,9 @@ export const addToCart = asyncHandler(async (req, res) => {
     cart.email = user.email;
   }
 
-  // check if product already in cart
+  // check if product already in cart (match by product_id, size AND color)
   const itemIndex = cart.items.findIndex(
-    (item) =>  !item.isCombo && item.product_id === product_id && item.size === size
+    (item) =>  !item.isCombo && item.product_id === product_id && item.size === size && item.color === color
   );
 
   if (itemIndex > -1) {
@@ -90,6 +98,7 @@ export const addToCart = asyncHandler(async (req, res) => {
       product: product._id,
       product_id: product.product_id,
       size: size || null,
+      color: color || null,
       quantity,
       price, // ✅ DB-derived snapshot
       isCombo: false,

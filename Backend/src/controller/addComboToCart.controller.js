@@ -17,9 +17,10 @@ export const addComboToCart = asyncHandler(async (req, res) => {
   const validatedItems = [];
 
   for (const item of combo_items) {
+    // Find product - allow is_active: true OR undefined (for backwards compatibility)
     const product = await Product.findOne({
       product_id: item.product_id,
-      is_active: true,
+      $or: [{ is_active: true }, { is_active: { $exists: false } }]
     });
 
     if (!product) {
@@ -28,14 +29,32 @@ export const addComboToCart = asyncHandler(async (req, res) => {
 
     let price;
 
+    // Categories that use single pricing (no sizes)
+    const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"];
+    const isSinglePrice = product.product_type === "simple" || 
+                          SINGLE_PRICE_CATEGORIES.includes(product.category);
+
     // 🔹 DB-based price calculation
-    if (product.product_type === "sized") {
-      if (!item.size || !product.pricing[item.size]) {
-        throw new ApiError(400, `Invalid size for ${product.name}`);
+    if (isSinglePrice) {
+      // Balloons, Candles, Combos - use single price
+      // Fallback: if price is not set, try to use pricing.medium or pricing.small
+      price = product.price || product.pricing?.medium || product.pricing?.small || product.pricing?.large;
+    } else if (item.size) {
+      // Product has size selected - use sized pricing
+      const sizeKey = item.size.toLowerCase();
+      if (product.pricing?.[sizeKey]) {
+        price = product.pricing[sizeKey];
+      } else {
+        throw new ApiError(400, `Invalid size '${item.size}' for ${product.name}`);
       }
-      price = product.pricing[item.size];
-    } else {
+    } else if (product.price) {
+      // Fallback to single price if no size and price exists
       price = product.price;
+    } else if (product.pricing?.medium) {
+      // Fallback to medium pricing if available
+      price = product.pricing.medium;
+    } else {
+      throw new ApiError(400, `No valid price configuration for ${product.name}`);
     }
 
     if (!price) {
@@ -48,7 +67,8 @@ export const addComboToCart = asyncHandler(async (req, res) => {
       product: product._id,
       product_id: product.product_id,
       name: product.name,
-      size: item.size || null,
+      size: item.size?.toLowerCase() || null,
+      color: item.color?.name || item.color || null,
       quantity: item.quantity,
       price,
     });

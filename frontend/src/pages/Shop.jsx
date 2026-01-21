@@ -198,11 +198,6 @@ export default function Shop() {
         if (data.success && data.data) {
           let sortedProducts = [...data.data]
           
-          // DEBUG: Log all products and their combo values
-          console.log('All products:', sortedProducts.map(p => ({ name: p.name, combo: p.combo, category: p.category, is_active: p.is_active })))
-          console.log('Products with combo=true:', sortedProducts.filter(p => p.combo === true).map(p => p.name))
-          console.log('Selected category:', selectedCategory)
-          
           // Apply search filter first if search query exists
           if (searchQuery) {
             sortedProducts = filterBySearch(sortedProducts, searchQuery)

@@ -20,6 +20,10 @@ const comboSubItemSchema = new Schema(
       type: String,
       default: null,
     },
+    color: {
+      type: String,
+      default: null,
+    },
     quantity: {
       type: Number,
       required: true,
@@ -53,6 +57,10 @@ const cartItemSchema = new Schema({
     type: String,
     required: false, // Not required for combo items
   },
+  color: {
+    type: String,
+    required: false, // For balloons and other color products
+  },
   price: {
     type: Number, // price at time of add
     required: true,
@@ -67,7 +75,7 @@ const cartItemSchema = new Schema({
     required: false, // Name for combo packages
   },
   combo_items: {
-    type: [comboSubItemSchema], // ✅ STRUCTURED
+    type: [comboSubItemSchema], 
     required: false,
   },
   // Delivery fields

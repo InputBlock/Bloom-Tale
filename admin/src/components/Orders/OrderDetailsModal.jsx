@@ -105,23 +105,47 @@ export default function OrderDetailsModal({ order, onClose, onStatusUpdate }) {
                   {order.items?.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between items-center pb-3 sm:pb-4 border-b border-gray-100 last:border-0"
+                      className="pb-3 sm:pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-medium text-gray-900 text-sm sm:text-base">{item.name}</p>
-                          {item.isCombo && (
-                            <span className="px-1.5 sm:px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] sm:text-xs font-medium">
-                              Combo
-                            </span>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-medium text-gray-900 text-sm sm:text-base">{item.name}</p>
+                            {item.isCombo && (
+                              <span className="px-1.5 sm:px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] sm:text-xs font-medium">
+                                Combo
+                              </span>
+                            )}
+                          </div>
+                          {item.description && (
+                            <p className="text-xs sm:text-sm text-gray-500">{item.description}</p>
                           )}
+                          <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1">Qty: {item.quantity}</p>
                         </div>
-                        {item.description && (
-                          <p className="text-xs sm:text-sm text-gray-500">{item.description}</p>
-                        )}
-                        <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1">Qty: {item.quantity}</p>
+                        <p className="font-semibold text-gray-900 text-sm sm:text-base ml-2">₹{item.price?.toFixed(2) || "0.00"}</p>
                       </div>
-                      <p className="font-semibold text-gray-900 text-sm sm:text-base ml-2">₹{item.price?.toFixed(2) || "0.00"}</p>
+                      
+                      {/* Combo Sub-items */}
+                      {item.isCombo && item.comboItems && item.comboItems.length > 0 && (
+                        <div className="mt-3 ml-4 space-y-2 bg-purple-50 p-3 rounded-lg">
+                          <p className="text-[10px] sm:text-xs font-semibold text-purple-700 uppercase tracking-wider">Combo Contents:</p>
+                          {item.comboItems.map((subItem, subIdx) => (
+                            <div key={subIdx} className="flex justify-between items-center text-xs sm:text-sm">
+                              <div>
+                                <span className="text-gray-700">{subItem.name}</span>
+                                <span className="text-gray-500 ml-2">
+                                  {[
+                                    subItem.size ? `Size: ${subItem.size}` : "",
+                                    subItem.color ? `Color: ${subItem.color}` : ""
+                                  ].filter(Boolean).join(", ") || ""}
+                                </span>
+                                <span className="text-gray-400 ml-2">× {subItem.quantity}</span>
+                              </div>
+                              <span className="text-gray-600">₹{subItem.price?.toFixed(2) || "0.00"}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
