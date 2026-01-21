@@ -17,6 +17,7 @@ export default function ProductForm({ images, setImages }) {
       medium: "",
       large: ""
     },
+    discount_percentage: "", // Discount percentage for display
     inStock: true,
     sameDayDelivery: false,
     isActive: true,
@@ -69,6 +70,9 @@ export default function ProductForm({ images, setImages }) {
         formDataToSend.append("pricing", JSON.stringify(formData.pricing))
       }
       
+      // Send discount percentage
+      formDataToSend.append("discount_percentage", formData.discount_percentage || 0)
+      
       // Append all image files - first image will be the main image
       if (images.length > 0) {
         images.forEach((img) => {
@@ -92,6 +96,7 @@ export default function ProductForm({ images, setImages }) {
           medium: "",
           large: ""
         },
+        discount_percentage: "",
         inStock: true,
         sameDayDelivery: false,
         isActive: true,
@@ -307,6 +312,56 @@ export default function ProductForm({ images, setImages }) {
             </div>
             <p className="mt-2 text-sm text-gray-500">Set different prices for small, medium, and large arrangements</p>
           </>
+        )}
+      </div>
+
+      {/* Discount Percentage Field */}
+      <div>
+        <label className="block text-gray-900 font-medium mb-2">
+          Discount Percentage <span className="text-gray-500 text-sm font-normal">(Optional)</span>
+        </label>
+        <div className="relative max-w-md">
+          <input
+            type="number"
+            value={formData.discount_percentage}
+            onChange={(e) => {
+              const value = e.target.value === "" ? "" : Math.min(100, Math.max(0, parseFloat(e.target.value) || 0))
+              setFormData({ ...formData, discount_percentage: value })
+            }}
+            placeholder="0"
+            min="0"
+            max="100"
+            step="1"
+            className="w-full pr-10 pl-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">%</span>
+        </div>
+        <p className="mt-2 text-sm text-gray-500">
+          Enter discount percentage to show as crossed-out original price (0-100%). Leave at 0 for no discount display.
+        </p>
+        {formData.discount_percentage > 0 && (
+          <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+            <p className="text-sm font-medium text-blue-900 mb-1">💡 Preview:</p>
+            {SINGLE_PRICE_CATEGORIES.includes(formData.type) ? (
+              formData.price && (
+                <p className="text-sm text-blue-800">
+                  Customer will see: <span className="line-through text-gray-500">₹{(parseFloat(formData.price) * (1 + parseFloat(formData.discount_percentage) / 100)).toFixed(0)}</span>{" "}
+                  <strong className="text-green-700">₹{parseFloat(formData.price).toFixed(0)}</strong>{" "}
+                  <span className="text-green-600 font-semibold">({formData.discount_percentage}% OFF)</span>
+                </p>
+              )
+            ) : (
+              <p className="text-sm text-blue-800">
+                Customer will see all size prices with <strong>{formData.discount_percentage}% markup</strong> crossed out
+                {formData.pricing.medium && (
+                  <span className="block mt-1">
+                    Example (Medium): <span className="line-through text-gray-500">₹{(parseFloat(formData.pricing.medium) * (1 + parseFloat(formData.discount_percentage) / 100)).toFixed(0)}</span>{" "}
+                    <strong className="text-green-700">₹{parseFloat(formData.pricing.medium).toFixed(0)}</strong>
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
         )}
       </div>
 

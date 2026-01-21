@@ -110,6 +110,20 @@ export default function Footer({ isComboSidebarOpen = false }) {
                 </Link>
               </li>
               <li>
+                <Link to="/services" className={`text-white/70 hover:text-white transition-colors ${
+                  isComboSidebarOpen ? 'text-xs' : 'text-sm'
+                }`}>
+                  Services
+                </Link>
+              </li>
+              <li>
+                <Link to="/cart" className={`text-white/70 hover:text-white transition-colors ${
+                  isComboSidebarOpen ? 'text-xs' : 'text-sm'
+                }`}>
+                  Cart
+                </Link>
+              </li>
+              <li>
                 <Link to="/faq" className={`text-white/70 hover:text-white transition-colors ${
                   isComboSidebarOpen ? 'text-xs' : 'text-sm'
                 }`}>
@@ -137,38 +151,52 @@ export default function Footer({ isComboSidebarOpen = false }) {
               isComboSidebarOpen ? 'space-y-2' : 'space-y-3'
             }`}>
               <li>
-                <Link to="/shop?occasion=birthday" className={`text-white/70 hover:text-white transition-colors ${
+                <Link to="/shop?category=Birthday" className={`text-white/70 hover:text-white transition-colors ${
                   isComboSidebarOpen ? 'text-xs' : 'text-sm'
                 }`}>
-                  Birthday Flowers
+                  Birthday
                 </Link>
               </li>
               <li>
-                <Link to="/shop?occasion=anniversary" className={`text-white/70 hover:text-white transition-colors ${
+                <Link to="/shop?category=Anniversary" className={`text-white/70 hover:text-white transition-colors ${
                   isComboSidebarOpen ? 'text-xs' : 'text-sm'
                 }`}>
                   Anniversary
                 </Link>
               </li>
               <li>
-                <Link to="/shop?occasion=wedding" className={`text-white/70 hover:text-white transition-colors ${
+                <Link to="/shop?category=Forever Flowers" className={`text-white/70 hover:text-white transition-colors ${
                   isComboSidebarOpen ? 'text-xs' : 'text-sm'
                 }`}>
-                  Wedding
+                  Forever Flowers
                 </Link>
               </li>
               <li>
-                <Link to="/shop?occasion=sympathy" className={`text-white/70 hover:text-white transition-colors ${
+                <Link to="/shop?category=Candles" className={`text-white/70 hover:text-white transition-colors ${
                   isComboSidebarOpen ? 'text-xs' : 'text-sm'
                 }`}>
-                  Sympathy
+                  Candles
                 </Link>
               </li>
               <li>
-                <Link to="/shop?type=plants" className={`text-white/70 hover:text-white transition-colors ${
+                <Link to="/shop?category=Premium" className={`text-white/70 hover:text-white transition-colors ${
                   isComboSidebarOpen ? 'text-xs' : 'text-sm'
                 }`}>
-                  Plants
+                  Premium
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop?category=Corporate" className={`text-white/70 hover:text-white transition-colors ${
+                  isComboSidebarOpen ? 'text-xs' : 'text-sm'
+                }`}>
+                  Corporate
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop?category=Combos" className={`text-white/70 hover:text-white transition-colors ${
+                  isComboSidebarOpen ? 'text-xs' : 'text-sm'
+                }`}>
+                  Combos
                 </Link>
               </li>
             </ul>

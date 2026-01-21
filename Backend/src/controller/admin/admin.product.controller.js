@@ -34,6 +34,7 @@ const add_item = asyncHandler(async (req, res) => {
             ? { small: null, medium: null, large: null } 
             : (req.body.pricing ? JSON.parse(req.body.pricing) : { small: 0, medium: 0, large: 0 }),
         sizes: isSinglePrice ? [] : (req.body.sizes ? JSON.parse(req.body.sizes) : ["Small", "Medium", "Large"]),
+        discount_percentage: parseFloat(req.body.discount_percentage) || 0,
         images_uri: images_uri,
         image_public: image_public,
         stock: parseInt(req.body.stock) || 0,

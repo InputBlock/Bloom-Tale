@@ -106,9 +106,30 @@ export default function ProductCard({
         >
           {product.name}
         </h3>
-        <p className="text-base sm:text-lg font-light text-[#3e4026]">
-          ₹{(product.pricing?.medium || product.pricing?.small || product.pricing?.large || product.price || 0).toLocaleString()}
-        </p>
+        
+        {/* Price Display with Discount */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {product.discount_percentage > 0 ? (
+            <>
+              <p className="text-xs sm:text-sm text-gray-400 line-through">
+                ₹{(
+                  (product.pricing?.medium || product.pricing?.small || product.pricing?.large || product.price || 0) * 
+                  (1 + product.discount_percentage / 100)
+                ).toFixed(0)}
+              </p>
+              <p className="text-base sm:text-lg font-semibold text-[#3e4026]">
+                ₹{(product.pricing?.medium || product.pricing?.small || product.pricing?.large || product.price || 0).toLocaleString()}
+              </p>
+              <span className="text-[9px] sm:text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
+                {product.discount_percentage}% OFF
+              </span>
+            </>
+          ) : (
+            <p className="text-base sm:text-lg font-light text-[#3e4026]">
+              ₹{(product.pricing?.medium || product.pricing?.small || product.pricing?.large || product.price || 0).toLocaleString()}
+            </p>
+          )}
+        </div>
         
         {/* Stock Status */}
         {product.stock && product.stock > 0 ? (
