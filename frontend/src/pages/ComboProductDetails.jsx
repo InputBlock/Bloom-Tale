@@ -465,21 +465,59 @@ export default function ComboProductDetails() {
         <ComboSidebar />
       </div>
 
-      {/* Mobile: Floating Combo Button */}
+      {/* Mobile: Floating Combo Button - Premium Design */}
       {!showComboSidebar && (
-        <button
-          onClick={() => setShowComboSidebar(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-[#3e4026] to-[#5a5c3d] text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all z-40 md:hidden"
-        >
-          <div className="relative">
-            <Package className="w-6 h-6" />
-            {comboItems.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                {comboItems.length}
-              </span>
-            )}
-          </div>
-        </button>
+        <div className="fixed bottom-6 left-4 right-4 md:hidden z-40">
+          <button
+            onClick={() => setShowComboSidebar(true)}
+            className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl shadow-2xl transition-all active:scale-[0.98] ${
+              comboItems.length > 0
+                ? 'bg-gradient-to-r from-[#3e4026] via-[#4a4c2d] to-[#3e4026] text-white'
+                : 'bg-white border-2 border-dashed border-[#3e4026]/30 text-[#3e4026]'
+            }`}
+            style={{
+              boxShadow: comboItems.length > 0 
+                ? '0 10px 40px -10px rgba(62, 64, 38, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.1)' 
+                : '0 4px 20px -5px rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center ${
+                comboItems.length > 0 ? 'bg-white/20' : 'bg-[#3e4026]/10'
+              }`}>
+                <ShoppingBag className="w-6 h-6" />
+                {comboItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center shadow-lg">
+                    {comboItems.length}
+                  </span>
+                )}
+              </div>
+              <div className="text-left">
+                <p className={`font-semibold text-base ${
+                  comboItems.length > 0 ? 'text-white' : 'text-[#3e4026]'
+                }`}>
+                  {comboItems.length > 0 ? 'Your Combo Cart' : 'Start Your Combo'}
+                </p>
+                <p className={`text-xs ${
+                  comboItems.length > 0 ? 'text-white/70' : 'text-[#3e4026]/60'
+                }`}>
+                  {comboItems.length > 0 
+                    ? `${comboItems.length} item${comboItems.length !== 1 ? 's' : ''} • Save 20%` 
+                    : 'Add items to get 20% off'
+                  }
+                </p>
+              </div>
+            </div>
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm ${
+              comboItems.length > 0 
+                ? 'bg-white text-[#3e4026]' 
+                : 'bg-[#3e4026] text-white'
+            }`}>
+              <span>{comboItems.length > 0 ? 'View' : 'Browse'}</span>
+              <Package className="w-4 h-4" />
+            </div>
+          </button>
+        </div>
       )}
 
       {/* Mobile: Combo Sidebar Overlay */}

@@ -49,6 +49,7 @@ export const addComboToCart = asyncHandler(async (req, res) => {
       product_id: product.product_id,
       name: product.name,
       size: item.size || null,
+      color: item.color?.name || item.color || null,
       quantity: item.quantity,
       price,
     });

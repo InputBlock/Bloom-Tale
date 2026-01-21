@@ -170,10 +170,11 @@ export default function OrdersTable() {
                             name: item.productName || item.comboName || item.product?.name || "Product",
                             description: item.isCombo 
                               ? `Combo (${item.combo_items?.length || 0} items)` 
-                              : (item.size ? `Size: ${item.size}` : ""),
+                              : [item.size ? `Size: ${item.size}` : "", item.color ? `Color: ${item.color}` : ""].filter(Boolean).join(", "),
                             price: item.price || 0,
                             quantity: item.quantity || 1,
-                            isCombo: item.isCombo || false
+                            isCombo: item.isCombo || false,
+                            color: item.color || null
                           })) || [],
                           subtotal: order.totalAmount || 0,
                           tax: 0,
@@ -298,10 +299,11 @@ export default function OrdersTable() {
                                   name: item.productName || item.comboName || item.product?.name || "Product",
                                   description: item.isCombo 
                                     ? `Combo (${item.combo_items?.length || 0} items)` 
-                                    : (item.size ? `Size: ${item.size}` : ""),
+                                    : [item.size ? `Size: ${item.size}` : "", item.color ? `Color: ${item.color}` : ""].filter(Boolean).join(", "),
                                   price: item.price || 0,
                                   quantity: item.quantity || 1,
-                                  isCombo: item.isCombo || false
+                                  isCombo: item.isCombo || false,
+                                  color: item.color || null
                                 })) || [],
                                 subtotal: order.totalAmount || 0,
                                 tax: 0,

@@ -14,6 +14,7 @@ export default function BestsellingBlooms() {
   const [loading, setLoading] = useState(true)
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
   const sectionRef = useRef(null)
+  const touchStartRef = useRef({ x: 0, y: 0 })
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
   const navigate = useNavigate()
 
@@ -109,7 +110,23 @@ export default function BestsellingBlooms() {
                 onMouseEnter={() => setHoveredId(product._id)}
                 onMouseLeave={() => setHoveredId(null)}
                 onClick={() => handleProductClick(product.product_id)}
-                className="group cursor-pointer"
+                onTouchStart={(e) => {
+                  const touch = e.touches[0]
+                  touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+                }}
+                onTouchEnd={(e) => {
+                  const touch = e.changedTouches[0]
+                  const deltaX = Math.abs(touch.clientX - touchStartRef.current.x)
+                  const deltaY = Math.abs(touch.clientY - touchStartRef.current.y)
+                  // If moved more than 10px, it's a scroll - don't navigate
+                  if (deltaX > 10 || deltaY > 10) {
+                    return
+                  }
+                  e.preventDefault()
+                  handleProductClick(product.product_id)
+                }}
+                className="group cursor-pointer touch-manipulation select-none"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 {/* Product Image */}
                 <div className="relative overflow-hidden mb-3 sm:mb-4 aspect-[3/4] bg-[#f9f8f6] rounded-sm">

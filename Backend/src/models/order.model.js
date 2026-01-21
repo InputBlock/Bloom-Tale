@@ -7,6 +7,7 @@ const comboSubItemSchema = new Schema(
     product_id: String,
     name: String,
     size: String,
+    color: String,
     quantity: Number,
     price: Number,
   },
@@ -23,6 +24,7 @@ const orderItemSchema = new Schema({
   productName: String,
   productImage: String,
   size: String,
+  color: String,
   quantity: Number,
   price: Number,
   // Combo-specific fields

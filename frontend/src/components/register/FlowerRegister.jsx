@@ -410,7 +410,8 @@ export default function FlowerRegister() {
   };
 
   const handleGoogleSignup = () => {
-    authAPI.googleLogin();
+    // For register, redirect to home after Google signup
+    authAPI.googleLogin('/home');
   };
 
   return (

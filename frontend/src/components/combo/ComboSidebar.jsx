@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { X, MapPin, Truck, Check, Package, ShoppingCart, Minus, Plus } from "lucide-react"
 import { useCombo } from "../../context/ComboContext"
 import { useCart } from "../../context/CartContext"
@@ -27,23 +27,47 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
   const [pincodeMessage, setPincodeMessage] = useState(null)
   const [addingToCart, setAddingToCart] = useState(false)
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
+  
+  // Swipe to close state
+  const [dragY, setDragY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartY = useRef(0)
+  const sidebarRef = useRef(null)
 
-  // Close sidebar on scroll (mobile only)
+  // Handle swipe gesture for mobile
+  const handleTouchStart = (e) => {
+    // Only allow drag from the header/drag handle area
+    const touch = e.touches[0]
+    dragStartY.current = touch.clientY
+    setIsDragging(true)
+  }
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return
+    const touch = e.touches[0]
+    const deltaY = touch.clientY - dragStartY.current
+    // Only allow dragging down (positive delta)
+    if (deltaY > 0) {
+      setDragY(deltaY)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    setIsDragging(false)
+    // If dragged more than 100px down, close the sidebar
+    if (dragY > 100) {
+      onClose()
+    }
+    // Reset drag position with animation
+    setDragY(0)
+  }
+
+  // Reset drag when closed
   useEffect(() => {
-    const handleScroll = () => {
-      if (isOpen && window.innerWidth < 768) {
-        onClose()
-      }
+    if (!isOpen) {
+      setDragY(0)
     }
-
-    if (isOpen) {
-      window.addEventListener('scroll', handleScroll, { passive: true })
-    }
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [isOpen, onClose])
+  }, [isOpen])
 
   const DELIVERY_CHARGE = 199
 
@@ -138,31 +162,48 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
   }
 
   return (
-    <div className={`fixed left-0 right-0 bottom-0 md:right-0 md:left-auto md:top-[78px] md:bottom-auto h-[80vh] md:h-[calc(100vh-73px)] w-full md:w-[320px] bg-white border-t md:border-t-0 md:border-l border-gray-200 z-50 flex flex-col overflow-hidden transition-transform duration-300 ease-out rounded-t-3xl md:rounded-none ${
-      isOpen ? 'translate-y-0' : 'translate-y-full'
-    } md:translate-y-0 md:translate-x-0`}>
-      {/* Drag Handle - Mobile Only */}
-      <div className="md:hidden w-12 h-1 bg-gray-200 rounded-full mx-auto mt-2 mb-1"></div>
+    <div 
+      ref={sidebarRef}
+      className={`fixed left-0 right-0 bottom-0 md:right-0 md:left-auto md:top-[78px] md:bottom-auto h-[85vh] md:h-[calc(100vh-73px)] w-full md:w-[320px] bg-white border-t md:border-t-0 md:border-l border-gray-200 z-50 flex flex-col overflow-hidden rounded-t-3xl md:rounded-none ${
+        isOpen ? 'translate-y-0' : 'translate-y-full'
+      } md:translate-y-0 md:translate-x-0`}
+      style={{
+        transform: `translateY(${isOpen ? dragY : '100%'}px)`,
+        transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
+        boxShadow: isOpen ? '0 -10px 40px -10px rgba(0,0,0,0.2)' : 'none'
+      }}
+    >
+      {/* Drag Handle - Mobile Only - Swipe to close */}
+      <div 
+        className="md:hidden flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="w-10 h-1.5 bg-gray-300 rounded-full mb-1"></div>
+        <p className="text-[10px] text-gray-400 font-medium">Swipe down to close</p>
+      </div>
       
       {/* Header */}
-      <div className="p-4 text- flex-shrink-0">
+      <div className="px-4 pb-3 pt-1 md:pt-4 flex-shrink-0 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Package className="w-5 h-5" />
-            <h2 className="text-lg font-semibold text-[#3e4026]">Your Combo</h2>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-[#3e4026] rounded-xl flex items-center justify-center">
+              <Package className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-[#3e4026]">Your Combo</h2>
+              <p className="text-xs text-gray-500">{comboItems.length} {comboItems.length === 1 ? 'item' : 'items'} • Save 20%</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="bg-white/20 px-2.5 py-1 rounded-full text-xs font-semibold">
-              {comboItems.length} {comboItems.length === 1 ? 'item' : 'items'}
-            </span>
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
-              aria-label="Close sidebar"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          {/* X button - Desktop Only */}
+          <button
+            onClick={onClose}
+            className="hidden md:flex p-2 hover:bg-gray-100 rounded-xl transition-colors"
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
         </div>
       </div>
 

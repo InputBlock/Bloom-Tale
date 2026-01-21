@@ -62,8 +62,9 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product) => {
     if (!isLoggedIn()) {
-      // Redirect to login if not logged in
-      window.location.href = "/login"
+      // Redirect to login with return URL to come back after login
+      const currentPath = window.location.pathname + window.location.search
+      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
       return { success: false, message: "Please login to add items to cart" }
     }
 
@@ -97,7 +98,8 @@ export const CartProvider = ({ children }) => {
         const requestBody = {
           product_id: product.product_id,
           quantity: product.quantity || 1,
-          size: product.size || "medium",
+          size: product.size || null,
+          color: product.color || null,
           // Delivery info
           deliveryType: product.deliveryType || 'standard',
           deliveryFee: product.deliveryFee || 0,
