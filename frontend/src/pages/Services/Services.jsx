@@ -20,6 +20,7 @@ export default function Services() {
   const [activeMainImageIndexes, setActiveMainImageIndexes] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -712,9 +713,18 @@ export default function Services() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   className="relative group overflow-hidden aspect-square bg-gradient-to-br from-gray-100 to-gray-200 cursor-pointer"
+                  onClick={() => setSelectedGalleryImage(item)}
                 >
-                  {/* Placeholder for images - replace with actual images */}
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f9f8f6] to-gray-100">
+                  <img 
+                    src={item.image} 
+                    alt={item.alt}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none'
+                      e.target.nextElementSibling.style.display = 'flex'
+                    }}
+                  />
+                  <div className="w-full h-full hidden items-center justify-center bg-gradient-to-br from-[#f9f8f6] to-gray-100">
                     <p className="text-gray-400 text-xs text-center px-2">{item.alt}</p>
                   </div>
                   {/* Image overlay on hover */}
@@ -752,6 +762,45 @@ export default function Services() {
           )}
         </div>
       </section>
+
+      {/* Gallery Image Lightbox Modal */}
+      <AnimatePresence>
+        {selectedGalleryImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-8 sm:p-12 md:p-16 lg:p-20 bg-black/90 backdrop-blur-sm"
+            onClick={() => setSelectedGalleryImage(null)}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedGalleryImage(null)}
+              className="absolute top-6 right-6 sm:top-8 sm:right-8 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all z-10 group"
+              aria-label="Close image"
+            >
+              <X size={24} className="text-white group-hover:scale-110 transition-transform" />
+            </button>
+
+            {/* Image Container */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative max-w-5xl max-h-full w-full h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={selectedGalleryImage.image}
+                alt={selectedGalleryImage.alt}
+                className="w-full h-full object-contain rounded-lg"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>
