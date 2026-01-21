@@ -33,7 +33,13 @@ const heroSlides = [
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [isLoaded, setIsLoaded] = useState(false)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    // Mark as loaded after component mounts
+    setIsLoaded(true)
+  }, [])
 
   useEffect(() => {
     if (!isAutoPlaying) return
@@ -54,7 +60,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative h-[85vh] sm:h-[90vh] md:h-screen overflow-hidden">
+    <section className="relative h-[85vh] sm:h-[90vh] md:h-screen overflow-hidden bg-gray-900">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
@@ -66,8 +72,11 @@ export default function Hero() {
         >
           {/* Background Image */}
           <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${heroSlides[currentSlide].image})` }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+              backgroundImage: `url(${heroSlides[currentSlide].image})`,
+              willChange: 'transform'
+            }}
           />
           
           {/* Overlay */}
@@ -79,46 +88,48 @@ export default function Hero() {
       <div className="relative h-full flex items-center z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full">
           <div className="max-w-2xl">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlide}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                {/* Subtitle */}
-                <motion.p
-                  className="text-white/80 text-[11px] sm:text-xs md:text-sm tracking-[0.25em] sm:tracking-[0.3em] uppercase mb-3 sm:mb-4"
+            {isLoaded && (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentSlide}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
                 >
-                  {heroSlides[currentSlide].subtitle}
-                </motion.p>
+                  {/* Subtitle */}
+                  <motion.p
+                    className="text-white/80 text-[11px] sm:text-xs md:text-sm tracking-[0.25em] sm:tracking-[0.3em] uppercase mb-3 sm:mb-4"
+                  >
+                    {heroSlides[currentSlide].subtitle}
+                  </motion.p>
 
-                {/* Title */}
-                <h1 
-                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white font-light mb-4 sm:mb-5 md:mb-6 leading-tight"
-                  style={{ fontFamily: 'Playfair Display, serif' }}
-                >
-                  {heroSlides[currentSlide].title}
-                </h1>
+                  {/* Title */}
+                  <h1 
+                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white font-light mb-4 sm:mb-5 md:mb-6 leading-tight"
+                    style={{ fontFamily: 'Playfair Display, serif' }}
+                  >
+                    {heroSlides[currentSlide].title}
+                  </h1>
 
-                {/* Description */}
-                <p className="text-white/90 text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-7 md:mb-8 font-light max-w-lg">
-                  {heroSlides[currentSlide].description}
-                </p>
+                  {/* Description */}
+                  <p className="text-white/90 text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-7 md:mb-8 font-light max-w-lg">
+                    {heroSlides[currentSlide].description}
+                  </p>
 
-                {/* CTA Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate('/shop')}
-                  className="group inline-flex items-center gap-2 sm:gap-3 bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-medium tracking-wide hover:bg-gray-100 active:scale-95 transition-all duration-300 rounded-sm"
-                >
-                  {heroSlides[currentSlide].buttonText}
-                  <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px] group-hover:translate-x-1 transition-transform" />
-                </motion.button>
-              </motion.div>
-            </AnimatePresence>
+                  {/* CTA Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/shop')}
+                    className="group inline-flex items-center gap-2 sm:gap-3 bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-medium tracking-wide hover:bg-gray-100 active:scale-95 transition-all duration-300 rounded-sm"
+                  >
+                    {heroSlides[currentSlide].buttonText}
+                    <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px] group-hover:translate-x-1 transition-transform" />
+                  </motion.button>
+                </motion.div>
+              </AnimatePresence>
+            )}
           </div>
         </div>
       </div>
@@ -153,15 +164,17 @@ export default function Hero() {
       </div>
 
       {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
-        <motion.div
-          key={currentSlide}
-          initial={{ width: 0 }}
-          animate={{ width: '100%' }}
-          transition={{ duration: 6, ease: 'linear' }}
-          className="h-full bg-white"
-        />
-      </div>
+      {isLoaded && (
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
+          <motion.div
+            key={currentSlide}
+            initial={{ width: 0 }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 6, ease: 'linear' }}
+            className="h-full bg-white"
+          />
+        </div>
+      )}
     </section>
   )
 }

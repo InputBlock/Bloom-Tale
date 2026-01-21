@@ -1,3 +1,14 @@
+/* Prevent layout shifts on page load */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 @keyframes slide-in-right {
   from {
     transform: translateX(100%);

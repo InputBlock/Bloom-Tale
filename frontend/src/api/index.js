@@ -251,6 +251,20 @@ export const cartAPI = {
     });
     return { response, data: await parseResponse(response) };
   },
+
+  /**
+   * CHANGE BY FARAAZ - Add combo to cart endpoint
+   * Connects to backend: http://localhost:8000/api/v1/cart/addComboToCart
+   * @param {Object} comboData - Combo data with combo_items array and delivery_pincode
+   * @returns {Promise} - API response
+   */
+  addCombo: async (comboData) => {
+    const response = await apiFetch('/api/v1/cart/addComboToCart', {
+      method: 'POST',
+      body: JSON.stringify(comboData),
+    });
+    return { response, data: await parseResponse(response) };
+  },
   
   update: async (productId, quantity) => {
     const response = await apiFetch('/api/v1/cart/updateQuantity', {

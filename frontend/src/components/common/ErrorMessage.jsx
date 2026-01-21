@@ -193,16 +193,20 @@ const ErrorMessage = ({ error, onClose }) => {
 
           {onClose && (
             <motion.button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-700 transition-all shrink-0 hover:bg-white/80 rounded-lg p-1.5 active:scale-95"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+              }}
+              className="text-gray-500 hover:text-gray-700 transition-all shrink-0 hover:bg-white/80 rounded-full p-2 active:scale-95 cursor-pointer z-10"
               aria-label="Close error message"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.85 }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <XCircle className="w-4 h-4" />
+              <XCircle className="w-5 h-5" />
             </motion.button>
           )}
         </motion.div>
