@@ -1,19 +1,29 @@
 import { motion, useInView } from "framer-motion"
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { ArrowLeft, ArrowRight, Quote } from "lucide-react"
 
 export default function Testimonials() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const testimonials = [
     {
       id: 1,
       name: "Raja Kumari",
-      title: "Actress",
+      title: "Global artist/rapper",
       rating: 5,
-      text: "Exquisite arrangements for my events and photoshoots. Their creativity and attention to detail bring my vision to life every single time. Truly exceptional!",
+      text: "You guys are so good at this—it’s unreal. Capturing moments outdoors like this feels so pure and real. It honestly reminded me of my mom, which made it even more special. Keep creating magic like this. I’ll definitely see you again.",
       image: "/raja-kumari.jpg",
     },
     {
@@ -42,7 +52,7 @@ export default function Testimonials() {
     },
   ]
 
-  const itemsPerPage = 2
+  const itemsPerPage = isMobile ? 1 : 2
   const totalPages = Math.ceil(testimonials.length / itemsPerPage)
 
   const handleNext = () => {
