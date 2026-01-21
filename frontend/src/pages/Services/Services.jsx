@@ -203,7 +203,7 @@ export default function Services() {
       <section className="pt-28 sm:pt-32 md:pt-36 pb-16 md:pb-24 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
           {/* Tabs */}
-          <div className="flex justify-start mb-8 sm:mb-10 md:mb-12 overflow-x-auto">
+          <div className="flex justify-start mb-8 sm:mb-10 md:mb-12 overflow-x-auto scrollbar-hide">
             <div className="inline-flex gap-8 sm:gap-10 md:gap-12 lg:gap-16">
               <button
                 onClick={() => setActiveTab("wedding")}
@@ -217,7 +217,7 @@ export default function Services() {
                 {activeTab === "wedding" && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#3e4026]"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#3e4026]"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
@@ -234,7 +234,7 @@ export default function Services() {
                 {activeTab === "social" && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#3e4026]"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#3e4026]"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
@@ -251,7 +251,7 @@ export default function Services() {
                 {activeTab === "corporate" && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#3e4026]"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#3e4026]"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
