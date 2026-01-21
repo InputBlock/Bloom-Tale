@@ -71,32 +71,44 @@ export const CartProvider = ({ children }) => {
       // Check if this is a combo product
       const isCombo = product.isCombo || product.combo_items
 
-      const requestBody = isCombo ? {
-        // Combo product structure
-        product_id: product.product_id,
-        quantity: product.quantity || 1,
-        isCombo: true,
-        combo_items: product.combo_items,
-        price: product.price,
-        name: product.name || 'Custom Combo Package',
-        delivery_pincode: product.delivery_pincode,
-        delivery_charge: product.delivery_charge,
-        subtotal: product.subtotal,
-        discount: product.discount,
-        discount_percentage: product.discount_percentage
-      } : {
-        // Regular product structure
-        product_id: product.product_id,
-        quantity: product.quantity || 1,
-        size: product.size || "medium",
-        // Delivery info
-        deliveryType: product.deliveryType || 'standard',
-        deliveryFee: product.deliveryFee || 0,
-        deliverySlot: product.deliverySlot || null,
-        pincode: product.pincode || null,
-      }
+      let response, data
 
-      const { response, data } = await cartAPI.add(requestBody)
+      if (isCombo) {
+        /**
+         * CHANGE BY FARAAZ - Use dedicated combo endpoint for combo products
+         * Backend endpoint: /api/v1/cart/addComboToCart
+         */
+        const comboRequestBody = {
+          combo_items: product.combo_items.map(item => ({
+            product_id: item.product_id,
+            name: item.name,
+            size: item.size || item.selectedSize || null,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          delivery_pincode: product.delivery_pincode
+        }
+
+        const result = await cartAPI.addCombo(comboRequestBody)
+        response = result.response
+        data = result.data
+      } else {
+        // Regular product - use standard addToCart endpoint
+        const requestBody = {
+          product_id: product.product_id,
+          quantity: product.quantity || 1,
+          size: product.size || "medium",
+          // Delivery info
+          deliveryType: product.deliveryType || 'standard',
+          deliveryFee: product.deliveryFee || 0,
+          deliverySlot: product.deliverySlot || null,
+          pincode: product.pincode || null,
+        }
+
+        const result = await cartAPI.add(requestBody)
+        response = result.response
+        data = result.data
+      }
 
       // Check for auth errors (auto-handled by api utility)
       if (!response.ok) {
@@ -126,11 +138,19 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      // Note: You'll need to implement removeFromCart endpoint in backend
-      // For now, we'll handle it on the frontend
-      setCartItems((prevItems) => 
-        prevItems.filter((item) => item.product_id !== product_id)
-      )
+      // CHANGE BY FARAAZ - Now properly calling backend API to remove item from cart
+      const { response, data } = await cartAPI.remove(product_id)
+      
+      if (response.ok && data.success) {
+        // Update local state after successful backend deletion
+        setCartItems((prevItems) => 
+          prevItems.filter((item) => item.product_id !== product_id)
+        )
+        // Refresh cart to get updated total
+        await fetchCart()
+      } else {
+        console.error("Failed to remove item from cart:", data.message)
+      }
     } catch (error) {
       console.error("Error removing from cart:", error)
     }

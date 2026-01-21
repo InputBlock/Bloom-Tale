@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import { motion, useInView } from "framer-motion"
 import { useNavigate } from "react-router-dom"
-import { useCart } from "../../context/CartContext"
 import SuccessModal from "../common/SuccessModal"
 import { productsAPI } from "../../api"
 
@@ -17,7 +16,6 @@ export default function BestsellingBlooms() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
   const navigate = useNavigate()
-  const { addToCart } = useCart()
 
   // Fetch bestseller products from backend
   useEffect(() => {
@@ -41,23 +39,6 @@ export default function BestsellingBlooms() {
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`)
-  }
-
-  const handleAddToCart = async (e, product) => {
-    e.stopPropagation()
-    
-    const result = await addToCart({
-      product_id: product.product_id,
-      quantity: 1,
-    })
-
-    if (result && result.success) {
-      setModalState({ isOpen: true, message: "Product added to cart successfully!", type: "success" })
-      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
-    } else if (result && !result.success) {
-      setModalState({ isOpen: true, message: result.message || "Failed to add to cart", type: "error" })
-      setTimeout(() => setModalState({ isOpen: false, message: "", type: "success" }), 4000)
-    }
   }
 
   const handleNext = () => {
@@ -151,7 +132,7 @@ export default function BestsellingBlooms() {
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                   
-                  {/* Quick Add Button */}
+                  {/* Buy Now Button */}
                   <motion.button
                     initial={{ opacity: 0, y: 10 }}
                     animate={{
@@ -159,16 +140,14 @@ export default function BestsellingBlooms() {
                       y: hoveredId === product._id ? 0 : 10,
                     }}
                     transition={{ duration: 0.3 }}
-                    onClick={(e) => handleAddToCart(e, product)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleProductClick(product.product_id)
+                    }}
                     className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 bg-white py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-[#3e4026] hover:bg-[#3e4026] hover:text-white active:scale-95 transition-all duration-300 rounded-sm"
                   >
-                    Add to Cart
+                    Buy Now
                   </motion.button>
-
-                  {/* Arrow Icon */}
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-white rounded-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <ArrowUpRight size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] text-[#3e4026]" />
-                  </div>
 
                   {/* Category Badge */}
                   <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4">

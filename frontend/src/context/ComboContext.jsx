@@ -1,6 +1,41 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, useEffect } from "react"
 
 const ComboContext = createContext()
+
+/**
+ * CHANGE BY FARAAZ - Added localStorage persistence for combo items
+ * This ensures combo cart survives page refresh
+ */
+const COMBO_STORAGE_KEY = 'bloomtale_combo_cart'
+
+// Helper to load combo data from localStorage
+const loadComboFromStorage = () => {
+  try {
+    const stored = localStorage.getItem(COMBO_STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch (error) {
+    console.error('Error loading combo from localStorage:', error)
+  }
+  return {
+    comboItems: [],
+    pincode: "",
+    pincodeVerified: false,
+    deliveryOption: null,
+    deliveryCategory: null,
+    deliveryCharges: 0
+  }
+}
+
+// Helper to save combo data to localStorage
+const saveComboToStorage = (data) => {
+  try {
+    localStorage.setItem(COMBO_STORAGE_KEY, JSON.stringify(data))
+  } catch (error) {
+    console.error('Error saving combo to localStorage:', error)
+  }
+}
 
 const useCombo = () => {
   const context = useContext(ComboContext)
@@ -11,12 +46,27 @@ const useCombo = () => {
 }
 
 const ComboProvider = ({ children }) => {
-  const [comboItems, setComboItems] = useState([])
-  const [pincode, setPincode] = useState("")
-  const [pincodeVerified, setPincodeVerified] = useState(false)
-  const [deliveryOption, setDeliveryOption] = useState(null) // 'today' or 'tomorrow'
-  const [deliveryCategory, setDeliveryCategory] = useState(null) // 'schedule', 'midnight', 'express' for today
-  const [deliveryCharges, setDeliveryCharges] = useState(0)
+  // CHANGE BY FARAAZ - Initialize state from localStorage
+  const initialData = loadComboFromStorage()
+  
+  const [comboItems, setComboItems] = useState(initialData.comboItems)
+  const [pincode, setPincode] = useState(initialData.pincode)
+  const [pincodeVerified, setPincodeVerified] = useState(initialData.pincodeVerified)
+  const [deliveryOption, setDeliveryOption] = useState(initialData.deliveryOption)
+  const [deliveryCategory, setDeliveryCategory] = useState(initialData.deliveryCategory)
+  const [deliveryCharges, setDeliveryCharges] = useState(initialData.deliveryCharges)
+
+  // CHANGE BY FARAAZ - Save to localStorage whenever state changes
+  useEffect(() => {
+    saveComboToStorage({
+      comboItems,
+      pincode,
+      pincodeVerified,
+      deliveryOption,
+      deliveryCategory,
+      deliveryCharges
+    })
+  }, [comboItems, pincode, pincodeVerified, deliveryOption, deliveryCategory, deliveryCharges])
 
   // Calculate total price
   const calculateTotal = () => {
@@ -114,7 +164,7 @@ const ComboProvider = ({ children }) => {
     }
   }
 
-  // Clear combo
+  // Clear combo - CHANGE BY FARAAZ: Also clears localStorage
   const clearCombo = () => {
     setComboItems([])
     setPincode("")
@@ -122,6 +172,8 @@ const ComboProvider = ({ children }) => {
     setDeliveryOption(null)
     setDeliveryCategory(null)
     setDeliveryCharges(0)
+    // Clear from localStorage as well
+    localStorage.removeItem(COMBO_STORAGE_KEY)
   }
 
   // Reset pincode (for changing pincode)
