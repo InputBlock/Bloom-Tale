@@ -214,10 +214,18 @@ export const CartProvider = ({ children }) => {
       // Update state AND cache together
       updateCartState(updatedItems, newTotal)
       
-      // Then sync with backend
-      // Note: You'll need to implement updateQuantity endpoint in backend
+      // Sync with backend
+      const { response, data } = await cartAPI.update(product_id, newQuantity)
+      
+      if (!response.ok) {
+        console.error("Failed to update quantity in backend:", data.message)
+        // Revert on failure by fetching fresh cart
+        fetchCart()
+      }
     } catch (error) {
       console.error("Error updating quantity:", error)
+      // Revert on error by fetching fresh cart
+      fetchCart()
     }
   }
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
 import { orderAPI } from "../api"
+import { useCart } from "../context/CartContext"
 
 export default function RazorpayPayment() {
   const [loading, setLoading] = useState(true)
@@ -15,6 +16,7 @@ export default function RazorpayPayment() {
   const navigate = useNavigate()
   const location = useLocation()
   const orderId = location.state?.orderId
+  const { clearCart } = useCart()
 
   useEffect(() => {
     // Prevent re-opening Razorpay on back/refresh
@@ -132,6 +134,9 @@ export default function RazorpayPayment() {
         return
       }
       
+      // Clear cart in frontend state
+      clearCart()
+      
       // Payment verified successfully - redirect with replace to prevent back navigation
       setPaymentSuccess(true)
       setTimeout(() => {
@@ -194,10 +199,10 @@ export default function RazorpayPayment() {
                   Try Again
                 </button>
                 <button
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/shop")}
                   className="w-full border-2 border-[#3e4026] text-[#3e4026] text-sm sm:text-base py-3 rounded-sm font-semibold hover:bg-[#EDE8E0] transition-all active:scale-95"
                 >
-                  Go to Home
+                  Go to Shop
                 </button>
               </div>
             </div>

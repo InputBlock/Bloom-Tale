@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle2, Smartphone, Banknote, ChevronLeft, Loader2, X, Shield, CreditCard, Sparkles } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { orderAPI } from "../../api"
+import { useCart } from "../../context/CartContext"
 
 export default function Payment({ paymentMethod, setPaymentMethod, onBack, orderId, orderDetails }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const navigate = useNavigate()
+  const { clearCart } = useCart()
 
   const totalAmount = orderDetails?.totalAmount || 0
 
@@ -39,6 +41,9 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
         if (!codResponse.ok) {
           throw new Error(codData.message || "Failed to confirm COD order")
         }
+        
+        // Clear cart in frontend state
+        clearCart()
         
         // Show success modal for COD
         setShowSuccessModal(true)
@@ -252,28 +257,15 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
                 </p>
               </motion.div>
 
-              {/* Order ID */}
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="bg-[#FAF8F5] border border-[#EDE8E0] rounded-2xl p-4 mb-6"
-              >
-                <p className="text-xs text-[#5e6043] text-center mb-1 uppercase tracking-wide">Order ID</p>
-                <p className="text-base font-semibold text-[#3e4026] text-center font-mono">
-                  {orderId}
-                </p>
-              </motion.div>
-
               {/* Action Buttons */}
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.4 }}
                 className="space-y-3"
               >
                 <button
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/shop")}
                   className="w-full bg-[#3e4026] text-white py-3.5 rounded-xl font-medium hover:bg-[#5e6043] transition-all shadow-lg shadow-[#3e4026]/10"
                 >
                   Continue Shopping

@@ -31,7 +31,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   }
 
   //  Calculate totals and get delivery info from cart items
-  let totalAmount = 0;
+  let itemsTotal = 0;
   let cartDeliveryType = "standard";
   let cartDeliveryFee = 0;
   let cartDeliverySlot = null;
@@ -39,9 +39,9 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   cart.items.forEach((item) => {
     if (item.isCombo) {
-      totalAmount += item.price; // combo final price
+      itemsTotal += item.price; // combo final price
     } else {
-      totalAmount += item.price * item.quantity;
+      itemsTotal += item.price * item.quantity;
     }
     // Get delivery info from first item that has it
     if (item.deliveryType && cartDeliveryType === "standard") {
@@ -62,6 +62,9 @@ export const createOrder = asyncHandler(async (req, res) => {
   const finalDeliveryType = reqDeliveryType || cartDeliveryType || "standard";
   const finalDeliveryFee = reqDeliveryFee !== undefined ? reqDeliveryFee : cartDeliveryFee;
   const finalDeliverySlot = reqDeliverySlot || cartDeliverySlot;
+
+  // Total amount = items total + delivery fee
+  const totalAmount = itemsTotal + finalDeliveryFee;
 
   await User.findByIdAndUpdate(userId, {
     $set: { addresses: [address] },
