@@ -11,18 +11,32 @@ export default function RazorpayPayment() {
   const [error, setError] = useState("")
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const razorpayInstance = useRef(null)
+  const paymentInitiated = useRef(false)
   const navigate = useNavigate()
   const location = useLocation()
   const orderId = location.state?.orderId
 
   useEffect(() => {
+    // Prevent re-opening Razorpay on back/refresh
+    if (paymentInitiated.current) {
+      return
+    }
+
     if (!orderId) {
       setError("Order ID is missing")
       setLoading(false)
       return
     }
 
+    paymentInitiated.current = true
     initiateRazorpayPayment()
+
+    // Cleanup on unmount
+    return () => {
+      if (razorpayInstance.current) {
+        razorpayInstance.current.close()
+      }
+    }
   }, [orderId])
 
   const initiateRazorpayPayment = async () => {
@@ -118,8 +132,11 @@ export default function RazorpayPayment() {
         return
       }
       
-      // Payment verified successfully - redirect immediately
-      window.location.href = "/orders"
+      // Payment verified successfully - redirect with replace to prevent back navigation
+      setPaymentSuccess(true)
+      setTimeout(() => {
+        navigate("/orders", { replace: true })
+      }, 1500)
     } catch (err) {
       setError(err.message || "Payment verification failed")
       setLoading(false)
