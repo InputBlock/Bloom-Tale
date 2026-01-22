@@ -68,6 +68,26 @@ export default function Checkout() {
 
   // Calculate cart total for sidebar
   const cartTotal = getCartTotal ? getCartTotal() : 0
+  
+  // Calculate delivery fee from cart items (before order is created)
+  const cartDeliveryFee = cartItems?.reduce((maxCharge, item) => {
+    const itemCharge = item.delivery_charge || item.deliveryFee || 0
+    return Math.max(maxCharge, itemCharge)
+  }, 0) || 0
+  
+  // Use orderDetails delivery fee if available, otherwise use cart delivery fee
+  const displayDeliveryFee = orderDetails?.deliveryFee ?? cartDeliveryFee
+  
+  // Calculate subtotal (items total without delivery)
+  const cartItemsTotal = cartItems?.reduce((sum, item) => {
+    const price = item.price || item.product?.price || 0
+    const quantity = item.quantity || 1
+    return sum + (price * quantity)
+  }, 0) || 0
+  
+  // Display values for sidebar
+  const displaySubtotal = orderDetails ? (orderDetails.totalAmount - (orderDetails.deliveryFee || 0)) : cartItemsTotal
+  const displayTotal = orderDetails ? orderDetails.totalAmount : (cartItemsTotal + cartDeliveryFee)
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -225,14 +245,14 @@ export default function Checkout() {
                     <div className="flex justify-between">
                       <span className="text-[#5e6043]">Subtotal</span>
                       <span className="text-[#3e4026] font-medium">
-                        ₹{((orderDetails?.totalAmount || cartTotal) - (orderDetails?.deliveryFee || 0)).toLocaleString('en-IN')}
+                        ₹{displaySubtotal.toLocaleString('en-IN')}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[#5e6043]">Shipping</span>
                       <span className="text-[#3e4026] font-medium">
-                        {(orderDetails?.deliveryFee || 0) > 0 
-                          ? `₹${orderDetails.deliveryFee.toLocaleString('en-IN')}` 
+                        {displayDeliveryFee > 0 
+                          ? `₹${displayDeliveryFee.toLocaleString('en-IN')}` 
                           : 'Free'}
                       </span>
                     </div>
@@ -246,7 +266,7 @@ export default function Checkout() {
                     <div className="flex justify-between items-center">
                       <span className="text-base font-semibold text-[#3e4026]">Total</span>
                       <span className="text-xl font-bold text-[#3e4026]">
-                        ₹{(orderDetails?.totalAmount || cartTotal).toLocaleString('en-IN')}
+                        ₹{displayTotal.toLocaleString('en-IN')}
                       </span>
                     </div>
                   </div>
