@@ -33,6 +33,13 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
 
       // Step 2: Handle based on payment method
       if (paymentMethod === "cod") {
+        // Confirm COD order and clear cart
+        const { response: codResponse, data: codData } = await orderAPI.confirmCOD(orderId)
+        
+        if (!codResponse.ok) {
+          throw new Error(codData.message || "Failed to confirm COD order")
+        }
+        
         // Show success modal for COD
         setShowSuccessModal(true)
       } else {

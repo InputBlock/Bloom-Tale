@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/verifyJwt.middleware.js";
 
-import { createOrder, getMyAddresses, getOrderSummary, updatePaymentMethod } from "../controller/order.controller.js";
+import { createOrder, getMyAddresses, getOrderSummary, updatePaymentMethod, confirmCODOrder } from "../controller/order.controller.js";
 import { createPaymentOrder } from "../utils/razorpay.js";
 import { verifyPayment } from "../utils/razorpay.js";
 import { razorpayWebhook } from "../utils/razorpay.js";
@@ -18,6 +18,9 @@ router.patch(
   verifyJWT,
   updatePaymentMethod
 );
+
+// COD confirmation - clears cart after user confirms
+router.post("/:orderId/confirm-cod", verifyJWT, confirmCODOrder);
 
 router.post("/payment", verifyJWT, createPaymentOrder);
 router.post("/verify-payment", verifyJWT, verifyPayment);

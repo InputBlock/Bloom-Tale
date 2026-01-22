@@ -319,6 +319,13 @@ export const orderAPI = {
     return { response, data: await parseResponse(response) };
   },
   
+  confirmCOD: async (orderId) => {
+    const response = await apiFetch(`/api/v1/order/${orderId}/confirm-cod`, {
+      method: 'POST',
+    });
+    return { response, data: await parseResponse(response) };
+  },
+  
   createPayment: async (orderId) => {
     const response = await apiFetch('/api/v1/order/payment', {
       method: 'POST',

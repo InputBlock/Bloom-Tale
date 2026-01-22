@@ -153,8 +153,8 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
 
   await order.save();
 
-  // 🧹 Clear cart
-  await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+  // ⚠️ Don't clear cart here - clear only after successful payment
+  // Cart will be cleared in verifyPayment (for ONLINE) or confirmCOD
 
   return res
     .status(200)
@@ -177,4 +177,38 @@ export const getOrderSummary = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, order, "Order Summary Fetched successfully"));
 });
+
+/**
+ * Confirm COD order and clear cart
+ * Called after user confirms COD payment
+ */
+export const confirmCODOrder = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { orderId } = req.params;
+
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  if (order.user.toString() !== userId.toString()) {
+    throw new ApiError(403, "Not allowed");
+  }
+
+  if (order.paymentMethod !== "COD") {
+    throw new ApiError(400, "This order is not a COD order");
+  }
+
+  // Mark order as placed
+  order.order_status = "PLACED";
+  await order.save();
+
+  // 🧹 Clear cart after COD confirmation
+  await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, order, "COD order confirmed successfully"));
+});
+
 //Razorpay => Goto util razorpay.js

@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import Order from "../models/order.model.js";
+import Cart from "../models/cart.model.js";
 import  Razorpay from "razorpay";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -101,6 +102,9 @@ export const verifyPayment = asyncHandler(async (req, res) => {
   order.paymentInfo.signature = razorpay_signature;
 
   await order.save();
+
+  // 🧹 Clear cart after successful payment
+  await Cart.findOneAndUpdate({ user: order.user }, { items: [] });
 
   return res.json(new ApiResponse(200, null, "Payment verified successfully"));
 });
