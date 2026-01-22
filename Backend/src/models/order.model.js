@@ -106,6 +106,11 @@ const orderSchema = new Schema(
       default: 0,
     },
 
+    handlingCharge: {
+      type: Number,
+      default: 0,
+    },
+
     deliverySlot: {
       type: String,
     },

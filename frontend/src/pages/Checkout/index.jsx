@@ -75,10 +75,18 @@ export default function Checkout() {
     return Math.max(maxCharge, itemCharge)
   }, 0) || 0
   
-  // Use orderDetails delivery fee if available, otherwise use cart delivery fee
-  const displayDeliveryFee = orderDetails?.deliveryFee ?? cartDeliveryFee
+  // Calculate handling charge for Candles category (₹50 fixed)
+  const CANDLE_HANDLING_CHARGE = 50
+  const hasCandles = cartItems?.some(item => 
+    item.product?.category === "Candles" || item.category === "Candles"
+  )
+  const cartHandlingCharge = hasCandles ? CANDLE_HANDLING_CHARGE : 0
   
-  // Calculate subtotal (items total without delivery)
+  // Use orderDetails values if available, otherwise use cart values
+  const displayDeliveryFee = orderDetails?.deliveryFee ?? cartDeliveryFee
+  const displayHandlingCharge = orderDetails?.handlingCharge ?? cartHandlingCharge
+  
+  // Calculate subtotal (items total without delivery/handling)
   const cartItemsTotal = cartItems?.reduce((sum, item) => {
     const price = item.price || item.product?.price || 0
     const quantity = item.quantity || 1
@@ -86,8 +94,12 @@ export default function Checkout() {
   }, 0) || 0
   
   // Display values for sidebar
-  const displaySubtotal = orderDetails ? (orderDetails.totalAmount - (orderDetails.deliveryFee || 0)) : cartItemsTotal
-  const displayTotal = orderDetails ? orderDetails.totalAmount : (cartItemsTotal + cartDeliveryFee)
+  const displaySubtotal = orderDetails 
+    ? (orderDetails.totalAmount - (orderDetails.deliveryFee || 0) - (orderDetails.handlingCharge || 0)) 
+    : cartItemsTotal
+  const displayTotal = orderDetails 
+    ? orderDetails.totalAmount 
+    : (cartItemsTotal + cartDeliveryFee + cartHandlingCharge)
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -256,6 +268,14 @@ export default function Checkout() {
                           : 'Free'}
                       </span>
                     </div>
+                    {displayHandlingCharge > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-[#5e6043]">Handling</span>
+                        <span className="text-[#3e4026] font-medium">
+                          ₹{displayHandlingCharge.toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-[#5e6043]">Tax</span>
                       <span className="text-[#5e6043]">Included</span>

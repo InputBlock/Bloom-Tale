@@ -25,13 +25,17 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Delivery address is required");
   }
 
-  const cart = await Cart.findOne({ user: userId }).populate('items.product', 'name images_uri');
+  const cart = await Cart.findOne({ user: userId }).populate('items.product', 'name images_uri category');
   if (!cart || cart.items.length === 0) {
     throw new ApiError(400, "Cart is empty");
   }
 
+  // Constants
+  const CANDLE_HANDLING_CHARGE = 50;
+
   //  Calculate totals and get delivery info from cart items
   let itemsTotal = 0;
+  let handlingCharge = 0;
   let cartDeliveryType = "standard";
   let cartDeliveryFee = 0;
   let cartDeliverySlot = null;
@@ -43,6 +47,12 @@ export const createOrder = asyncHandler(async (req, res) => {
     } else {
       itemsTotal += item.price * item.quantity;
     }
+    
+    // Add handling charge for Candles category (only once)
+    if (item.product?.category === "Candles" && handlingCharge === 0) {
+      handlingCharge = CANDLE_HANDLING_CHARGE;
+    }
+    
     // Get delivery info from first item that has it
     if (item.deliveryType && cartDeliveryType === "standard") {
       cartDeliveryType = item.deliveryType;
@@ -63,8 +73,8 @@ export const createOrder = asyncHandler(async (req, res) => {
   const finalDeliveryFee = reqDeliveryFee !== undefined ? reqDeliveryFee : cartDeliveryFee;
   const finalDeliverySlot = reqDeliverySlot || cartDeliverySlot;
 
-  // Total amount = items total + delivery fee
-  const totalAmount = itemsTotal + finalDeliveryFee;
+  // Total amount = items total + delivery fee + handling charge
+  const totalAmount = itemsTotal + finalDeliveryFee + handlingCharge;
 
   await User.findByIdAndUpdate(userId, {
     $set: { addresses: [address] },
@@ -96,6 +106,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     deliveryAddress: address,
     deliveryType: finalDeliveryType,
     deliveryFee: finalDeliveryFee,
+    handlingCharge: handlingCharge,
     deliverySlot: finalDeliverySlot,
     deliveryPincode: cartPincode || address.pincode || null,
     totalAmount,
