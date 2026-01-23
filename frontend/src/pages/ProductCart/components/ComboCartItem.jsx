@@ -7,62 +7,79 @@ export default function ComboCartItem({
   onToggleDetails, 
   onRemove 
 }) {
-  const comboImages = item.combo_items?.map(ci => ci.image).filter(Boolean) || []
+  // Get images from populated product data or fallback to direct image field
+  const comboImages = item.combo_items?.map(ci => {
+    // First try to get from populated product
+    if (ci.product?.images_uri && ci.product.images_uri.length > 0) {
+      return ci.product.images_uri[0];
+    }
+    // Fallback to image field if it exists
+    return ci.image;
+  }).filter(Boolean) || []
 
   return (
-    <div className="relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all overflow-hidden">
-      <div className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
-          <div className="flex items-start gap-3 sm:gap-4">
+    <div className="relative bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all overflow-hidden">
+      <div className="p-3 sm:p-4">
+        <div className="flex items-center justify-between gap-3 sm:gap-4">
+          {/* Left Section: Image + Basic Info */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
             {/* Combo Image Collage */}
             <ComboImageCollage images={comboImages} />
 
             {/* Combo Info */}
             <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                <h3 className="text-base sm:text-xl md:text-2xl font-bold text-[#3e4026]">
+              <div className="flex items-center gap-1.5 mb-1">
+                <h3 className="text-sm sm:text-lg font-bold text-[#3e4026]">
                   Combo {comboNumber}
                 </h3>
-                <span className="bg-green-100 text-green-700 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold">
+                <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold">
                   {item.discount_percentage}% OFF
                 </span>
               </div>
-              
-              <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
-                {item.combo_items?.length || 0} items • Delivery: ₹{item.delivery_charge}
-              </p>
 
               <button
                 onClick={onToggleDetails}
-                className="inline-flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-semibold text-[#3e4026] hover:text-[#2d2f1c] transition-colors border-b-2 border-transparent hover:border-[#3e4026] pb-0.5"
+                className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium text-gray-600 hover:text-[#3e4026] transition-colors"
               >
                 {isExpanded ? 'Hide Details' : 'View Details'}
-                {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               </button>
             </div>
+          </div>
 
-            {/* Price & Delete */}
-            <div className="flex flex-col items-end gap-2 sm:gap-3">
-              <div className="text-right">
-                <p className="text-[10px] sm:text-sm text-gray-500 line-through">
-                  ₹{item.subtotal?.toLocaleString()}
-                </p>
-                <p className="text-base sm:text-xl md:text-2xl font-bold text-[#3e4026]">
-                  ₹{item.price?.toLocaleString()}
-                </p>
-                <p className="text-[10px] sm:text-xs text-green-600 font-semibold">
-                  Saved ₹{item.discount?.toLocaleString()}
-                </p>
-              </div>
-
-              <button
-                onClick={onRemove}
-                className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition p-2 sm:p-2.5 rounded-lg border border-gray-300 hover:border-red-300"
-                aria-label="Remove combo"
-              >
-                <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
-              </button>
+          {/* Right Section: Pricing Info, Items Count, Delivery */}
+          <div className="flex items-center gap-4 sm:gap-6 flex-shrink-0">
+            {/* Items & Delivery Info */}
+            <div className="text-right hidden sm:block">
+              <p className="text-xs font-semibold text-gray-700">
+                {item.combo_items?.length || 0} Items
+              </p>
+              <p className="text-[10px] text-gray-500">
+                Delivery: ₹{item.delivery_charge}
+              </p>
             </div>
+
+            {/* Price Info */}
+            <div className="text-right">
+              <p className="text-[9px] sm:text-[10px] text-gray-400 line-through leading-tight">
+                ₹{item.subtotal?.toLocaleString()}
+              </p>
+              <p className="text-base sm:text-xl font-bold text-[#3e4026] leading-tight">
+                ₹{item.price?.toLocaleString()}
+              </p>
+              <p className="text-[9px] sm:text-[10px] text-green-600 font-semibold leading-tight">
+                Saved ₹{item.discount?.toLocaleString()}
+              </p>
+            </div>
+
+            {/* Delete Button */}
+            <button
+              onClick={onRemove}
+              className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition p-1.5 sm:p-2 rounded-lg border border-gray-200 hover:border-red-300"
+              aria-label="Remove combo"
+            >
+              <Trash2 size={14} className="sm:w-4 sm:h-4" />
+            </button>
           </div>
         </div>
 
@@ -80,8 +97,8 @@ function ComboImageCollage({ images }) {
   if (images.length === 0) {
     return (
       <div className="flex-shrink-0">
-        <div className="w-20 h-20 sm:w-28 sm:h-28 flex items-center justify-center bg-gradient-to-br from-[#3e4026]/10 to-[#3e4026]/5 rounded-xl border-2 border-[#3e4026]/20">
-          <Package className="w-8 h-8 sm:w-10 sm:h-10 text-[#3e4026]/40" />
+        <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-gradient-to-br from-[#3e4026]/10 to-[#3e4026]/5 rounded-lg border border-[#3e4026]/20">
+          <Package className="w-6 h-6 sm:w-8 sm:h-8 text-[#3e4026]/40" />
         </div>
       </div>
     )
@@ -89,7 +106,7 @@ function ComboImageCollage({ images }) {
 
   return (
     <div className="flex-shrink-0">
-      <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-[#3e4026]/20 shadow-md">
+      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-[#3e4026]/20 shadow-sm">
         {images.length === 1 ? (
           <img src={images[0]} alt="Combo item" className="w-full h-full object-cover" />
         ) : images.length === 2 ? (
@@ -110,7 +127,7 @@ function ComboImageCollage({ images }) {
             ))}
           </div>
         )}
-        <div className="absolute top-1 left-1 bg-[#3e4026] text-white px-1.5 py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold shadow-lg">
+        <div className="absolute top-0.5 left-0.5 bg-[#3e4026] text-white px-1 py-0.5 rounded-full text-[7px] sm:text-[8px] font-bold shadow-sm">
           {images.length} Items
         </div>
       </div>
@@ -124,12 +141,16 @@ function ComboExpandedDetails({ item }) {
     <div className="mt-6 pt-6 border-t border-gray-200">
       <h4 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Items in this Combo</h4>
       <div className="space-y-3">
-        {item.combo_items.map((comboItem, idx) => (
+        {item.combo_items.map((comboItem, idx) => {
+          // Get image from populated product or fallback to direct image field
+          const itemImage = comboItem.product?.images_uri?.[0] || comboItem.image;
+          
+          return (
           <div key={idx} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             <div className="flex-shrink-0">
-              {comboItem.image ? (
+              {itemImage ? (
                 <img
-                  src={comboItem.image}
+                  src={itemImage}
                   alt={comboItem.name}
                   className="w-16 h-16 object-cover rounded-lg border border-gray-200"
                 />
@@ -169,7 +190,7 @@ function ComboExpandedDetails({ item }) {
               </p>
             </div>
           </div>
-        ))}
+        )})}
       </div>
 
       {/* Pricing Summary */}

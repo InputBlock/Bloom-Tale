@@ -17,8 +17,8 @@ export const weddingServicesData = [
     ]
   },
   {
-    title: "Let us assist your wedding story into eternity",
-    description: "Complete wedding journey management from pre-wedding to the grand celebration. We create dedicated Instagram pages for couples, manage your wedding timeline, coordinate all vendors, and ensure every moment from engagement to reception is perfectly executed and beautifully documented.",
+    title: "Wedding Assistance",
+    description: "Our Wedding Assistants are your behind-the-scenes support system, available one month prior to the wedding and throughout the celebrations. From assisting the bride, groom, and their families to managing everyday errands, our assistants handle anything and everything that needs attention. Whether it’s shopping for outfits, coordinating appointments",
     images: [
       "/serviceimage/assist-1.png",
       "/serviceimage/assist-2.png",

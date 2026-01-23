@@ -10,7 +10,8 @@ export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const cart = await Cart.findOne({ user: userId })
-    .populate("items.product");
+    .populate("items.product")
+    .populate("items.combo_items.product");
 
   if (!cart) {
     return res.status(200).json(
