@@ -31,11 +31,37 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
         if (response.ok) {
           // Handle different response structures
           const addresses = data.data || data.addresses || data || []
-          setSavedAddresses(Array.isArray(addresses) ? addresses : [])
+          const addressList = Array.isArray(addresses) ? addresses : []
+          setSavedAddresses(addressList)
           
           // If no saved addresses, show the form
-          if (!addresses || addresses.length === 0) {
+          if (!addressList || addressList.length === 0) {
             setShowNewAddressForm(true)
+          } else {
+            // Check if formData already has values (user came back from next step)
+            const hasExistingFormData = formData.recipientName || formData.mobileNumber || formData.pincode
+            
+            if (hasExistingFormData) {
+              // Try to find matching address by pincode and mobile
+              const matchingAddress = addressList.find(addr => 
+                addr.pincode === formData.pincode || addr.mobile === formData.mobileNumber
+              )
+              if (matchingAddress) {
+                setSelectedAddressId(matchingAddress._id)
+              }
+            } else {
+              // Auto-select and populate the first saved address
+              const firstAddress = addressList[0]
+              setSelectedAddressId(firstAddress._id)
+              handleInputChange('recipientName', firstAddress.fullName || '')
+              handleInputChange('mobileNumber', firstAddress.mobile || '')
+              handleInputChange('apartment', firstAddress.house || '')
+              handleInputChange('streetAddress', firstAddress.street || '')
+              handleInputChange('city', firstAddress.city || '')
+              handleInputChange('state', firstAddress.state || '')
+              handleInputChange('pincode', firstAddress.pincode || '')
+              handleInputChange('addressTag', firstAddress.addressTag || 'Home')
+            }
           }
         } else {
           // If no addresses or error, show the form
