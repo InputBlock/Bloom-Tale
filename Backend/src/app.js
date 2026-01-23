@@ -20,8 +20,16 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // CORS configuration
+const allowedOrigins = [
+    process.env.CORS_ORIGIN,
+    process.env.ADMIN_CORS_ORIGIN,
+    // Auto-include www variant if main origin doesn't have www
+    process.env.CORS_ORIGIN?.replace('https://', 'https://www.'),
+    process.env.CORS_ORIGIN?.replace('https://www.', 'https://'),
+].filter(Boolean)
+
 app.use(cors({
-    origin: [process.env.CORS_ORIGIN, process.env.ADMIN_CORS_ORIGIN].filter(Boolean),
+    origin: allowedOrigins,
     credentials: true
 }))
 

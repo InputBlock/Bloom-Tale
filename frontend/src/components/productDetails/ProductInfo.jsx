@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom"
 import SuccessModal from "../common/SuccessModal"
 import DeliveryCheck from "./DeliveryCheck"
 
+// Categories that use single price instead of size-based pricing
+const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"]
+
 export default function ProductInfo({ product }) {
   const [quantity, setQuantity] = useState(1)
   const [selectedSize, setSelectedSize] = useState("Medium")
@@ -15,8 +18,17 @@ export default function ProductInfo({ product }) {
   const { addToCart, isLoggedIn } = useCart()
   const navigate = useNavigate()
 
-  // Get the price based on selected size
+  // Check if this is a single-price category
+  const isSinglePriceCategory = SINGLE_PRICE_CATEGORIES.includes(product?.category)
+
+  // Get the price based on selected size or single price
   const getCurrentPrice = () => {
+    if (!product) return 0
+    // For single-price categories, use the price field
+    if (isSinglePriceCategory) {
+      return product.price || 0
+    }
+    // For sized products, use pricing object
     if (!product?.pricing) return 0
     const sizeKey = selectedSize.toLowerCase()
     return product.pricing[sizeKey] || 0
@@ -60,7 +72,7 @@ export default function ProductInfo({ product }) {
     const result = await addToCart({
       product_id: product.product_id,
       quantity: quantity,
-      size: selectedSize.toLowerCase(),
+      size: isSinglePriceCategory ? null : selectedSize.toLowerCase(),
       // Delivery info from DeliveryCheck component
       deliveryType: deliveryZone?.deliveryType || 'standard',
       deliveryFee: deliveryZone?.deliveryFee || 0,
@@ -101,7 +113,7 @@ export default function ProductInfo({ product }) {
     const result = await addToCart({
       product_id: product.product_id,
       quantity: quantity,
-      size: selectedSize.toLowerCase(),
+      size: isSinglePriceCategory ? null : selectedSize.toLowerCase(),
       // Delivery info from DeliveryCheck component
       deliveryType: deliveryZone?.deliveryType || 'standard',
       deliveryFee: deliveryZone?.deliveryFee || 0,
@@ -207,25 +219,27 @@ export default function ProductInfo({ product }) {
         </div>
       </div>
 
-      {/* Size Selection - Full Width */}
-      <div>
-        <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-3 font-medium">Size</p>
-        <div className="grid grid-cols-3 gap-3 w-full">
-          {['Small', 'Medium', 'Large'].map((size) => (
-            <button
-              key={size}
-              onClick={() => setSelectedSize(size)}
-              className={`py-3 px-4 text-sm font-medium transition-all border ${
-                selectedSize === size 
-                  ? "bg-[#3e4026] text-white border-[#3e4026]" 
-                  : "bg-white text-[#3e4026] border-gray-300 hover:border-[#3e4026]"
-              }`}
-            >
-              {size}
-            </button>
-          ))}
+      {/* Size Selection - Only show for sized products */}
+      {!isSinglePriceCategory && (
+        <div>
+          <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-3 font-medium">Size</p>
+          <div className="grid grid-cols-3 gap-3 w-full">
+            {['Small', 'Medium', 'Large'].map((size) => (
+              <button
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                className={`py-3 px-4 text-sm font-medium transition-all border ${
+                  selectedSize === size 
+                    ? "bg-[#3e4026] text-white border-[#3e4026]" 
+                    : "bg-white text-[#3e4026] border-gray-300 hover:border-[#3e4026]"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Delivery Check Component */}
       <div ref={deliveryRef}>
