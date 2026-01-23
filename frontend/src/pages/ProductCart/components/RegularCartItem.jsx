@@ -34,13 +34,16 @@ export default function RegularCartItem({
             {productInfo.name || "Product"}
           </h3>
           
-          <p className="text-[10px] sm:text-xs text-gray-500 font-['Poppins']">
-            Delivery - {isFreeDelivery ? (
-              <span className="text-green-600 font-medium">FREE</span>
-            ) : (
-              <span>₹{baseDeliveryCharge}</span>
-            )}
-          </p>
+          {/* Only show delivery info for standard and fixed delivery, not midnight/express */}
+          {item.deliveryType !== 'midnight' && item.deliveryType !== 'express' && (
+            <p className="text-[10px] sm:text-xs text-gray-500 font-['Poppins']">
+              Delivery - {isFreeDelivery ? (
+                <span className="text-green-600 font-medium">FREE</span>
+              ) : (
+                <span>₹{baseDeliveryCharge}</span>
+              )}
+            </p>
+          )}
           
           {/* Mobile: Price below title */}
           <p className="sm:hidden text-base font-bold text-gray-900 font-['Poppins'] mt-1">
