@@ -9,8 +9,11 @@ export default function DeliveryCheck({
   productPrice = 0 
 }) {
   // Use centralized delivery constants
-  const { STANDARD_DELIVERY_CHARGE, FREE_DELIVERY_THRESHOLD } = DELIVERY_CONSTANTS
-  const isFreeDelivery = productPrice >= FREE_DELIVERY_THRESHOLD
+  const { STANDARD_DELIVERY_CHARGE, FREE_DELIVERY_THRESHOLD, SAME_DAY_FREE_DELIVERY_THRESHOLD } = DELIVERY_CONSTANTS
+  // Standard delivery free at ₹1500, same-day (fixed time) free at ₹2000
+  const isFreeDelivery = sameDayDelivery 
+    ? productPrice >= SAME_DAY_FREE_DELIVERY_THRESHOLD 
+    : productPrice >= FREE_DELIVERY_THRESHOLD
 
   // Use global pincode context for session persistence
   const { 
@@ -44,10 +47,20 @@ export default function DeliveryCheck({
       initializedRef.current = true
       // Already verified from session - notify parent
       const deliveryType = sameDayDelivery ? selectedDeliveryType : "standard"
-      // For non-same-day delivery, use standard pricing from DB (free if price >= threshold)
-      const deliveryFee = sameDayDelivery 
-        ? (globalZone?.pricing?.fixed_time || 0) 
-        : (isFreeDelivery ? 0 : (globalZone?.pricing?.standard || 0))
+      // For same-day: fixed_time is free if price >= threshold, midnight/express always charged
+      // For non-same-day: standard is free if price >= threshold
+      let deliveryFee = 0
+      if (sameDayDelivery) {
+        if (selectedDeliveryType === 'fixed') {
+          deliveryFee = isFreeDelivery ? 0 : (globalZone?.pricing?.fixed_time || 0)
+        } else if (selectedDeliveryType === 'midnight') {
+          deliveryFee = globalZone?.pricing?.midnight || 0
+        } else if (selectedDeliveryType === 'express') {
+          deliveryFee = globalZone?.pricing?.express || 0
+        }
+      } else {
+        deliveryFee = isFreeDelivery ? 0 : (globalZone?.pricing?.standard || 0)
+      }
       onDeliveryStatusChange?.('available', {
         zone: globalZone,
         pincode: globalPincode,
@@ -67,7 +80,9 @@ export default function DeliveryCheck({
     }
     
     switch (deliveryType) {
-      case "fixed": return zoneData.pricing.fixed_time || 0
+      // Fixed time is free when order >= FREE_DELIVERY_THRESHOLD
+      case "fixed": return isFreeDelivery ? 0 : (zoneData.pricing.fixed_time || 0)
+      // Midnight and Express are always charged
       case "midnight": return zoneData.pricing.midnight || 0
       case "express": return zoneData.pricing.express || 0
       default: return 0
@@ -129,10 +144,20 @@ export default function DeliveryCheck({
     if (result.success) {
       // Notify parent with zone info
       const deliveryType = sameDayDelivery ? selectedDeliveryType : "standard"
-      // For non-same-day delivery, use standard pricing from DB (free if price >= threshold)
-      const deliveryFee = sameDayDelivery 
-        ? (result.zone?.pricing?.fixed_time || 0) 
-        : (isFreeDelivery ? 0 : (result.zone?.pricing?.standard || 0))
+      // For same-day: fixed_time is free if price >= threshold, midnight/express always charged
+      // For non-same-day: standard is free if price >= threshold
+      let deliveryFee = 0
+      if (sameDayDelivery) {
+        if (selectedDeliveryType === 'fixed') {
+          deliveryFee = isFreeDelivery ? 0 : (result.zone?.pricing?.fixed_time || 0)
+        } else if (selectedDeliveryType === 'midnight') {
+          deliveryFee = result.zone?.pricing?.midnight || 0
+        } else if (selectedDeliveryType === 'express') {
+          deliveryFee = result.zone?.pricing?.express || 0
+        }
+      } else {
+        deliveryFee = isFreeDelivery ? 0 : (result.zone?.pricing?.standard || 0)
+      }
       onDeliveryStatusChange?.('available', {
         zone: result.zone,
         pincode: localPincode,
@@ -293,9 +318,16 @@ export default function DeliveryCheck({
             >
               <div className="flex justify-between items-start mb-2">
                 <h4 className="text-sm font-semibold text-[#3e4026]">Fixed Time</h4>
-                <span className="text-sm font-medium text-[#3e4026]">₹{globalZone.pricing.fixed_time}</span>
+                {isFreeDelivery ? (
+                  <span className="text-sm font-semibold text-green-600">FREE</span>
+                ) : (
+                  <span className="text-sm font-medium text-[#3e4026]">₹{globalZone.pricing.fixed_time}</span>
+                )}
               </div>
               <p className="text-xs text-[#3e4026]/70">Delivery during selected 2hr slot</p>
+              {isFreeDelivery && (
+                <p className="text-xs text-green-600 mt-1">Free on orders above ₹{SAME_DAY_FREE_DELIVERY_THRESHOLD}</p>
+              )}
             </button>
 
             {/* Midnight */}
@@ -365,7 +397,7 @@ export default function DeliveryCheck({
                 {isFreeDelivery ? (
                   <span className="text-sm font-semibold text-green-600">FREE</span>
                 ) : (
-                  <span className="text-sm font-semibold text-[#3e4026]">₹{STANDARD_DELIVERY_CHARGE}</span>
+                  <span className="text-sm font-semibold text-[#3e4026]">₹{globalZone?.pricing?.standard || STANDARD_DELIVERY_CHARGE}</span>
                 )}
               </div>
               <p className="text-xs text-[#3e4026]/70">Expected delivery in 2-3 business days</p>

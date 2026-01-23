@@ -1,7 +1,10 @@
 // Delivery Constants - Single source of truth
 export const DELIVERY_CONSTANTS = {
-  // Free delivery threshold
+  // Free delivery threshold for standard (non-same-day) delivery
   FREE_DELIVERY_THRESHOLD: 1500,
+  
+  // Free delivery threshold for same-day delivery (fixed time only)
+  SAME_DAY_FREE_DELIVERY_THRESHOLD: 2000,
   
   // Standard delivery charge when cart < threshold
   STANDARD_DELIVERY_CHARGE: 150,
