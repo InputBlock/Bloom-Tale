@@ -21,19 +21,19 @@ export default function Testimonials() {
     },
     {
       id: "featured-2",
-      name: "Priya Sharma",
-      title: "Verified Customer",
+      name: "Police",
+      title: "Mumbai Police",
       rating: 5,
-      text: "The most beautiful flowers I've ever received. Fresh, fragrant, and absolutely stunning. The attention to detail in the arrangement was remarkable.",
-      image: null,
+      text: "They weren’t just flowers, they felt like forever—beautiful moments captured in bloom.",
+      image: "police.jpg",
     },
     {
       id: "featured-3",
       name: "Rahul Verma",
       title: "Regular Customer",
       rating: 5,
-      text: "Same-day delivery saved our anniversary! The roses were incredibly fresh and the premium packaging made it feel truly special.",
-      image: null,
+      text: "Just a small bunch of flowers, but a moment that stayed with us. Bloom Tale turns moments into memories.",
+      image: "/couple.jpg",
     },
   ]
 
@@ -156,10 +156,10 @@ export default function Testimonials() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col"
+                className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col h-[550px] sm:h-[580px] md:h-[600px]"
               >
                 {/* Image or Avatar */}
-                <div className="h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-100">
+                <div className="h-48 sm:h-56 md:h-64 flex-shrink-0 overflow-hidden bg-gray-100">
                   {testimonial.image ? (
                     <img 
                       src={testimonial.image} 
@@ -176,14 +176,14 @@ export default function Testimonials() {
                 </div>
 
                 {/* Content */}
-                <div className="p-6 flex flex-col grow">
+                <div className="p-6 flex flex-col flex-grow min-h-0">
                   {/* Text */}
-                  <p className="text-gray-700 text-sm sm:text-base mb-6 leading-relaxed grow">
+                  <p className="text-gray-700 text-sm sm:text-base mb-6 leading-relaxed flex-grow overflow-y-auto">
                     {testimonial.text}
                   </p>
 
                   {/* Author */}
-                  <div>
+                  <div className="flex-shrink-0">
                     <p className="font-semibold text-gray-900 text-base sm:text-lg">{testimonial.name}</p>
                     <p className="text-gray-500 text-sm">{testimonial.title}</p>
                   </div>

@@ -17,6 +17,16 @@ export const weddingServicesData = [
     ]
   },
   {
+    title: "Let us assist your wedding story into eternity",
+    description: "Complete wedding journey management from pre-wedding to the grand celebration. We create dedicated Instagram pages for couples, manage your wedding timeline, coordinate all vendors, and ensure every moment from engagement to reception is perfectly executed and beautifully documented.",
+    images: [
+      "/serviceimage/assist-1.png",
+      "/serviceimage/assist-2.png",
+      "/serviceimage/assist-3.png",
+      "/serviceimage/assist-4.png"
+    ]
+  },
+  {
     title: "Catering",
     description: "Delight your guests with exquisite culinary experiences, featuring customized menus and presentation that matches your wedding's elegance.",
     images: [
@@ -37,7 +47,7 @@ export const weddingServicesData = [
     ]
   },
   {
-    title: "Photography",
+    title: "Social Media Management",
     description: "Capture every precious moment with our professional photography services, creating timeless memories you'll cherish forever.",
     images: [
       "/serviceimage/photography-1.png",
