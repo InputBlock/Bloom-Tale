@@ -41,7 +41,7 @@ export default function Footer({ isComboSidebarOpen = false }) {
             <p className={`text-white/60 leading-relaxed mb-3 transition-all duration-300 ${
               isComboSidebarOpen ? 'text-xs md:text-sm' : 'text-xs md:text-sm'
             }`}>
-              Crafting beautiful moments with nature's finest blooms since 2010. 
+              Crafting beautiful moments with nature's finest blooms since 2017. 
               Every arrangement tells your unique story.
             </p>
             {/* Social Icons */}
@@ -59,15 +59,7 @@ export default function Footer({ isComboSidebarOpen = false }) {
               >
                 <Instagram size={isComboSidebarOpen ? 16 : 16} />
               </a>
-              <a 
-                href="#" 
-                className={`border border-white/20 flex items-center justify-center hover:bg-white hover:text-[#3e4026] transition-all duration-300 ${
-                  isComboSidebarOpen ? 'w-8 h-8' : 'w-9 h-9 md:w-10 md:h-10'
-                }`}
-                aria-label="Facebook"
-              >
-                <Facebook size={isComboSidebarOpen ? 16 : 16} />
-              </a>
+
               <a 
                 href="https://x.com/bloom_tale" 
                 target="_blank"
@@ -99,8 +91,7 @@ export default function Footer({ isComboSidebarOpen = false }) {
                 <span className={`text-white/70 transition-all duration-300 ${
                   isComboSidebarOpen ? 'text-xs' : 'text-xs md:text-sm'
                 }`}>
-                  123 Bloom Street, Flower District<br />
-                  Mumbai, 400001
+                  Near Grunge Salon Mumbai, 400018
                 </span>
               </li>
               <li className={`flex items-center transition-all duration-300 ${
