@@ -70,7 +70,7 @@ export default function SubHeader() {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          <span className="text-sm font-semibold">Browse Categories</span>
+          <span className="text-sm font-semibold">Explore Bloom Collections</span>
         </button>
 
         {isMenuOpen && (
