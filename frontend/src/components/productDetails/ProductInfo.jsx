@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { Minus, Plus } from "lucide-react"
 import { useCart } from "../../context/CartContext"
 import { useNavigate } from "react-router-dom"
@@ -14,7 +14,9 @@ export default function ProductInfo({ product }) {
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
   const [deliveryStatus, setDeliveryStatus] = useState(null)
   const [deliveryZone, setDeliveryZone] = useState(null)
+  const [isSticky, setIsSticky] = useState(false)
   const deliveryRef = useRef(null)
+  const buttonsRef = useRef(null)
   const { addToCart, isLoggedIn } = useCart()
   const navigate = useNavigate()
 
@@ -49,6 +51,28 @@ export default function ProductInfo({ product }) {
     setDeliveryStatus(status)
     setDeliveryZone(zone)
   }, [])
+  
+  // Scroll listener for sticky buttons on mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!buttonsRef.current) return
+      
+      const rect = buttonsRef.current.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      
+      // Make sticky when buttons go below viewport
+      if (rect.bottom > windowHeight) {
+        setIsSticky(true)
+      } else {
+        setIsSticky(false)
+      }
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    handleScroll() // Check initial position
+    
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleAddToCart = async () => {
     if (!product) return
@@ -56,6 +80,10 @@ export default function ProductInfo({ product }) {
     // Check if pincode is verified
     if (deliveryStatus !== 'available') {
       deliveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // Focus the input to open keyboard on mobile
+      setTimeout(() => {
+        deliveryRef.current?.focusInput?.()
+      }, 300)
       return
     }
 
@@ -97,6 +125,10 @@ export default function ProductInfo({ product }) {
     // Check if pincode is verified
     if (deliveryStatus !== 'available') {
       deliveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // Focus the input to open keyboard on mobile
+      setTimeout(() => {
+        deliveryRef.current?.focusInput?.()
+      }, 300)
       return
     }
 
@@ -144,7 +176,7 @@ export default function ProductInfo({ product }) {
   }
 
   return (
-    <div className="space-y-6 px-6 md:px-8">
+    <div className="space-y-4 sm:space-y-5 md:space-y-6 px-4 sm:px-6 md:px-8">
       {/* Same Day Delivery Badge or Category */}
       {product.same_day_delivery ? (
         <div className="inline-flex items-center gap-2.5 bg-[#f9f8f6] px-4 py-2 border border-[#3e4026]/20 rounded">
@@ -161,59 +193,60 @@ export default function ProductInfo({ product }) {
 
       {/* Product Title */}
       <h1 
-        className="text-3xl md:text-4xl lg:text-5xl text-[#3e4026] leading-tight"
+        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#3e4026] leading-tight"
         style={{ fontFamily: 'Playfair Display, serif' }}
       >
         {product.name}
       </h1>
 
       {/* Price and Quantity Section */}
-      <div className="flex items-start justify-between gap-8">
-        <div className="flex-1">
+      <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4 sm:gap-8">
+        <div className="flex-1 w-full sm:w-auto">
           {/* Price Display with Discount */}
           {product.discount_percentage > 0 ? (
             <div className="space-y-2">
-              <div className="flex items-baseline gap-3 flex-wrap">
-                <div className="text-xl md:text-2xl text-gray-400 line-through">
+              <div className="flex items-baseline gap-2 sm:gap-3 flex-wrap">
+                <div className="text-lg sm:text-xl md:text-2xl text-gray-400 line-through">
                   ₹ {(getCurrentPrice() * (1 + product.discount_percentage / 100)).toFixed(0)}
                 </div>
-                <div className="text-3xl md:text-4xl font-semibold text-[#3e4026]">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#3e4026]">
                   ₹ {getCurrentPrice()?.toLocaleString()}
                 </div>
               </div>
-              <div className="inline-flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full border border-green-200">
-                <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-green-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-green-200">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="text-sm font-semibold text-green-700">
+                <span className="text-xs sm:text-sm font-semibold text-green-700">
                   {product.discount_percentage}% OFF
                 </span>
               </div>
             </div>
           ) : (
-            <div className="text-3xl md:text-4xl font-light text-[#3e4026]">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-light text-[#3e4026]">
               ₹ {getCurrentPrice()?.toLocaleString()}
             </div>
           )}
         </div>
         
-        {/* Quantity on the right */}
-        <div className="flex flex-col items-end">
-          <div className="inline-flex items-center border border-gray-300 bg-white">
+        {/* Quantity */}
+        <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
+          <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-2 font-medium sm:hidden">Quantity</p>
+          <div className="inline-flex items-center border border-gray-300 bg-white w-full sm:w-auto">
             <button
               onClick={() => handleQuantityChange("decrement")}
-              className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
               disabled={quantity <= 1}
             >
-              <Minus size={16} className="text-[#3e4026]" />
+              <Minus size={14} className="sm:w-4 sm:h-4 text-[#3e4026]" />
             </button>
-            <span className="w-16 text-center text-[#3e4026] font-medium">{quantity}</span>
+            <span className="flex-1 sm:w-16 text-center text-[#3e4026] font-medium text-sm sm:text-base">{quantity}</span>
             <button
               onClick={() => handleQuantityChange("increment")}
-              className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
               disabled={product.stock && quantity >= product.stock}
             >
-              <Plus size={16} className="text-[#3e4026]" />
+              <Plus size={14} className="sm:w-4 sm:h-4 text-[#3e4026]" />
             </button>
           </div>
         </div>
@@ -222,13 +255,13 @@ export default function ProductInfo({ product }) {
       {/* Size Selection - Only show for sized products */}
       {!isSinglePriceCategory && (
         <div>
-          <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-3 font-medium">Size</p>
-          <div className="grid grid-cols-3 gap-3 w-full">
+          <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-2 sm:mb-3 font-medium">Size</p>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full">
             {['Small', 'Medium', 'Large'].map((size) => (
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`py-3 px-4 text-sm font-medium transition-all border ${
+                className={`py-2.5 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium transition-all border ${
                   selectedSize === size 
                     ? "bg-[#3e4026] text-white border-[#3e4026]" 
                     : "bg-white text-[#3e4026] border-gray-300 hover:border-[#3e4026]"
@@ -255,16 +288,16 @@ export default function ProductInfo({ product }) {
 
       {/* Description Section */}
       <div>
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#3e4026] mb-3 pb-2 border-b border-gray-200">
+        <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#3e4026] mb-2 sm:mb-3 pb-2 border-b border-gray-200">
           Description
         </h3>
         <div className="py-2">
           {product.description ? (
-            <p className="text-[#3e4026]/80 leading-relaxed text-sm">
+            <p className="text-[#3e4026]/80 leading-relaxed text-xs sm:text-sm">
               {product.description}
             </p>
           ) : (
-            <p className="text-[#3e4026]/80 leading-relaxed text-sm">
+            <p className="text-[#3e4026]/80 leading-relaxed text-xs sm:text-sm">
               {product.name} is a sculpted arrangement of delicate balance and quiet grace. 
               Purple and white shaded carnations, white carnations, sweet avalanche roses, 
               purple roses, purple carnations and white spray solidago are hand-arranged to 
@@ -275,25 +308,66 @@ export default function ProductInfo({ product }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-4 pt-2">
+      <div ref={buttonsRef} className="grid grid-cols-2 gap-3 sm:gap-4 pt-2">
         <button 
           onClick={handleAddToCart}
-          disabled={!product.stock || product.stock === 0 || deliveryStatus !== 'available'}
-          className="bg-[#3e4026] text-white py-4 px-6 text-sm font-semibold hover:bg-[#2d2f1c] transition-all uppercase tracking-wider flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          disabled={!product.stock || product.stock === 0}
+          className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold transition-all uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 ${
+            deliveryStatus === 'available'
+              ? 'bg-[#3e4026] text-white hover:bg-[#2d2f1c]'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          } ${(!product.stock || product.stock === 0) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''}`}
         >
-          <span>Add to Cart</span>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
+          <span>Add to Cart</span>
         </button>
         <button 
           onClick={handleBuyNow}
-          disabled={!product.stock || product.stock === 0 || deliveryStatus !== 'available'}
-          className="bg-white border-2 border-[#3e4026] text-[#3e4026] py-4 px-6 text-sm font-semibold hover:bg-[#3e4026] hover:text-white transition-all uppercase tracking-wider disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-white"
+          disabled={!product.stock || product.stock === 0}
+          className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold transition-all uppercase tracking-wider active:scale-95 ${
+            deliveryStatus === 'available'
+              ? 'bg-white border-2 border-[#3e4026] text-[#3e4026] hover:bg-[#3e4026] hover:text-white'
+              : 'bg-white border-2 border-gray-300 text-gray-400 cursor-not-allowed'
+          } ${(!product.stock || product.stock === 0) ? 'border-gray-200 text-gray-300 cursor-not-allowed' : ''}`}
         >
           Buy Now
         </button>
       </div>
+      
+      {/* Mobile Sticky Buttons - Only show when scrolled past original buttons */}
+      {isSticky && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-40">
+          <div className="grid grid-cols-2 gap-3 max-w-7xl mx-auto">
+            <button 
+              onClick={handleAddToCart}
+              disabled={!product.stock || product.stock === 0}
+              className={`py-3 px-3 text-xs font-semibold transition-all uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 ${
+                deliveryStatus === 'available'
+                  ? 'bg-[#3e4026] text-white hover:bg-[#2d2f1c]'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              } ${(!product.stock || product.stock === 0) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''}`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span>Add to Cart</span>
+            </button>
+            <button 
+              onClick={handleBuyNow}
+              disabled={!product.stock || product.stock === 0}
+              className={`py-3 px-3 text-xs font-semibold transition-all uppercase tracking-wider active:scale-95 ${
+                deliveryStatus === 'available'
+                  ? 'bg-white border-2 border-[#3e4026] text-[#3e4026] hover:bg-[#3e4026] hover:text-white'
+                  : 'bg-white border-2 border-gray-300 text-gray-400 cursor-not-allowed'
+              } ${(!product.stock || product.stock === 0) ? 'border-gray-200 text-gray-300 cursor-not-allowed' : ''}`}
+            >
+              Buy Now
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Success Modal */}
       <SuccessModal 

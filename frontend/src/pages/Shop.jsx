@@ -28,6 +28,10 @@ export default function Shop() {
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const productsPerPage = 9
+  
   // Combo-specific state - start closed on mobile
   const [showComboSidebar, setShowComboSidebar] = useState(false)
   
@@ -50,6 +54,11 @@ export default function Shop() {
       setSelectedCategory('all') // Reset category when searching
     }
   }, [searchParams])
+  
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, selectedPriceRange, searchQuery, sortBy])
 
   // Categories - matching SubHeader categories
   const categories = [
@@ -294,6 +303,32 @@ export default function Shop() {
   const toggleFilter = (name) => {
     setOpenFilters(prev => ({ ...prev, [name]: !prev[name] }))
   }
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(products.length / productsPerPage)
+  const indexOfLastProduct = currentPage * productsPerPage
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct)
+  
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+  
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+  
+  const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className="min-h-screen bg-[#faf9f7]">
@@ -368,35 +403,94 @@ export default function Shop() {
                 />
               </div>
             </div>
+            
+            {/* Mobile Filter Overlay */}
+            {mobileFilterOpen && (
+              <>
+                <div
+                  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+                  onClick={() => setMobileFilterOpen(false)}
+                />
+                <div className="fixed inset-y-0 left-0 w-72 bg-white z-50 lg:hidden overflow-y-auto shadow-2xl">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-lg font-semibold text-[#3e4026]">Filters</h2>
+                      <button
+                        onClick={() => setMobileFilterOpen(false)}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <FilterSidebar
+                      categories={categories}
+                      priceRanges={priceRanges}
+                      selectedCategory={selectedCategory}
+                      selectedPriceRange={selectedPriceRange}
+                      onCategoryChange={(category) => {
+                        setSelectedCategory(category)
+                        setMobileFilterOpen(false)
+                      }}
+                      onPriceRangeChange={(priceId) => {
+                        handlePriceRangeChange(priceId)
+                        setMobileFilterOpen(false)
+                      }}
+                      openFilters={openFilters}
+                      onToggleFilter={toggleFilter}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Right - Products */}
             <div className={`flex-1 ml-0 lg:ml-5 ${selectedCategory === 'combos' ? 'pr-0' : ''}`} ref={sectionRef}>
-              {/* Products Count with Combo Button */}
+              {/* Products Count with Filter/Combo Button */}
               <div className="mb-4 sm:mb-6 flex items-center justify-between gap-3">
                 <p className="text-[11px] sm:text-[13px] tracking-[0.15em] sm:tracking-[0.2em] text-[#3e4026] font-medium">
                   {products.length} PRODUCT{products.length !== 1 ? 'S' : ''}
+                  {products.length > productsPerPage && (
+                    <span className="ml-2 text-[#3e4026]/60">
+                      (Page {currentPage} of {totalPages})
+                    </span>
+                  )}
                 </p>
                 
-                {selectedCategory === 'combos' && (
+                <div className="flex items-center gap-2">
+                  {/* Mobile Filter Button */}
                   <button
-                    onClick={() => setShowComboSidebar(!showComboSidebar)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all md:hidden whitespace-nowrap shadow-lg active:scale-95 ${
-                      comboItems.length > 0 
-                        ? 'bg-gradient-to-r from-[#3e4026] to-[#5a5c3d] text-white animate-pulse hover:shadow-xl' 
-                        : 'bg-gray-100 text-gray-500 border border-gray-200'
-                    }`}
+                    onClick={() => setMobileFilterOpen(true)}
+                    className="lg:hidden flex items-center gap-2 px-3 py-2 bg-white border border-[#3e4026]/20 rounded-lg text-[#3e4026] hover:bg-[#3e4026]/5 transition-colors"
                   >
-                    <div className="relative">
-                      <ShoppingBag className="w-4 h-4" />
-                      {comboItems.length > 0 && (
-                        <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                          {comboItems.length}
-                        </span>
-                      )}
-                    </div>
-                    <span>{comboItems.length > 0 ? 'View Combo' : 'Combo Empty'}</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    <span className="text-xs font-medium">Filter</span>
                   </button>
-                )}
+                  
+                  {selectedCategory === 'combos' && (
+                    <button
+                      onClick={() => setShowComboSidebar(!showComboSidebar)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all md:hidden whitespace-nowrap shadow-lg active:scale-95 ${
+                        comboItems.length > 0 
+                          ? 'bg-gradient-to-r from-[#3e4026] to-[#5a5c3d] text-white animate-pulse hover:shadow-xl' 
+                          : 'bg-gray-100 text-gray-500 border border-gray-200'
+                      }`}
+                    >
+                      <div className="relative">
+                        <ShoppingBag className="w-4 h-4" />
+                        {comboItems.length > 0 && (
+                          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                            {comboItems.length}
+                          </span>
+                        )}
+                      </div>
+                      <span>{comboItems.length > 0 ? 'View Combo' : 'Combo Empty'}</span>
+                    </button>
+                  )}
+                </div>
               </div>
               
               {selectedCategory === 'combos' && (
@@ -427,7 +521,7 @@ export default function Shop() {
               )}
               
               <ProductGrid
-                products={products}
+                products={currentProducts}
                 loading={loading}
                 isInView={isInView}
                 hoveredId={hoveredId}
@@ -438,6 +532,76 @@ export default function Shop() {
                 onViewAll={() => setSelectedCategory('all')}
                 isComboMode={selectedCategory === 'combos'}
               />
+              
+              {/* Pagination Controls */}
+              {products.length > productsPerPage && (
+                <div className="mt-8 sm:mt-12 flex flex-col items-center gap-4">
+                  {/* Page Numbers */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handlePrevPage}
+                      disabled={currentPage === 1}
+                      className={`px-3 py-2 text-sm font-medium rounded transition-all ${
+                        currentPage === 1
+                          ? 'text-gray-400 cursor-not-allowed'
+                          : 'text-[#3e4026] hover:bg-[#3e4026] hover:text-white'
+                      }`}
+                    >
+                      Previous
+                    </button>
+                    
+                    <div className="flex items-center gap-1">
+                      {[...Array(totalPages)].map((_, index) => {
+                        const pageNumber = index + 1
+                        // Show first page, last page, current page, and pages around current
+                        const showPage = 
+                          pageNumber === 1 ||
+                          pageNumber === totalPages ||
+                          (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                        
+                        if (!showPage) {
+                          // Show ellipsis
+                          if (pageNumber === currentPage - 2 || pageNumber === currentPage + 2) {
+                            return <span key={pageNumber} className="px-2 text-gray-400">...</span>
+                          }
+                          return null
+                        }
+                        
+                        return (
+                          <button
+                            key={pageNumber}
+                            onClick={() => handlePageClick(pageNumber)}
+                            className={`min-w-[40px] h-10 text-sm font-medium rounded transition-all ${
+                              currentPage === pageNumber
+                                ? 'bg-[#3e4026] text-white'
+                                : 'text-[#3e4026] hover:bg-[#3e4026]/10'
+                            }`}
+                          >
+                            {pageNumber}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    
+                    <button
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className={`px-3 py-2 text-sm font-medium rounded transition-all ${
+                        currentPage === totalPages
+                          ? 'text-gray-400 cursor-not-allowed'
+                          : 'text-[#3e4026] hover:bg-[#3e4026] hover:text-white'
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                  
+                  {/* Page Info */}
+                  <p className="text-xs text-gray-500">
+                    Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, products.length)} of {products.length} products
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

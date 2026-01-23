@@ -1,19 +1,29 @@
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from "react"
 import { useGlobalPincode } from "../../context/PincodeContext"
 import { deliveryAPI } from "../../api"
 import { DELIVERY_CONSTANTS } from "../../constants/delivery"
 
-export default function DeliveryCheck({ 
+const DeliveryCheck = forwardRef(({ 
   onDeliveryStatusChange, 
   sameDayDelivery = false,
   productPrice = 0 
-}) {
+}, ref) => {
   // Use centralized delivery constants
   const { STANDARD_DELIVERY_CHARGE, FREE_DELIVERY_THRESHOLD, SAME_DAY_FREE_DELIVERY_THRESHOLD } = DELIVERY_CONSTANTS
   // Standard delivery free at ₹1500, same-day (fixed time) free at ₹2000
   const isFreeDelivery = sameDayDelivery 
     ? productPrice >= SAME_DAY_FREE_DELIVERY_THRESHOLD 
     : productPrice >= FREE_DELIVERY_THRESHOLD
+
+  // Add ref for the input element
+  const inputRef = useRef(null)
+
+  // Expose focus method to parent
+  useImperativeHandle(ref, () => ({
+    focusInput: () => {
+      inputRef.current?.focus()
+    }
+  }))
 
   // Use global pincode context for session persistence
   const { 
@@ -207,6 +217,7 @@ export default function DeliveryCheck({
         </p>
         <div className="flex gap-3">
           <input
+            ref={inputRef}
             type="text"
             value={localPincode}
             onChange={handlePincodeChange}
@@ -410,4 +421,8 @@ export default function DeliveryCheck({
       )}
     </div>
   )
-}
+})
+
+DeliveryCheck.displayName = 'DeliveryCheck'
+
+export default DeliveryCheck
