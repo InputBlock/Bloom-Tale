@@ -21,6 +21,7 @@ const deliveryZoneSchema = new mongoose.Schema(
       fixed_time: { type: Number, required: true },
       midnight : { type: Number, required: true },
       express: { type: Number, required: true },
+      standard: { type: Number, required: true, default: 0 },
     },
     isActive: {
       type: Boolean,

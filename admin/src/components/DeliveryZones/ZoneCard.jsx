@@ -40,7 +40,7 @@ export default function ZoneCard({
 
           {/* Mobile Pricing */}
           <div className="flex items-center justify-between">
-            <div className="grid grid-cols-3 gap-2 text-xs flex-1">
+            <div className="grid grid-cols-4 gap-2 text-xs flex-1">
               <div className="text-center bg-gray-50 rounded p-1.5">
                 <p className="text-[10px] text-gray-500">Fixed</p>
                 <p className="font-semibold">₹{zone.pricing.fixed_time}</p>
@@ -52,6 +52,10 @@ export default function ZoneCard({
               <div className="text-center bg-gray-50 rounded p-1.5">
                 <p className="text-[10px] text-gray-500">Express</p>
                 <p className="font-semibold">{zone.pricing.express > 0 ? `₹${zone.pricing.express}` : 'N/A'}</p>
+              </div>
+              <div className="text-center bg-blue-50 rounded p-1.5">
+                <p className="text-[10px] text-gray-500">Standard</p>
+                <p className="font-semibold">{zone.pricing.standard > 0 ? `₹${zone.pricing.standard}` : 'Free'}</p>
               </div>
             </div>
             <button
@@ -91,6 +95,10 @@ export default function ZoneCard({
               <div className="text-center px-2 lg:px-3">
                 <p className="text-[10px] lg:text-xs text-gray-500">Express</p>
                 <p className="font-semibold">{zone.pricing.express > 0 ? `₹${zone.pricing.express}` : 'N/A'}</p>
+              </div>
+              <div className="text-center px-2 lg:px-3 bg-blue-50 rounded">
+                <p className="text-[10px] lg:text-xs text-gray-500">Standard</p>
+                <p className="font-semibold">{zone.pricing.standard > 0 ? `₹${zone.pricing.standard}` : 'Free'}</p>
               </div>
             </div>
 

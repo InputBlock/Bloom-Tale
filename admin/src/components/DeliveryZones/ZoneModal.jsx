@@ -9,7 +9,7 @@ export default function ZoneModal({ zone, onClose, onSave, saving }) {
     name: zone?.name || "",
     description: zone?.description || "",
     pincodes: "",
-    pricing: zone?.pricing || { fixed_time: 0, midnight: 0, express: 0 },
+    pricing: zone?.pricing || { fixed_time: 0, midnight: 0, express: 0, standard: 0 },
     isActive: zone?.isActive ?? true
   })
 
@@ -83,7 +83,7 @@ export default function ZoneModal({ zone, onClose, onSave, saving }) {
 
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Pricing (₹)</label>
-            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2 mb-2">
               <div>
                 <label className="text-[10px] sm:text-xs text-gray-500">Fixed Time</label>
                 <input
@@ -108,6 +108,8 @@ export default function ZoneModal({ zone, onClose, onSave, saving }) {
                   className="w-full border rounded px-2 sm:px-3 py-2 text-xs sm:text-sm"
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
               <div>
                 <label className="text-[10px] sm:text-xs text-gray-500">Express</label>
                 <input
@@ -116,6 +118,18 @@ export default function ZoneModal({ zone, onClose, onSave, saving }) {
                   onChange={(e) => setForm({
                     ...form,
                     pricing: { ...form.pricing, express: Number(e.target.value) }
+                  })}
+                  className="w-full border rounded px-2 sm:px-3 py-2 text-xs sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] sm:text-xs text-gray-500">Standard (Non-Same Day)</label>
+                <input
+                  type="number"
+                  value={form.pricing.standard || 0}
+                  onChange={(e) => setForm({
+                    ...form,
+                    pricing: { ...form.pricing, standard: Number(e.target.value) }
                   })}
                   className="w-full border rounded px-2 sm:px-3 py-2 text-xs sm:text-sm"
                 />

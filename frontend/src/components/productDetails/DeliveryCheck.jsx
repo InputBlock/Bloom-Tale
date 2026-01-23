@@ -44,7 +44,10 @@ export default function DeliveryCheck({
       initializedRef.current = true
       // Already verified from session - notify parent
       const deliveryType = sameDayDelivery ? selectedDeliveryType : "standard"
-      const deliveryFee = sameDayDelivery ? (globalZone?.pricing?.fixed_time || 0) : 0
+      // For non-same-day delivery, use standard pricing from DB (free if price >= threshold)
+      const deliveryFee = sameDayDelivery 
+        ? (globalZone?.pricing?.fixed_time || 0) 
+        : (isFreeDelivery ? 0 : (globalZone?.pricing?.standard || 0))
       onDeliveryStatusChange?.('available', {
         zone: globalZone,
         pincode: globalPincode,
@@ -53,12 +56,15 @@ export default function DeliveryCheck({
         deliverySlot: null
       })
     }
-  }, [globalPincode, globalStatus, globalZone, sameDayDelivery, onDeliveryStatusChange, selectedDeliveryType])
+  }, [globalPincode, globalStatus, globalZone, sameDayDelivery, onDeliveryStatusChange, selectedDeliveryType, isFreeDelivery])
 
   // Calculate delivery fee based on selected type
   const getDeliveryFee = useCallback((zoneData, deliveryType) => {
     if (!zoneData?.pricing) return 0
-    if (!sameDayDelivery) return 0 // Standard delivery - free or fixed rate
+    // For non-same-day delivery, use standard pricing from DB (free if price >= threshold)
+    if (!sameDayDelivery) {
+      return isFreeDelivery ? 0 : (zoneData.pricing.standard || 0)
+    }
     
     switch (deliveryType) {
       case "fixed": return zoneData.pricing.fixed_time || 0
@@ -66,7 +72,7 @@ export default function DeliveryCheck({
       case "express": return zoneData.pricing.express || 0
       default: return 0
     }
-  }, [sameDayDelivery])
+  }, [sameDayDelivery, isFreeDelivery])
 
   // Notify parent when delivery options change - only if values actually changed
   useEffect(() => {
@@ -123,7 +129,10 @@ export default function DeliveryCheck({
     if (result.success) {
       // Notify parent with zone info
       const deliveryType = sameDayDelivery ? selectedDeliveryType : "standard"
-      const deliveryFee = sameDayDelivery ? (result.zone?.pricing?.fixed_time || 0) : 0
+      // For non-same-day delivery, use standard pricing from DB (free if price >= threshold)
+      const deliveryFee = sameDayDelivery 
+        ? (result.zone?.pricing?.fixed_time || 0) 
+        : (isFreeDelivery ? 0 : (result.zone?.pricing?.standard || 0))
       onDeliveryStatusChange?.('available', {
         zone: result.zone,
         pincode: localPincode,
