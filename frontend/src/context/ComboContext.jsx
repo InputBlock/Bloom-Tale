@@ -133,22 +133,16 @@ const ComboProvider = ({ children }) => {
     ))
   }
 
-  // Verify pincode
-  const verifyPincode = async (code) => {
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const pincodeNum = parseInt(code)
-        if (code.length === 6 && pincodeNum < 500000) {
-          setPincode(code)
-          setPincodeVerified(true)
-          resolve({ success: true, message: "Delivery available to this pincode" })
-        } else {
-          setPincodeVerified(false)
-          resolve({ success: false, message: "Sorry, we don't deliver to this pincode yet. Please try a different pincode." })
-        }
-      }, 500)
-    })
+  // Verify pincode - Now just stores the pincode (actual verification done via PincodeContext)
+  const verifyPincode = (code) => {
+    if (code && code.length === 6) {
+      setPincode(code)
+      setPincodeVerified(true)
+      return { success: true, message: "Pincode saved" }
+    } else {
+      setPincodeVerified(false)
+      return { success: false, message: "Invalid pincode" }
+    }
   }
 
   // Set delivery option

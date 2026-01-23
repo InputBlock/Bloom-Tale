@@ -77,7 +77,23 @@ export const addComboToCart = asyncHandler(async (req, res) => {
   // 🔹 Combo discount logic (backend controlled)
   const discountPercentage = 20;
   const discount = (subtotal * discountPercentage) / 100;
-  const total = subtotal - discount;
+  const discountedTotal = subtotal - discount;
+  
+  // 🔹 Free delivery threshold
+  const FREE_DELIVERY_THRESHOLD = 1500;
+  const comboDeliveryCharge = 199;
+  
+  // Check if combo qualifies for free delivery:
+  // - If discounted price >= threshold → FREE
+  // - If discounted + delivery >= threshold → also FREE (edge case)
+  const qualifiesForFreeDelivery = discountedTotal >= FREE_DELIVERY_THRESHOLD || 
+                                   (discountedTotal + comboDeliveryCharge) >= FREE_DELIVERY_THRESHOLD;
+  
+  const finalDeliveryCharge = qualifiesForFreeDelivery ? 0 : comboDeliveryCharge;
+  const finalPrice = discountedTotal + finalDeliveryCharge;
+  
+  // Calculate total savings (discount + free delivery if applicable)
+  const totalSaved = discount + (qualifiesForFreeDelivery ? comboDeliveryCharge : 0);
 
   let cart = await Cart.findOne({ user: userId });
 
@@ -96,12 +112,14 @@ export const addComboToCart = asyncHandler(async (req, res) => {
     isCombo: true,
     comboName: comboName,
     quantity: 1, // quantity of combo
-    price: total, // final combo price
+    price: finalPrice, // final combo price
     combo_items: validatedItems,
     subtotal,
-    discount,
+    discount: totalSaved, // Total savings (discount + free delivery)
     discount_percentage: discountPercentage,
     delivery_pincode,
+    delivery_charge: finalDeliveryCharge,
+    freeDeliveryApplied: qualifiesForFreeDelivery,
   });
 
   await cart.save();

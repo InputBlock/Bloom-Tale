@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { X, MapPin, Truck, Check, Package, ShoppingCart, Minus, Plus } from "lucide-react"
 import { useCombo } from "../../context/ComboContext"
 import { useCart } from "../../context/CartContext"
+import { useGlobalPincode } from "../../context/PincodeContext"
 import { useNavigate } from "react-router-dom"
 import SuccessModal from "../common/SuccessModal"
 
@@ -10,23 +11,46 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
     comboItems, 
     removeFromCombo, 
     updateQuantity,
-    verifyPincode,
     selectDeliveryOption,
     calculateTotal,
     calculateDiscount,
     calculateFinalTotal,
-    isPincodeVerified,
     selectedDeliveryOption,
     clearCombo
   } = useCombo()
 
   const { addToCart } = useCart()
+  const { 
+    pincode: globalPincode, 
+    setPincode, 
+    checkPincode, 
+    isChecking: pincodeChecking, 
+    isPincodeVerified,
+    status: pincodeStatus 
+  } = useGlobalPincode()
   const navigate = useNavigate()
   
-  const [pincodeInput, setPincodeInput] = useState("")
+  const [pincodeInput, setPincodeInput] = useState(globalPincode || "")
   const [pincodeMessage, setPincodeMessage] = useState(null)
   const [addingToCart, setAddingToCart] = useState(false)
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
+
+  // Sync local input with global pincode on mount and when global changes
+  useEffect(() => {
+    if (globalPincode && globalPincode !== pincodeInput) {
+      setPincodeInput(globalPincode)
+    }
+  }, [globalPincode])
+
+  // Show message based on global pincode status
+  useEffect(() => {
+    if (pincodeStatus === 'available' && globalPincode) {
+      setPincodeMessage({ type: 'success', message: 'Delivery available!' })
+      selectDeliveryOption('standard')
+    } else if (pincodeStatus === 'unavailable' && globalPincode) {
+      setPincodeMessage({ type: 'error', message: 'Service not available for this pincode' })
+    }
+  }, [pincodeStatus, globalPincode])
   
   // Swipe to close state
   const [dragY, setDragY] = useState(0)
@@ -70,23 +94,31 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
   }, [isOpen])
 
   const DELIVERY_CHARGE = 199
+  const FREE_DELIVERY_THRESHOLD = 1500
+  
+  // Check if combo qualifies for free delivery
+  const discountedTotal = calculateTotal() - calculateDiscount()
+  const qualifiesForFreeDelivery = discountedTotal >= FREE_DELIVERY_THRESHOLD || 
+                                   (discountedTotal + DELIVERY_CHARGE) >= FREE_DELIVERY_THRESHOLD
+  const finalDeliveryCharge = qualifiesForFreeDelivery ? 0 : DELIVERY_CHARGE
 
-  const handleVerifyPincode = () => {
+  const handleVerifyPincode = async () => {
     if (pincodeInput.length !== 6) {
       setPincodeMessage({ type: 'error', message: 'Please enter valid 6-digit pincode' })
       return
     }
 
-    const pincode = parseInt(pincodeInput)
-    if (pincode >= 500000) {
-      setPincodeMessage({ type: 'error', message: 'Service not available for this pincode' })
-      return
+    setPincodeMessage(null)
+    
+    // Use global pincode context to check
+    const result = await checkPincode(pincodeInput)
+    
+    if (result.success) {
+      setPincodeMessage({ type: 'success', message: result.message })
+      selectDeliveryOption('standard')
+    } else {
+      setPincodeMessage({ type: 'error', message: result.message })
     }
-
-    verifyPincode(pincodeInput)
-    setPincodeMessage({ type: 'success', message: 'Delivery available!' })
-    // Auto-select standard delivery
-    selectDeliveryOption('standard')
   }
 
   const handleAddToCart = async () => {
@@ -95,14 +127,18 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
     setAddingToCart(true)
     
     try {
-      const finalTotal = calculateTotal() - calculateDiscount() + DELIVERY_CHARGE
+      const subtotal = calculateTotal()
+      const discount = calculateDiscount()
+      const discountedPrice = subtotal - discount
+      // Only add delivery if doesn't qualify for free delivery
+      const finalPrice = discountedPrice + finalDeliveryCharge
       
       // Create combo product with all details
       const comboProduct = {
         product_id: `COMBO_${Date.now()}`,
         name: 'Custom Combo Package',
         quantity: 1,
-        price: finalTotal,
+        price: finalPrice, // Price after 20% discount + delivery (₹1559)
         isCombo: true,
         combo_items: comboItems.map(item => ({
           product_id: item.product_id,
@@ -113,8 +149,8 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
           color: item.selectedColor,
           price: item.price
         })),
-        delivery_pincode: pincodeInput,
-        delivery_charge: DELIVERY_CHARGE,
+        delivery_pincode: globalPincode || pincodeInput,
+        delivery_charge: 0, // Delivery already included in price
         subtotal: calculateTotal(),
         discount: calculateDiscount(),
         discount_percentage: 20
@@ -227,10 +263,14 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
             />
             <button
               onClick={handleVerifyPincode}
-              disabled={pincodeInput.length !== 6}
-              className="flex-shrink-0 px-4 py-2 text-sm bg-[#3e4026] text-white rounded-md font-medium hover:bg-[#2d2f1c] transition-all disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
+              disabled={pincodeInput.length !== 6 || pincodeChecking}
+              className="flex-shrink-0 px-4 py-2 text-sm bg-[#3e4026] text-white rounded-md font-medium hover:bg-[#2d2f1c] transition-all disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap min-w-[70px]"
             >
-              Check
+              {pincodeChecking ? (
+                <span className="flex items-center justify-center gap-1.5">
+                  <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                </span>
+              ) : 'Check'}
             </button>
           </div>
 
@@ -350,7 +390,11 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
               {isPincodeVerified && (
                 <div className="flex justify-between text-sm">
                   <span className="text-[#3e4026]/70">Delivery</span>
-                  <span className="text-[#3e4026]">₹{DELIVERY_CHARGE.toFixed(2)}</span>
+                  {qualifiesForFreeDelivery ? (
+                    <span className="text-green-600 font-medium">FREE</span>
+                  ) : (
+                    <span className="text-[#3e4026]">₹{DELIVERY_CHARGE.toFixed(2)}</span>
+                  )}
                 </div>
               )}
               
@@ -363,9 +407,14 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
                 <div className="flex justify-between items-center">
                   <span className="text-base font-bold text-[#3e4026]">Total</span>
                   <span className="text-xl font-bold text-[#3e4026]">
-                    ₹{(isPincodeVerified ? calculateFinalTotal() + DELIVERY_CHARGE : calculateTotal() - calculateDiscount()).toFixed(2)}
+                    ₹{(calculateTotal() - calculateDiscount() + (isPincodeVerified ? finalDeliveryCharge : 0)).toFixed(2)}
                   </span>
                 </div>
+                {isPincodeVerified && qualifiesForFreeDelivery && (
+                  <p className="text-xs text-green-600 mt-1 text-right">
+                    Total Saved: ₹{(calculateDiscount() + DELIVERY_CHARGE).toFixed(2)}
+                  </p>
+                )}
               </div>
             </div>
 

@@ -45,13 +45,21 @@ export default function ProductCart() {
     const itemCharge = item.delivery_charge || item.deliveryFee || 0
     return Math.max(maxCharge, itemCharge)
   }, 0)
-  const isFreeDelivery = cartTotal >= freeDeliveryThreshold
+  
+  // Check if any combo has free delivery already applied
+  const hasComboWithFreeDelivery = cartItems.some(item => 
+    item.isCombo && (item.freeDeliveryApplied || item.delivery_charge === 0)
+  )
+  
+  // Free delivery if: cart >= threshold OR combo already has free delivery
+  const isFreeDelivery = cartTotal >= freeDeliveryThreshold || hasComboWithFreeDelivery
+  
   // For same-day delivery, only fixed time can be free (midnight/express always charged)
   const hasMidnightOrExpress = cartItems.some(item => 
     item.deliveryType === 'midnight' || item.deliveryType === 'express'
   )
   const deliveryCharge = (isFreeDelivery && !hasMidnightOrExpress) ? 0 : baseDeliveryCharge
-  const remainingForFree = Math.max(freeDeliveryThreshold - cartTotal, 0)
+  const remainingForFree = isFreeDelivery ? 0 : Math.max(freeDeliveryThreshold - cartTotal, 0)
   const totalAmount = cartTotal + deliveryCharge
 
   // Get combo number for display
