@@ -8,7 +8,7 @@ import DeliveryCheck from "./DeliveryCheck"
 // Categories that use single price instead of size-based pricing
 const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"]
 
-export default function ProductInfo({ product }) {
+export default function ProductInfo({ product, fromSameDay = false }) {
   const [quantity, setQuantity] = useState(1)
   const [selectedSize, setSelectedSize] = useState("Medium")
   const [modalState, setModalState] = useState({ isOpen: false, message: "", type: "success" })
@@ -19,6 +19,10 @@ export default function ProductInfo({ product }) {
   const buttonsRef = useRef(null)
   const { addToCart, isLoggedIn } = useCart()
   const navigate = useNavigate()
+  
+  // Show same-day delivery options only if user came from same-day category
+  // OR if product is marked as same_day_delivery and not from another category
+  const showSameDayDelivery = fromSameDay || (product?.same_day_delivery && fromSameDay !== false)
 
   // Check if this is a single-price category
   const isSinglePriceCategory = SINGLE_PRICE_CATEGORIES.includes(product?.category)
@@ -278,7 +282,7 @@ export default function ProductInfo({ product }) {
       <div ref={deliveryRef}>
         <DeliveryCheck 
           onDeliveryStatusChange={handleDeliveryStatusChange}
-          sameDayDelivery={product.same_day_delivery}
+          sameDayDelivery={showSameDayDelivery}
           productPrice={getCurrentPrice() * quantity}
         />
       </div>

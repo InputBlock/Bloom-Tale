@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useSearchParams } from "react-router-dom"
 import { ChevronRight } from "lucide-react"
 import Header from "../components/common/Header"
 import Footer from "../components/common/Footer"
@@ -10,9 +10,13 @@ import { productsAPI } from "../api"
 
 export default function ProductDetailsPage() {
   const { productId } = useParams()
+  const [searchParams] = useSearchParams()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  
+  // Check if user came from same-day-delivery category
+  const fromSameDay = searchParams.get('from') === 'same-day'
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -128,7 +132,7 @@ export default function ProductDetailsPage() {
           </div>
 
           <div>
-            <ProductInfo product={product} />
+            <ProductInfo product={product} fromSameDay={fromSameDay} />
           </div>
         </div>
 

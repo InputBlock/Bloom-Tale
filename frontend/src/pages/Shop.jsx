@@ -279,7 +279,9 @@ export default function Shop() {
     if (selectedCategory === 'combos') {
       navigate(`/combo-product/${productId}`)
     } else {
-      navigate(`/product/${productId}`)
+      // Pass category info so product page knows delivery type to show
+      const categoryParam = selectedCategory === 'same-day-delivery' ? '?from=same-day' : ''
+      navigate(`/product/${productId}${categoryParam}`)
     }
   }
 
