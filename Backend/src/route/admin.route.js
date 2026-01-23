@@ -4,7 +4,7 @@ import { add_item, list_item, unlist_item, update_item, delete_item,get_list } f
 import { upload } from "../service/cloudinary.service.js";
 import { upload as imagekitUpload } from "../service/image.service.js";
 import { get_user_info, get_user_by_id, delete_user, get_user_stats } from "../controller/admin/status.controller.js"
-import { getAllOrders, getOrderById, updateOrderStatus, getOrderStats } from "../controller/admin/order.admin.controller.js";
+import { getAllOrders, getOrderById, updateOrderStatus, getOrderStats, getMonthlyStats } from "../controller/admin/order.admin.controller.js";
 import { add_hero_section, get_hero_sections, update_hero_section, delete_hero_section } from "../controller/admin/editcontent.controller.js";
 import { getAboutSection, getAllAboutSections, createAboutSection, updateAboutSection, deleteAboutSection, setActiveAboutSection } from "../controller/admin/aboutSection.controller.js";
 import { getAllEnquiries, getEnquiryById, updateEnquiryStatus, deleteEnquiry, getEnquiryStats } from "../controller/admin/enquiry.admin.controller.js";
@@ -36,6 +36,7 @@ router.delete("/users/:userId", verifyAdminJWT, delete_user);
 // Order routes
 router.get("/orders", verifyAdminJWT, getAllOrders);
 router.get("/orders/stats", verifyAdminJWT, getOrderStats);
+router.get("/orders/monthly", verifyAdminJWT, getMonthlyStats);
 router.get("/orders/:orderId", verifyAdminJWT, getOrderById);
 router.patch("/orders/:orderId/status", verifyAdminJWT, updateOrderStatus);
 

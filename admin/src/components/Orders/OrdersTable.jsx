@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Eye, MoreHorizontal, Loader2 } from "lucide-react"
+import { Eye, MoreHorizontal, Loader2, ChevronLeft, ChevronRight, Search } from "lucide-react"
 import { ordersAPI } from "../../api"
 import OrderStatusBadge from "./OrderStatusBadge"
 import OrderDetailsModal from "./OrderDetailsModal"
@@ -10,14 +10,25 @@ export default function OrdersTable() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalOrders, setTotalOrders] = useState(0)
+  const [statusFilter, setStatusFilter] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchInput, setSearchInput] = useState("")
+  const limit = 15 // Orders per page
 
-  // Fetch orders from backend
-  const fetchOrders = async () => {
+  // Fetch orders from backend with pagination
+  const fetchOrders = async (page = currentPage, status = statusFilter, search = searchQuery) => {
     try {
       setLoading(true)
-      const response = await ordersAPI.getAll()
-      if (response.data?.data?.orders) {
-        setOrders(response.data.data.orders)
+      const response = await ordersAPI.getAll({ page, limit, status: status || undefined, search: search || undefined })
+      if (response.data?.data) {
+        setOrders(response.data.data.orders || [])
+        setTotalPages(response.data.data.pagination?.totalPages || 1)
+        setTotalOrders(response.data.data.pagination?.totalOrders || 0)
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch orders")
@@ -28,8 +39,8 @@ export default function OrdersTable() {
   }
 
   useEffect(() => {
-    fetchOrders()
-  }, [])
+    fetchOrders(currentPage, statusFilter, searchQuery)
+  }, [currentPage, statusFilter, searchQuery])
 
   // Map order_status to color
   const getOrderStatusColor = (status) => {
@@ -68,11 +79,35 @@ export default function OrdersTable() {
   const updateOrderStatus = async (orderId, status) => {
     try {
       await ordersAPI.updateStatus(orderId, status)
-      fetchOrders() // Refresh orders
+      fetchOrders(currentPage, statusFilter) // Refresh orders
     } catch (err) {
       console.error("Error updating order:", err)
       alert(err.response?.data?.message || "Failed to update order")
     }
+  }
+
+  // Pagination handlers
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+
+  const handleStatusFilterChange = (status) => {
+    setStatusFilter(status)
+    setCurrentPage(1) // Reset to first page when filter changes
+  }
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    setSearchQuery(searchInput)
+    setCurrentPage(1) // Reset to first page when searching
+  }
+
+  const clearSearch = () => {
+    setSearchInput("")
+    setSearchQuery("")
+    setCurrentPage(1)
   }
 
   const handleAction = (action, order) => {
@@ -116,6 +151,64 @@ export default function OrdersTable() {
   return (
     <>
       <div className="space-y-3 sm:space-y-4">
+        {/* Filter and Stats Bar */}
+        <div className="flex flex-col gap-3 bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            {/* Search */}
+            <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search order ID, name, email..."
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-3 sm:px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition flex items-center gap-1"
+              >
+                <Search className="w-4 h-4 sm:hidden" />
+                <span className="hidden sm:inline">Search</span>
+              </button>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="px-2 sm:px-3 py-2 text-gray-600 text-sm border border-gray-200 rounded-lg hover:bg-gray-100 transition"
+                >
+                  <span className="hidden sm:inline">Clear</span>
+                  <span className="sm:hidden">✕</span>
+                </button>
+              )}
+            </form>
+          </div>
+          
+          <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-xs sm:text-sm text-gray-600">Filter:</span>
+              <select
+                value={statusFilter}
+                onChange={(e) => handleStatusFilterChange(e.target.value)}
+                className="flex-1 xs:flex-none px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">All Orders</option>
+                <option value="CREATED">Created</option>
+                <option value="PLACED">Placed</option>
+                <option value="SHIPPED">Shipped</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+            <div className="text-xs sm:text-sm text-gray-600">
+              Showing {orders.length} of {totalOrders} orders
+              {searchQuery && <span className="ml-1 text-green-600 break-all">for "{searchQuery}"</span>}
+            </div>
+          </div>
+        </div>
+
         {/* Mobile Card View */}
         <div className="md:hidden space-y-3">
           {orders.length === 0 ? (
@@ -362,6 +455,58 @@ export default function OrdersTable() {
             </table>
           </div>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={16} />
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+            
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Page numbers */}
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 text-sm rounded-lg transition ${
+                      currentPage === pageNum
+                        ? "bg-green-600 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
       </div>
       
       {selectedOrder && (
