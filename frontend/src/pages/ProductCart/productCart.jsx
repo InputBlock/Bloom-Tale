@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Loader2 } from "lucide-react"
 import { useCart } from "../../context/CartContext"
+import { useGlobalPincode } from "../../context/PincodeContext"
 import Header from "../../components/common/Header"
 import { DELIVERY_CONSTANTS, getRemainingForFreeDelivery } from "../../constants/delivery"
 import { 
@@ -14,6 +15,7 @@ import {
 
 export default function ProductCart() {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, isLoggedIn, loading } = useCart()
+  const { zone: deliveryZone } = useGlobalPincode()
   const navigate = useNavigate()
   const [expandedCombos, setExpandedCombos] = useState({})
 
@@ -41,8 +43,35 @@ export default function ProductCart() {
   
   // Calculate delivery and totals
   const cartTotal = getCartTotal()
+  
+  // For free delivery threshold: use items subtotal BEFORE discount
+  const itemsSubtotalBeforeDiscount = cartItems.reduce((sum, item) => {
+    if (item.isCombo && item.subtotal) {
+      // For combos: use subtotal (before discount)
+      return sum + item.subtotal
+    } else {
+      // For regular items: use price × quantity
+      const price = item.price || 0
+      const quantity = item.quantity || 1
+      return sum + (price * quantity)
+    }
+  }, 0)
+  
+  // Check if cart has ONLY combos (combos already include delivery in price)
+  const hasOnlyCombos = cartItems.length > 0 && cartItems.every(item => item.isCombo)
+  
+  // For combos, use live delivery zone pricing for DISPLAY only (not added to total)
   const baseDeliveryCharge = cartItems.reduce((maxCharge, item) => {
-    const itemCharge = item.delivery_charge || item.deliveryFee || 0
+    let itemCharge = 0
+    
+    if (item.isCombo && deliveryZone?.pricing?.standard) {
+      // Use live zone pricing for combos (display purposes)
+      itemCharge = deliveryZone.pricing.standard
+    } else if (!item.isCombo) {
+      // Use stored charge for regular items only
+      itemCharge = item.delivery_charge || item.deliveryFee || 0
+    }
+    
     return Math.max(maxCharge, itemCharge)
   }, 0)
   
@@ -51,15 +80,21 @@ export default function ProductCart() {
     item.isCombo && (item.freeDeliveryApplied || item.delivery_charge === 0)
   )
   
-  // Free delivery if: cart >= threshold OR combo already has free delivery
-  const isFreeDelivery = cartTotal >= freeDeliveryThreshold || hasComboWithFreeDelivery
+  // Free delivery if: items subtotal (before discount) >= threshold OR combo already has free delivery
+  const isFreeDelivery = itemsSubtotalBeforeDiscount >= freeDeliveryThreshold || hasComboWithFreeDelivery
   
   // For same-day delivery, only fixed time can be free (midnight/express always charged)
   const hasMidnightOrExpress = cartItems.some(item => 
     item.deliveryType === 'midnight' || item.deliveryType === 'express'
   )
-  const deliveryCharge = (isFreeDelivery && !hasMidnightOrExpress) ? 0 : baseDeliveryCharge
-  const remainingForFree = isFreeDelivery ? 0 : Math.max(freeDeliveryThreshold - cartTotal, 0)
+  
+  // Delivery charge calculation:
+  // - If cart has ONLY combos: delivery already included in combo price, so 0
+  // - Otherwise: apply delivery charge for non-combo items
+  const deliveryCharge = hasOnlyCombos ? 0 : ((isFreeDelivery && !hasMidnightOrExpress) ? 0 : baseDeliveryCharge)
+  
+  // Use items subtotal before discount for progress calculation
+  const remainingForFree = isFreeDelivery ? 0 : Math.max(freeDeliveryThreshold - itemsSubtotalBeforeDiscount, 0)
   const totalAmount = cartTotal + deliveryCharge
 
   // Get combo number for display
@@ -160,6 +195,7 @@ export default function ProductCart() {
                     isExpanded={expandedCombos[itemId]}
                     onToggleDetails={() => toggleComboDetails(itemId)}
                     onRemove={() => removeFromCart(item.product_id)}
+                    isFreeDelivery={isFreeDelivery}
                   />
                 )
               }

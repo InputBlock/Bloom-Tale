@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Product from "../models/product.js";
 import Cart from "../models/cart.model.js";
+import DeliveryZone from "../models/deliveryZone.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -79,21 +80,27 @@ export const addComboToCart = asyncHandler(async (req, res) => {
   const discount = (subtotal * discountPercentage) / 100;
   const discountedTotal = subtotal - discount;
   
+  // 🔹 Fetch delivery charge from zone based on pincode
+  let comboDeliveryCharge = 199; // fallback
+  if (delivery_pincode) {
+    const zone = await DeliveryZone.findOne({ 
+      pincodes: delivery_pincode 
+    });
+    
+    if (zone?.pricing?.standard) {
+      comboDeliveryCharge = zone.pricing.standard;
+    }
+  }
+  
   // 🔹 Free delivery threshold
   const FREE_DELIVERY_THRESHOLD = 1500;
-  const comboDeliveryCharge = 199;
   
-  // Check if combo qualifies for free delivery:
-  // - If discounted price >= threshold → FREE
-  // - If discounted + delivery >= threshold → also FREE (edge case)
-  const qualifiesForFreeDelivery = discountedTotal >= FREE_DELIVERY_THRESHOLD || 
-                                   (discountedTotal + comboDeliveryCharge) >= FREE_DELIVERY_THRESHOLD;
+  // Check if combo qualifies for free delivery based on subtotal BEFORE discount
+  // This matches cart page logic
+  const qualifiesForFreeDelivery = subtotal >= FREE_DELIVERY_THRESHOLD;
   
   const finalDeliveryCharge = qualifiesForFreeDelivery ? 0 : comboDeliveryCharge;
   const finalPrice = discountedTotal + finalDeliveryCharge;
-  
-  // Calculate total savings (discount + free delivery if applicable)
-  const totalSaved = discount + (qualifiesForFreeDelivery ? comboDeliveryCharge : 0);
 
   let cart = await Cart.findOne({ user: userId });
 
@@ -115,11 +122,11 @@ export const addComboToCart = asyncHandler(async (req, res) => {
     price: finalPrice, // final combo price
     combo_items: validatedItems,
     subtotal,
-    discount: totalSaved, // Total savings (discount + free delivery)
+    discount: discount, // Only 20% discount, not including free delivery
     discount_percentage: discountPercentage,
     delivery_pincode,
-    delivery_charge: finalDeliveryCharge,
-    freeDeliveryApplied: qualifiesForFreeDelivery,
+    delivery_charge: comboDeliveryCharge, // Store actual charge (₹149)
+    freeDeliveryApplied: qualifiesForFreeDelivery, // Flag to show FREE in display
   });
 
   await cart.save();

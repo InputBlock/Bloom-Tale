@@ -5,7 +5,8 @@ export default function ComboCartItem({
   comboNumber,
   isExpanded, 
   onToggleDetails, 
-  onRemove 
+  onRemove,
+  isFreeDelivery = false
 }) {
   // Get images from populated product data or fallback to direct image field
   const comboImages = item.combo_items?.map(ci => {
@@ -55,7 +56,11 @@ export default function ComboCartItem({
                 {item.combo_items?.length || 0} Items
               </p>
               <p className="text-[10px] text-gray-500">
-                Delivery: ₹{item.delivery_charge}
+                Delivery: {isFreeDelivery ? (
+                  <span className="text-green-600 font-medium">FREE</span>
+                ) : (
+                  `₹${item.delivery_charge}`
+                )}
               </p>
             </div>
 
@@ -85,7 +90,7 @@ export default function ComboCartItem({
 
         {/* Expanded Details */}
         {isExpanded && item.combo_items && (
-          <ComboExpandedDetails item={item} />
+          <ComboExpandedDetails item={item} isFreeDelivery={isFreeDelivery} />
         )}
       </div>
     </div>
@@ -136,7 +141,7 @@ function ComboImageCollage({ images }) {
 }
 
 // Combo Expanded Details Component
-function ComboExpandedDetails({ item }) {
+function ComboExpandedDetails({ item, isFreeDelivery }) {
   return (
     <div className="mt-6 pt-6 border-t border-gray-200">
       <h4 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Items in this Combo</h4>
@@ -202,7 +207,11 @@ function ComboExpandedDetails({ item }) {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Delivery</span>
-            <span className="font-semibold">₹{item.delivery_charge?.toLocaleString()}</span>
+            {isFreeDelivery ? (
+              <span className="font-semibold text-green-600">FREE</span>
+            ) : (
+              <span className="font-semibold">₹{item.delivery_charge?.toLocaleString()}</span>
+            )}
           </div>
           <div className="flex justify-between text-green-700">
             <span className="font-semibold">Discount ({item.discount_percentage}%)</span>

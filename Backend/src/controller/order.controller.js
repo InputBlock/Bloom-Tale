@@ -37,6 +37,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   //  Calculate totals and get delivery info from cart items
   let itemsTotal = 0;
+  let itemsSubtotalBeforeDiscount = 0; // For free delivery threshold check
   let handlingCharge = 0;
   let cartDeliveryType = "standard";
   let cartDeliveryFee = 0;
@@ -45,9 +46,26 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   cart.items.forEach((item) => {
     if (item.isCombo) {
-      itemsTotal += item.price; // combo final price
+      // For combos: check if free delivery applies based on subtotal
+      const comboSubtotal = item.subtotal || 0;
+      itemsSubtotalBeforeDiscount += comboSubtotal;
+      
+      // Free delivery if subtotal >= 1500
+      const hasFreeDelivery = comboSubtotal >= FREE_DELIVERY_THRESHOLD;
+      
+      let comboItemsPrice = item.price;
+      if (!hasFreeDelivery) {
+        // Below threshold: subtract delivery from price to get item-only price
+        const comboDeliveryCharge = item.delivery_charge || 0;
+        comboItemsPrice = item.price - comboDeliveryCharge;
+      }
+      // Above threshold: use price as-is (already the correct final price)
+      
+      itemsTotal += comboItemsPrice;
     } else {
-      itemsTotal += item.price * item.quantity;
+      const itemPrice = item.price * item.quantity;
+      itemsTotal += itemPrice;
+      itemsSubtotalBeforeDiscount += itemPrice;
     }
     
     // Add handling charge for Candles category (only once)
@@ -75,14 +93,15 @@ export const createOrder = asyncHandler(async (req, res) => {
   let finalDeliveryFee = reqDeliveryFee !== undefined ? reqDeliveryFee : cartDeliveryFee;
   const finalDeliverySlot = reqDeliverySlot || cartDeliverySlot;
 
-  // Apply free delivery threshold logic
+  // Apply free delivery threshold logic - check against subtotal BEFORE discount
   const isSameDayDelivery = ['fixed', 'midnight', 'express'].includes(finalDeliveryType);
   const isMidnightOrExpress = ['midnight', 'express'].includes(finalDeliveryType);
   const freeDeliveryThreshold = isSameDayDelivery ? SAME_DAY_FREE_DELIVERY_THRESHOLD : FREE_DELIVERY_THRESHOLD;
   
   // Only fixed time same-day and standard delivery can be free
   // Midnight and Express are always charged
-  if (itemsTotal >= freeDeliveryThreshold && !isMidnightOrExpress) {
+  // Check threshold against items subtotal BEFORE discount
+  if (itemsSubtotalBeforeDiscount >= freeDeliveryThreshold && !isMidnightOrExpress) {
     finalDeliveryFee = 0;
   }
 

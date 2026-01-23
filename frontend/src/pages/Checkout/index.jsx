@@ -70,6 +70,22 @@ export default function Checkout() {
   // Calculate cart total for sidebar
   const cartTotal = getCartTotal ? getCartTotal() : 0
   
+  // For free delivery threshold: use items subtotal BEFORE discount
+  const itemsSubtotalBeforeDiscount = cartItems?.reduce((sum, item) => {
+    if (item.isCombo && item.subtotal) {
+      // For combos: use subtotal (before discount)
+      return sum + item.subtotal
+    } else {
+      // For regular items: use price × quantity
+      const price = item.price || 0
+      const quantity = item.quantity || 1
+      return sum + (price * quantity)
+    }
+  }, 0) || 0
+  
+  // Check if cart has ONLY combos (combos already include delivery in price)
+  const hasOnlyCombos = cartItems?.length > 0 && cartItems.every(item => item.isCombo)
+  
   // Get delivery thresholds
   const { FREE_DELIVERY_THRESHOLD, SAME_DAY_FREE_DELIVERY_THRESHOLD } = DELIVERY_CONSTANTS
   
@@ -86,16 +102,22 @@ export default function Checkout() {
   // Determine the correct threshold
   const freeDeliveryThreshold = hasSameDayDelivery ? SAME_DAY_FREE_DELIVERY_THRESHOLD : FREE_DELIVERY_THRESHOLD
   
-  // Check if free delivery applies
-  const isFreeDelivery = cartTotal >= freeDeliveryThreshold && !hasMidnightOrExpress
+  // Check if free delivery applies - use items subtotal BEFORE discount
+  const isFreeDelivery = itemsSubtotalBeforeDiscount >= freeDeliveryThreshold && !hasMidnightOrExpress
   
-  // Calculate base delivery fee from cart items
+  // Calculate base delivery fee from cart items (exclude combos as they have delivery in price)
   const baseCartDeliveryFee = cartItems?.reduce((maxCharge, item) => {
+    // For combos, get the delivery charge for display purposes
+    if (item.isCombo) {
+      const comboDeliveryCharge = item.delivery_charge || 0
+      return Math.max(maxCharge, comboDeliveryCharge)
+    }
+    
     const itemCharge = item.delivery_charge || item.deliveryFee || 0
     return Math.max(maxCharge, itemCharge)
   }, 0) || 0
   
-  // Apply free delivery if threshold is met
+  // For display: always show delivery charge (even for combos)
   const cartDeliveryFee = isFreeDelivery ? 0 : baseCartDeliveryFee
   
   // Calculate handling charge for Candles category (₹50 fixed)
@@ -111,9 +133,25 @@ export default function Checkout() {
   
   // Calculate subtotal (items total without delivery/handling)
   const cartItemsTotal = cartItems?.reduce((sum, item) => {
-    const price = item.price || item.product?.price || 0
+    let itemPrice = item.price || item.product?.price || 0
     const quantity = item.quantity || 1
-    return sum + (price * quantity)
+    
+    // For combos: check if free delivery applies
+    if (item.isCombo) {
+      const comboSubtotal = item.subtotal || 0
+      const comboDeliveryCharge = item.delivery_charge || 0
+      
+      // Free delivery if subtotal >= 1500
+      const hasFreeDelivery = comboSubtotal >= FREE_DELIVERY_THRESHOLD
+      
+      if (!hasFreeDelivery) {
+        // Below threshold: subtract delivery from price to get item-only price
+        itemPrice = itemPrice - comboDeliveryCharge
+      }
+      // Above threshold: use price as-is (already the correct final price)
+    }
+    
+    return sum + (itemPrice * quantity)
   }, 0) || 0
   
   // Display values for sidebar

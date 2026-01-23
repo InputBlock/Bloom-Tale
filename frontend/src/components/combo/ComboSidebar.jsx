@@ -26,7 +26,8 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
     checkPincode, 
     isChecking: pincodeChecking, 
     isPincodeVerified,
-    status: pincodeStatus 
+    status: pincodeStatus,
+    zone: deliveryZone
   } = useGlobalPincode()
   const navigate = useNavigate()
   
@@ -93,7 +94,8 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
     }
   }, [isOpen])
 
-  const DELIVERY_CHARGE = 199
+  // Get delivery charge from zone pricing (standard delivery for combos)
+  const DELIVERY_CHARGE = deliveryZone?.pricing?.standard || 199
   const FREE_DELIVERY_THRESHOLD = 1500
   
   // Check if combo qualifies for free delivery
@@ -150,7 +152,8 @@ export default function ComboSidebar({ isOpen = true, onClose = () => {} }) {
           price: item.price
         })),
         delivery_pincode: globalPincode || pincodeInput,
-        delivery_charge: 0, // Delivery already included in price
+        delivery_charge: DELIVERY_CHARGE, // Store actual delivery charge from zone pricing
+        deliveryType: 'standard', // Combos use standard delivery
         subtotal: calculateTotal(),
         discount: calculateDiscount(),
         discount_percentage: 20
