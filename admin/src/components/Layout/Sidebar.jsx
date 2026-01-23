@@ -59,7 +59,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile }) {
           {isOpen ? (
             <>
               <div>
-                <h1 className="text-2xl font-bold text-white">FOREVER</h1>
+                <h1 className="text-2xl font-bold text-white">BloomTale</h1>
                 <p className="text-gray-400 text-sm">Admin Panel</p>
               </div>
               <button

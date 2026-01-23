@@ -18,9 +18,6 @@ export default function Header({ title, subtitle, setIsOpen, isSidebarOpen, isMo
           <p className="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">{subtitle}</p>
         </div>
       </div>
-      <button className="hidden sm:block bg-black text-white px-4 lg:px-6 py-2 rounded-full hover:bg-gray-800 transition text-sm lg:text-base">
-        Logout
-      </button>
     </header>
   )
 }

@@ -87,8 +87,14 @@ export const productsAPI = {
 // ORDERS API
 // ============================================
 export const ordersAPI = {
-  getAll: () => 
-    api.get('/api/v1/admin/orders'),
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', params.page || 1);
+    queryParams.append('limit', params.limit || 15);
+    if (params.status) queryParams.append('status', params.status);
+    if (params.search) queryParams.append('search', params.search);
+    return api.get(`/api/v1/admin/orders?${queryParams.toString()}`);
+  },
   
   getRecent: (limit = 5) => 
     api.get(`/api/v1/admin/orders?limit=${limit}`),
@@ -98,6 +104,9 @@ export const ordersAPI = {
   
   getStats: () => 
     api.get('/api/v1/admin/orders/stats'),
+  
+  getMonthlyStats: () => 
+    api.get('/api/v1/admin/orders/monthly'),
   
   updateStatus: (orderId, status) => 
     api.patch(`/api/v1/admin/orders/${orderId}/status`, { status }),

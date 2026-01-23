@@ -39,7 +39,7 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-md">
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">FOREVER</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">BloomTale</h1>
             <p className="text-gray-500 mt-1 text-sm sm:text-base">Admin Panel</p>
           </div>
 
@@ -116,7 +116,7 @@ export default function Login() {
       {/* Right Side - Image/Branding */}
       <div className="hidden lg:flex flex-1 bg-black items-center justify-center p-8">
         <div className="text-center text-white">
-          <h2 className="text-4xl font-bold mb-4">FOREVER</h2>
+          <h2 className="text-4xl font-bold mb-4">BloomTale</h2>
           <p className="text-gray-400 text-lg">Manage your flower shop with ease</p>
         </div>
       </div>
