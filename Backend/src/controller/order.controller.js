@@ -32,6 +32,8 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   // Constants
   const CANDLE_HANDLING_CHARGE = 50;
+  const FREE_DELIVERY_THRESHOLD = 1500;
+  const SAME_DAY_FREE_DELIVERY_THRESHOLD = 2000;
 
   //  Calculate totals and get delivery info from cart items
   let itemsTotal = 0;
@@ -70,8 +72,19 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   // Use request body values if provided, otherwise use cart values
   const finalDeliveryType = reqDeliveryType || cartDeliveryType || "standard";
-  const finalDeliveryFee = reqDeliveryFee !== undefined ? reqDeliveryFee : cartDeliveryFee;
+  let finalDeliveryFee = reqDeliveryFee !== undefined ? reqDeliveryFee : cartDeliveryFee;
   const finalDeliverySlot = reqDeliverySlot || cartDeliverySlot;
+
+  // Apply free delivery threshold logic
+  const isSameDayDelivery = ['fixed', 'midnight', 'express'].includes(finalDeliveryType);
+  const isMidnightOrExpress = ['midnight', 'express'].includes(finalDeliveryType);
+  const freeDeliveryThreshold = isSameDayDelivery ? SAME_DAY_FREE_DELIVERY_THRESHOLD : FREE_DELIVERY_THRESHOLD;
+  
+  // Only fixed time same-day and standard delivery can be free
+  // Midnight and Express are always charged
+  if (itemsTotal >= freeDeliveryThreshold && !isMidnightOrExpress) {
+    finalDeliveryFee = 0;
+  }
 
   // Total amount = items total + delivery fee + handling charge
   const totalAmount = itemsTotal + finalDeliveryFee + handlingCharge;

@@ -8,6 +8,7 @@ import OrderSummary from "./OrderSummary"
 import Payment from "./Payment"
 import { useCart } from "../../context/CartContext"
 import { orderAPI } from "../../api"
+import { DELIVERY_CONSTANTS } from "../../constants/delivery"
 
 export default function Checkout() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -69,11 +70,33 @@ export default function Checkout() {
   // Calculate cart total for sidebar
   const cartTotal = getCartTotal ? getCartTotal() : 0
   
-  // Calculate delivery fee from cart items (before order is created)
-  const cartDeliveryFee = cartItems?.reduce((maxCharge, item) => {
+  // Get delivery thresholds
+  const { FREE_DELIVERY_THRESHOLD, SAME_DAY_FREE_DELIVERY_THRESHOLD } = DELIVERY_CONSTANTS
+  
+  // Check if any cart item has same-day delivery (fixed/midnight/express)
+  const hasSameDayDelivery = cartItems?.some(item => 
+    item.deliveryType === 'fixed' || item.deliveryType === 'midnight' || item.deliveryType === 'express'
+  ) || false
+  
+  // Check if midnight or express (never free)
+  const hasMidnightOrExpress = cartItems?.some(item => 
+    item.deliveryType === 'midnight' || item.deliveryType === 'express'
+  ) || false
+  
+  // Determine the correct threshold
+  const freeDeliveryThreshold = hasSameDayDelivery ? SAME_DAY_FREE_DELIVERY_THRESHOLD : FREE_DELIVERY_THRESHOLD
+  
+  // Check if free delivery applies
+  const isFreeDelivery = cartTotal >= freeDeliveryThreshold && !hasMidnightOrExpress
+  
+  // Calculate base delivery fee from cart items
+  const baseCartDeliveryFee = cartItems?.reduce((maxCharge, item) => {
     const itemCharge = item.delivery_charge || item.deliveryFee || 0
     return Math.max(maxCharge, itemCharge)
   }, 0) || 0
+  
+  // Apply free delivery if threshold is met
+  const cartDeliveryFee = isFreeDelivery ? 0 : baseCartDeliveryFee
   
   // Calculate handling charge for Candles category (₹50 fixed)
   const CANDLE_HANDLING_CHARGE = 50
