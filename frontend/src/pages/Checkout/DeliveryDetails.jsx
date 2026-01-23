@@ -209,7 +209,7 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
                       <span>+91 {address.mobile}</span>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center items-end gap-2 sm:gap-3">
                     <button
                       type="button"
                       onClick={(e) => {
@@ -217,7 +217,7 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
                         handleAddressSelect(address)
                         setShowNewAddressForm(true)
                       }}
-                      className="text-sm text-[#5e6043] hover:text-[#3e4026] transition-colors"
+                      className="text-xs sm:text-sm text-[#5e6043] hover:text-[#3e4026] transition-colors px-2 py-1"
                     >
                       Edit
                     </button>
@@ -229,17 +229,18 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
                         handleFormSubmit({ preventDefault: () => {} })
                       }}
                       disabled={loading}
-                      className="px-5 py-2.5 bg-[#3e4026] text-white text-sm font-medium rounded-full hover:bg-[#5e6043] transition-all disabled:opacity-50 flex items-center gap-2 group"
+                      className="px-3 sm:px-5 py-2 sm:py-2.5 bg-[#3e4026] text-white text-xs sm:text-sm font-medium rounded-full hover:bg-[#5e6043] transition-all disabled:opacity-50 flex items-center gap-1.5 sm:gap-2 group whitespace-nowrap"
                     >
                       {loading && selectedAddressId === address._id ? (
                         <>
-                          <Loader2 className="animate-spin" size={14} />
-                          Processing...
+                          <Loader2 className="animate-spin" size={12} />
+                          <span className="hidden xs:inline">Processing...</span>
+                          <span className="xs:hidden">Wait...</span>
                         </>
                       ) : (
                         <>
                           Deliver Here
-                          <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                          <ChevronRight size={12} className="sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform" />
                         </>
                       )}
                     </button>

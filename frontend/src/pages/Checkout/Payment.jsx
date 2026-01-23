@@ -174,7 +174,7 @@ export default function Payment({ paymentMethod, setPaymentMethod, onBack, order
           disabled={loading}
           whileHover={{ scale: loading ? 1 : 1.01 }}
           whileTap={{ scale: loading ? 1 : 0.99 }}
-          className="w-full py-4 bg-[#3e4026] text-white font-medium rounded-xl hover:bg-[#5e6043] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-[#3e4026]/20"
+          className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-blue-500/20"
         >
           {loading ? (
             <>

@@ -134,18 +134,14 @@ export default function Checkout() {
           {/* Page Title */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-xl sm:text-2xl font-light text-[#3e4026] tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>Checkout</h1>
-            <div className="flex items-center gap-2 mt-2 text-xs sm:text-sm text-[#5e6043]">
-              <Lock size={14} />
-              <span>Secure checkout</span>
-            </div>
           </div>
           
           <div className="flex flex-col lg:flex-row gap-10">
             {/* Left Column - Main Content */}
             <div className="flex-1">
               {/* Progress Steps */}
-              <div className="mb-8">
-                <div className="flex items-center">
+              <div className="mb-8 flex justify-center">
+                <div className="flex items-center max-w-md w-full">
                   {steps.map((step, index) => {
                     const StepIcon = step.icon
                     const isCompleted = currentStep > step.id
