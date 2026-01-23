@@ -46,18 +46,32 @@ export default function ComboProductDetails() {
       if (data.success && data.data) {
         setProduct(data.data)
         
-        // Set default selections
-        const isFlower = data.data.category?.toLowerCase().includes('flower')
+        // Set default selections - check both category AND product name
+        const productName = data.data.name?.toLowerCase() || ''
+        const productCategory = data.data.category?.toLowerCase() || ''
+        
+        const isFlower = productCategory.includes('flower') || productName.includes('flower')
+        const isBalloon = productCategory.includes('balloon') || productName.includes('balloon')
+        const isCandle = productCategory.includes('candle') || productName.includes('candle')
         
         if (isFlower && data.data.pricing) {
           const mediumSize = 'Medium'
-          const mediumPrice = data.data.pricing?.medium || 0
+          const mediumPrice = data.data.pricing?.medium || data.data.pricing?.small || data.data.price || 0
           setSelectedSize(mediumSize)
           setCurrentPrice(mediumPrice)
-        } else {
-          // For balloons/candles, default to first color
+        } else if (isBalloon) {
+          // For balloons, default to first color
           setSelectedColor(colors[0])
-          setCurrentPrice(data.data.price || 0)
+          const productPrice = data.data.price || data.data.pricing?.medium || data.data.pricing?.small || 0
+          setCurrentPrice(productPrice)
+        } else if (isCandle) {
+          // For candles, use direct price (no size/color selection)
+          const productPrice = data.data.price || 0
+          setCurrentPrice(productPrice)
+        } else {
+          // For other categories
+          const productPrice = data.data.price || data.data.pricing?.medium || data.data.pricing?.small || 0
+          setCurrentPrice(productPrice)
         }
       }
     } catch (error) {
@@ -67,9 +81,13 @@ export default function ComboProductDetails() {
     }
   }
 
-  // Update price when size changes
+  // Update price when size changes (only for flowers with size selection)
   useEffect(() => {
-    if (product?.pricing && selectedSize) {
+    if (!product) return
+    const isFlower = product.category?.toLowerCase().includes('flower')
+    
+    // Only update price based on size for flowers
+    if (isFlower && product.pricing && selectedSize) {
       const sizeKey = selectedSize.toLowerCase()
       const newPrice = product.pricing[sizeKey] || 0
       setCurrentPrice(newPrice)
@@ -85,7 +103,12 @@ export default function ComboProductDetails() {
   }
 
   const handleAddToCombo = () => {
-    const isFlower = product.category?.toLowerCase().includes('flower')
+    // Check both category and product name for type detection
+    const pName = product.name?.toLowerCase() || ''
+    const pCategory = product.category?.toLowerCase() || ''
+    
+    const isFlowerItem = pCategory.includes('flower') || pName.includes('flower')
+    const isBalloonItem = pCategory.includes('balloon') || pName.includes('balloon')
     
     addToCombo({
       product_id: product.product_id,
@@ -93,8 +116,8 @@ export default function ComboProductDetails() {
       images_uri: product.images_uri?.[0] || '',
       price: currentPrice,
       quantity: quantity,
-      selectedSize: isFlower ? selectedSize : undefined,
-      selectedColor: !isFlower && selectedColor ? selectedColor : undefined,
+      selectedSize: isFlowerItem ? selectedSize : undefined,
+      selectedColor: isBalloonItem && selectedColor ? selectedColor : undefined,
       category: product.category
     })
 
@@ -163,7 +186,13 @@ export default function ComboProductDetails() {
     )
   }
 
-  const isFlower = product.category?.toLowerCase().includes('flower')
+  // Check both category AND product name for type detection
+  const productName = product.name?.toLowerCase() || ''
+  const productCategory = product.category?.toLowerCase() || ''
+  
+  const isFlower = productCategory.includes('flower') || productName.includes('flower')
+  const isBalloon = productCategory.includes('balloon') || productName.includes('balloon')
+  const isCandle = productCategory.includes('candle') || productName.includes('candle')
   const sizes = ['Small', 'Medium', 'Large']
 
   return (
@@ -306,11 +335,11 @@ export default function ComboProductDetails() {
             <div className="flex items-start justify-between gap-8">
               <div className="flex-1">
                 {/* Price Display with Discount */}
-                {product.discount_percentage > 0 ? (
+                {product.discount_percentage > 0 && currentPrice > 0 ? (
                   <div className="space-y-2">
                     <div className="flex items-baseline gap-3 flex-wrap">
                       <div className="text-xl md:text-2xl text-gray-400 line-through">
-                        ₹ {(currentPrice * (1 + product.discount_percentage / 100)).toFixed(0)}
+                        ₹ {Math.round(currentPrice / (1 - product.discount_percentage / 100)).toLocaleString()}
                       </div>
                       <div className="text-3xl md:text-4xl font-semibold text-[#3e4026]">
                         ₹ {currentPrice?.toLocaleString()}
@@ -378,8 +407,8 @@ export default function ComboProductDetails() {
               </div>
             )}
 
-            {/* Color Selection for Balloons/Candles */}
-            {!isFlower && (
+            {/* Color Selection for Balloons only */}
+            {isBalloon && (
               <div>
                 <p className="text-xs tracking-[0.2em] uppercase text-gray-500 mb-3 font-medium">Select Color</p>
                 <div className="flex gap-3 flex-wrap">

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { cartAPI, authAPI } from "../api"
 
 const CartContext = createContext()
@@ -64,15 +64,15 @@ export const CartProvider = ({ children }) => {
   }
 
   // Update cart state and cache
-  const updateCartState = (items, total) => {
+  const updateCartState = useCallback((items, total) => {
     setCartItems(items)
     setTotalAmount(total)
     saveCartToStorage(items, total)
-  }
+  }, [])
 
-  // Fetch cart from backend and sync with cache
-  const fetchCart = async () => {
-    if (!isLoggedIn()) {
+  // Internal function to fetch cart - defined before useEffect
+  const fetchCartFromBackend = useCallback(async () => {
+    if (!authAPI.isAuthenticated()) {
       updateCartState([], 0)
       return
     }
@@ -102,7 +102,37 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [updateCartState])
+
+  // Fetch cart from backend and sync with cache (exposed to components)
+  const fetchCart = useCallback(async () => {
+    await fetchCartFromBackend()
+  }, [fetchCartFromBackend])
+
+  // Auto-fetch cart when user is logged in (on mount)
+  useEffect(() => {
+    if (authAPI.isAuthenticated()) {
+      fetchCartFromBackend()
+    }
+  }, [fetchCartFromBackend])
+
+  // Listen for storage changes (login/logout in other tabs)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'token') {
+        if (e.newValue) {
+          // User logged in in another tab
+          fetchCartFromBackend()
+        } else {
+          // User logged out
+          updateCartState([], 0)
+          clearCartStorage()
+        }
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [fetchCartFromBackend, updateCartState])
 
   const addToCart = async (product) => {
     if (!isLoggedIn()) {

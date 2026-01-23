@@ -108,10 +108,10 @@ export default function Footer({ isComboSidebarOpen = false }) {
                 isComboSidebarOpen ? 'gap-2' : 'gap-2 md:gap-3'
               }`}>
                 <Mail size={isComboSidebarOpen ? 16 : 16} className="text-white/50 flex-shrink-0" />
-                <a href="mailto:hello@bloomtale.com" className={`text-white/70 hover:text-white transition-colors ${
+                <a href="mailto:bloomtale00@gmail.com" className={`text-white/70 hover:text-white transition-colors ${
                   isComboSidebarOpen ? 'text-xs' : 'text-xs md:text-sm'
                 }`}>
-                  hello@bloomtale.com
+                  bloomtale00@gmail.com
                 </a>
               </li>
             </ul>
@@ -131,17 +131,18 @@ export default function Footer({ isComboSidebarOpen = false }) {
             }
           `}
         >
-          <div className={`flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-white/50 transition-all duration-300 ${
+          <div className={`flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 text-white/50 transition-all duration-300 ${
             isComboSidebarOpen ? 'text-xs' : 'text-xs md:text-sm'
           }`}>
-            <p>© {currentYear} Bloom Tale. All rights reserved.</p>
-            <div className={`flex transition-all duration-300 ${
-              isComboSidebarOpen ? 'gap-3' : 'gap-4 md:gap-6'
+            <p className="order-1">© {currentYear} Bloom Tale. All rights reserved.</p>
+            <p className="text-white/40 order-3 md:order-2">Developed by <span className="text-white/60 hover:text-white transition-colors">chlabs</span></p>
+            <div className={`flex order-2 md:order-3 transition-all duration-300 ${
+              isComboSidebarOpen ? 'gap-4' : 'gap-6 md:gap-8'
             }`}>
               <Link to="/privacy" className="hover:text-white transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/terms" className="hover:text-white transition-colors py-1">
+              <Link to="/terms" className="hover:text-white transition-colors">
                 Terms of Service
               </Link>
             </div>

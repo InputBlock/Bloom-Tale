@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FlowerScene } from "./flowers";
 import ErrorMessage from "../common/ErrorMessage";
 import { authAPI } from "../../api";
+import { useCart } from "../../context/CartContext";
 
 // Email validation helper
 const isValidEmail = (email) => {
@@ -257,6 +258,7 @@ export default function FlowerLogin() {
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { fetchCart } = useCart();
   
   // Get redirect URL from query params or location state
   const searchParams = new URLSearchParams(location.search);
@@ -348,6 +350,9 @@ export default function FlowerLogin() {
       if (data.data.accessToken) {
         localStorage.setItem("token", data.data.accessToken);
       }
+
+      // Fetch cart immediately after login (before redirect)
+      fetchCart();
 
       // Wait for welcome animation then redirect (longer delay for text animation)
       timeoutRef.current = setTimeout(() => {

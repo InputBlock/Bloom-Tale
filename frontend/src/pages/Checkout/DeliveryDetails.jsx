@@ -56,7 +56,7 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
               handleInputChange('recipientName', firstAddress.fullName || '')
               handleInputChange('mobileNumber', firstAddress.mobile || '')
               handleInputChange('apartment', firstAddress.house || '')
-              handleInputChange('streetAddress', firstAddress.street || '')
+              handleInputChange('streetAddress', firstAddress.streetAddress || firstAddress.street || '')
               handleInputChange('city', firstAddress.city || '')
               handleInputChange('state', firstAddress.state || '')
               handleInputChange('pincode', firstAddress.pincode || '')
@@ -86,7 +86,7 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
     handleInputChange('recipientName', address.fullName || '')
     handleInputChange('mobileNumber', address.mobile || '')
     handleInputChange('apartment', address.house || '')
-    handleInputChange('streetAddress', address.street || '')
+    handleInputChange('streetAddress', address.streetAddress || address.street || '')
     handleInputChange('city', address.city || '')
     handleInputChange('state', address.state || '')
     handleInputChange('pincode', address.pincode || '')
@@ -105,7 +105,7 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
           email: formData.email,
           mobile: formData.mobileNumber,
           house: formData.apartment,
-          street: formData.streetAddress,
+          streetAddress: formData.streetAddress,
           city: formData.city,
           state: formData.state,
           pincode: formData.pincode,
@@ -199,7 +199,7 @@ export default function DeliveryDetails({ formData, handleInputChange, onSubmit 
                       )}
                     </div>
                     <p className="text-sm text-[#5e6043] leading-relaxed">
-                      {[address.house, address.street].filter(Boolean).join(', ')}
+                      {[address.house, address.streetAddress || address.street].filter(Boolean).join(', ')}
                     </p>
                     <p className="text-sm text-[#5e6043]">
                       {address.city}, {address.state} - {address.pincode}
