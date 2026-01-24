@@ -22,15 +22,17 @@ const add_item = asyncHandler(async (req, res) => {
 
     const category = req.body.category;
     const isSinglePrice = SINGLE_PRICE_CATEGORIES.includes(category);
+    const pricingType = req.body.pricing_type || (isSinglePrice ? "fixed" : "sized");
 
     const details = {
         name: req.body.name,
         description: req.body.description,
         category: category,
-        // For Candles/Combos: use single price field
-        // For others: use pricing object with sizes
-        price: isSinglePrice ? parseFloat(req.body.price) || 0 : null,
-        pricing: isSinglePrice 
+        pricing_type: pricingType,
+        // For Candles/Combos or fixed price flowers: use single price field
+        // For sized flowers: use pricing object with sizes
+        price: (isSinglePrice || pricingType === "fixed") ? parseFloat(req.body.price) || 0 : null,
+        pricing: (isSinglePrice || pricingType === "fixed")
             ? { small: null, medium: null, large: null } 
             : (req.body.pricing ? JSON.parse(req.body.pricing) : { small: 0, medium: 0, large: 0 }),
         sizes: isSinglePrice ? [] : (req.body.sizes ? JSON.parse(req.body.sizes) : ["Small", "Medium", "Large"]),

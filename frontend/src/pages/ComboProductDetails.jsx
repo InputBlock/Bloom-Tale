@@ -54,7 +54,11 @@ export default function ComboProductDetails() {
         const isBalloon = productCategory.includes('balloon') || productName.includes('balloon')
         const isCandle = productCategory.includes('candle') || productName.includes('candle')
         
-        if (isFlower && data.data.pricing) {
+        // Check if flower has sized pricing
+        const hasSizedPricing = data.data.pricing && (data.data.pricing?.small || data.data.pricing?.medium || data.data.pricing?.large)
+        const isFixedPrice = data.data.pricing_type === 'fixed' || (!hasSizedPricing && data.data.price)
+        
+        if (isFlower && hasSizedPricing && !isFixedPrice) {
           const mediumSize = 'Medium'
           const mediumPrice = data.data.pricing?.medium || data.data.pricing?.small || data.data.price || 0
           setSelectedSize(mediumSize)
@@ -66,6 +70,10 @@ export default function ComboProductDetails() {
           setCurrentPrice(productPrice)
         } else if (isCandle) {
           // For candles, use direct price (no size/color selection)
+          const productPrice = data.data.price || 0
+          setCurrentPrice(productPrice)
+        } else if (isFlower && isFixedPrice) {
+          // For flowers with fixed price (no size selection)
           const productPrice = data.data.price || 0
           setCurrentPrice(productPrice)
         } else {
@@ -85,9 +93,11 @@ export default function ComboProductDetails() {
   useEffect(() => {
     if (!product) return
     const isFlower = product.category?.toLowerCase().includes('flower')
+    const hasSizedPricing = product.pricing && (product.pricing?.small || product.pricing?.medium || product.pricing?.large)
+    const isFixedPrice = product.pricing_type === 'fixed' || (!hasSizedPricing && product.price)
     
-    // Only update price based on size for flowers
-    if (isFlower && product.pricing && selectedSize) {
+    // Only update price based on size for flowers with sized pricing
+    if (isFlower && hasSizedPricing && !isFixedPrice && selectedSize) {
       const sizeKey = selectedSize.toLowerCase()
       const newPrice = product.pricing[sizeKey] || 0
       setCurrentPrice(newPrice)
@@ -380,8 +390,8 @@ export default function ComboProductDetails() {
               </div>
             </div>
 
-            {/* Size Selection for Flowers */}
-            {isFlower && product.pricing && (
+            {/* Size Selection for Flowers with sized pricing only */}
+            {isFlower && product.pricing && (product.pricing?.small || product.pricing?.medium || product.pricing?.large) && product.pricing_type !== 'fixed' && (
               <div>
                 <p className="text-xs tracking-[0.2em] uppercase text-[#3e4026]/60 mb-3 font-medium">Size</p>
                 <div className="grid grid-cols-3 gap-3 w-full">

@@ -26,7 +26,8 @@ export default function BestsellingBlooms() {
         const { response, data } = await productsAPI.getBestsellers()
         
         if (data.success && data.data) {
-          setProducts(data.data)
+          // Show only first 4 bestseller products on home page
+          setProducts(data.data.slice(0, 4))
         }
       } catch (error) {
         console.error('Error fetching bestseller products:', error)

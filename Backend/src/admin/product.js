@@ -1,7 +1,7 @@
 
 import productSchema from "../models/product.js";
 
-// Categories that use single pricing (no sizes) - product_type: "simple"
+// Categories that use single pricing ONLY (no sizes) - product_type: "simple"
 const SINGLE_PRICE_CATEGORIES = ["Candles", "Combos", "Balloons"];
 
 // Helper to determine product_type from category
@@ -30,17 +30,41 @@ export async function addItem(details) {
         details.pricing = { small: null, medium: null, large: null };
         details.sizes = []; // No sizes for simple products
         details.product_type = "simple";
+        details.pricing_type = "fixed";
     } else {
-        // For other categories - require all 3 pricing tiers
-        if (!details.pricing || !details.pricing.small || !details.pricing.medium || !details.pricing.large) {
-            throw new Error("All pricing tiers (small, medium, large) are required");
+        // For other categories (Flowers) - check pricing_type
+        const pricingType = details.pricing_type || "sized"; // Default to sized
+        
+        if (pricingType === "both") {
+            // Both pricing options - require fixed price and at least one size price
+            if (!details.price || details.price <= 0) {
+                throw new Error("Fixed price is required when using both pricing options");
+            }
+            if (!details.pricing || (!details.pricing.small && !details.pricing.medium && !details.pricing.large)) {
+                throw new Error("At least one size price is required when using both pricing options");
+            }
+            details.product_type = "sized";
+            details.pricing_type = "both";
+        } else if (pricingType === "fixed") {
+            // Fixed price only
+            if (!details.price || details.price <= 0) {
+                throw new Error("Price is required and must be greater than 0");
+            }
+            details.pricing = { small: null, medium: null, large: null };
+            details.product_type = "simple";
+            details.pricing_type = "fixed";
+        } else {
+            // Sized pricing (default)
+            if (!details.pricing || !details.pricing.small || !details.pricing.medium || !details.pricing.large) {
+                throw new Error("All pricing tiers (small, medium, large) are required");
+            }
+            if (details.pricing.small <= 0 || details.pricing.medium <= 0 || details.pricing.large <= 0) {
+                throw new Error("All prices must be greater than 0");
+            }
+            details.price = null;
+            details.product_type = "sized";
+            details.pricing_type = "sized";
         }
-        if (details.pricing.small <= 0 || details.pricing.medium <= 0 || details.pricing.large <= 0) {
-            throw new Error("All prices must be greater than 0");
-        }
-        // Clear single price for sized products
-        details.price = null;
-        details.product_type = "sized";
     }
     
     const existing = await productSchema.findOne({ name: details.name.trim() });
@@ -124,12 +148,26 @@ export async function updateItem(id, updateData) {
             updateData.sizes = [];
         }
         updateData.product_type = "simple";
+        updateData.pricing_type = "fixed";
     } else {
-        // For sized products - use pricing, clear price
-        if (updateData.pricing) {
-            updateData.price = null;
+        // For flower categories - check pricing_type
+        const pricingType = updateData.pricing_type || existing.pricing_type || "sized";
+        
+        if (pricingType === "fixed") {
+            // Fixed price for flower
+            if (updateData.price) {
+                updateData.pricing = { small: null, medium: null, large: null };
+            }
+            updateData.product_type = "simple";
+            updateData.pricing_type = "fixed";
+        } else {
+            // Size-based pricing
+            if (updateData.pricing) {
+                updateData.price = null;
+            }
+            updateData.product_type = "sized";
+            updateData.pricing_type = "sized";
         }
-        updateData.product_type = "sized";
     }
 
     Object.assign(existing, updateData);
@@ -161,7 +199,8 @@ export async function getList() {
             category: item.category,
             subcategory: item.subcategory,
             product_type: item.product_type || (SINGLE_PRICE_CATEGORIES.includes(item.category) ? "simple" : "sized"),
-            price: item.price, // Single price for Candles/Combos/Balloons
+            pricing_type: item.pricing_type || (SINGLE_PRICE_CATEGORIES.includes(item.category) ? "fixed" : "sized"),
+            price: item.price, // Single price for Candles/Combos/Balloons or fixed price flowers
             pricing: item.pricing, // Size-based pricing for other products
             sizes: item.sizes,
             stock: item.stock,

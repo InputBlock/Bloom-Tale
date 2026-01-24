@@ -23,6 +23,7 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
       setEditProduct({ 
         ...product,
         pricing: product.pricing || { small: 0, medium: 0, large: 0 },
+        pricing_type: product.pricing_type || (product.price ? 'fixed' : 'sized'),
         discount_percentage: product.discount_percentage || 0
       })
     }
@@ -107,47 +108,98 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
                 />
               </div>
             ) : (
-              // Three Sizes for other categories - Horizontal Layout
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                {/* Small Price */}
-                <div>
-                  <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">Small (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={editProduct.pricing.small}
-                    onChange={(e) => handlePricingChange('small', e.target.value)}
-                    className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
-                    placeholder="0.00"
-                  />
+              // Flower categories - choose between sized or fixed pricing
+              <>
+                {/* Pricing Type Selector */}
+                <div className="flex gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditProduct({ ...editProduct, pricing_type: "sized" })}
+                    className={`flex-1 py-2 px-3 rounded-lg font-medium text-xs sm:text-sm transition-all ${
+                      editProduct.pricing_type === "sized"
+                        ? "bg-black text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    Size Based (S/M/L)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditProduct({ ...editProduct, pricing_type: "fixed" })}
+                    className={`flex-1 py-2 px-3 rounded-lg font-medium text-xs sm:text-sm transition-all ${
+                      editProduct.pricing_type === "fixed"
+                        ? "bg-black text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    Fixed Price
+                  </button>
                 </div>
 
-                {/* Medium Price */}
-                <div>
-                  <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">Medium (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={editProduct.pricing.medium}
-                    onChange={(e) => handlePricingChange('medium', e.target.value)}
-                    className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
-                    placeholder="0.00"
-                  />
-                </div>
+                {editProduct.pricing_type === "fixed" ? (
+                  // Fixed Price for flowers
+                  <div>
+                    <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">Price (₹)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editProduct.price || ""}
+                      onChange={(e) => {
+                        const price = e.target.value === "" ? "" : parseFloat(e.target.value) || 0
+                        setEditProduct({
+                          ...editProduct,
+                          price: price,
+                          pricing: { small: null, medium: null, large: null }
+                        })
+                      }}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                      placeholder="0.00"
+                    />
+                  </div>
+                ) : (
+                  // Three Sizes for other categories - Horizontal Layout
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                    {/* Small Price */}
+                    <div>
+                      <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">Small (₹)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editProduct.pricing.small}
+                        onChange={(e) => handlePricingChange('small', e.target.value)}
+                        className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                        placeholder="0.00"
+                      />
+                    </div>
 
-                {/* Large Price */}
-                <div>
-                  <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">Large (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={editProduct.pricing.large}
-                    onChange={(e) => handlePricingChange('large', e.target.value)}
-                    className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
+                    {/* Medium Price */}
+                    <div>
+                      <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">Medium (₹)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editProduct.pricing.medium}
+                        onChange={(e) => handlePricingChange('medium', e.target.value)}
+                        className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                        placeholder="0.00"
+                      />
+                    </div>
+
+                    {/* Large Price */}
+                    <div>
+                      <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">Large (₹)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editProduct.pricing.large}
+                        onChange={(e) => handlePricingChange('large', e.target.value)}
+                        className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -178,7 +230,7 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }) {
               <div className="mt-2 p-2 sm:p-2.5 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-[10px] sm:text-xs text-blue-900">
                   <strong>💡 Preview:</strong> Customer sees{" "}
-                  {SINGLE_PRICE_CATEGORIES.includes(editProduct.category) ? (
+                  {SINGLE_PRICE_CATEGORIES.includes(editProduct.category) || editProduct.pricing_type === "fixed" ? (
                     editProduct.price && (
                       <span>
                         <span className="line-through text-gray-500">₹{(parseFloat(editProduct.price) * (1 + parseFloat(editProduct.discount_percentage) / 100)).toFixed(0)}</span>{" "}

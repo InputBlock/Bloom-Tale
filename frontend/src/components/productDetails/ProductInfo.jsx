@@ -24,20 +24,26 @@ export default function ProductInfo({ product, fromSameDay = false }) {
   // OR if product is marked as same_day_delivery and not from another category
   const showSameDayDelivery = fromSameDay || (product?.same_day_delivery && fromSameDay !== false)
 
-  // Check if this is a single-price category
-  const isSinglePriceCategory = SINGLE_PRICE_CATEGORIES.includes(product?.category)
+  // Check if this product uses single/fixed price (no size selection)
+  // 1. Category is Candles/Combos/Balloons
+  // 2. pricing_type is "fixed"
+  // 3. Has price but no pricing object (legacy support)
+  const hasSizedPricing = product?.pricing && (product?.pricing?.small || product?.pricing?.medium || product?.pricing?.large)
+  const isSinglePriceCategory = SINGLE_PRICE_CATEGORIES.includes(product?.category) || 
+                                 product?.pricing_type === "fixed" || 
+                                 (!hasSizedPricing && product?.price)
 
   // Get the price based on selected size or single price
   const getCurrentPrice = () => {
     if (!product) return 0
-    // For single-price categories, use the price field
+    // For single-price products, use the price field
     if (isSinglePriceCategory) {
       return product.price || 0
     }
     // For sized products, use pricing object
-    if (!product?.pricing) return 0
+    if (!product?.pricing) return product.price || 0
     const sizeKey = selectedSize.toLowerCase()
-    return product.pricing[sizeKey] || 0
+    return product.pricing[sizeKey] || product.price || 0
   }
 
   const handleQuantityChange = (type) => {

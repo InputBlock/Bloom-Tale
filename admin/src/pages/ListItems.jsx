@@ -30,6 +30,7 @@ export default function ListItems() {
         category: product.category,
         pricing: product.pricing || { small: 0, medium: 0, large: 0 },
         price: product.price,
+        pricing_type: product.pricing_type || 'sized',
         stock: product.stock,
         isListed: product.isActive,
         isBestSeller: product.isBestSeller || false,
@@ -105,6 +106,7 @@ export default function ListItems() {
         category: updatedProduct.category,
         pricing: updatedProduct.pricing,
         price: updatedProduct.price,
+        pricing_type: updatedProduct.pricing_type,
         same_day_delivery: updatedProduct.sameDayDelivery,
         bestSeller: updatedProduct.isBestSeller,
         combo: updatedProduct.isCombo
@@ -176,20 +178,29 @@ export default function ListItems() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  <div className="text-center bg-gray-50 rounded p-2">
-                    <p className="text-[10px] text-gray-500 mb-0.5">Small</p>
-                    <p className="text-sm font-semibold">₹{product.pricing?.small || 0}</p>
+                {product.pricing_type === 'fixed' || product.price ? (
+                  <div className="mb-3">
+                    <div className="text-center bg-gray-50 rounded p-2">
+                      <p className="text-[10px] text-gray-500 mb-0.5">Price</p>
+                      <p className="text-sm font-semibold">₹{product.price || 0}</p>
+                    </div>
                   </div>
-                  <div className="text-center bg-gray-50 rounded p-2">
-                    <p className="text-[10px] text-gray-500 mb-0.5">Medium</p>
-                    <p className="text-sm font-semibold">₹{product.pricing?.medium || 0}</p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2 mb-3">
+                    <div className="text-center bg-gray-50 rounded p-2">
+                      <p className="text-[10px] text-gray-500 mb-0.5">Small</p>
+                      <p className="text-sm font-semibold">₹{product.pricing?.small || 0}</p>
+                    </div>
+                    <div className="text-center bg-gray-50 rounded p-2">
+                      <p className="text-[10px] text-gray-500 mb-0.5">Medium</p>
+                      <p className="text-sm font-semibold">₹{product.pricing?.medium || 0}</p>
+                    </div>
+                    <div className="text-center bg-gray-50 rounded p-2">
+                      <p className="text-[10px] text-gray-500 mb-0.5">Large</p>
+                      <p className="text-sm font-semibold">₹{product.pricing?.large || 0}</p>
+                    </div>
                   </div>
-                  <div className="text-center bg-gray-50 rounded p-2">
-                    <p className="text-[10px] text-gray-500 mb-0.5">Large</p>
-                    <p className="text-sm font-semibold">₹{product.pricing?.large || 0}</p>
-                  </div>
-                </div>
+                )}
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -241,9 +252,15 @@ export default function ListItems() {
                         <span className="text-gray-900 font-medium text-sm lg:text-base">{product.name}</span>
                       </td>
                       <td className="py-3 lg:py-4 px-4 lg:px-6 text-gray-600 text-xs lg:text-sm">{product.category}</td>
-                      <td className="py-3 lg:py-4 px-2 lg:px-4 text-center text-gray-900 font-semibold text-xs lg:text-sm">₹{product.pricing?.small || 0}</td>
-                      <td className="py-3 lg:py-4 px-2 lg:px-4 text-center text-gray-900 font-semibold text-xs lg:text-sm">₹{product.pricing?.medium || 0}</td>
-                      <td className="py-3 lg:py-4 px-2 lg:px-4 text-center text-gray-900 font-semibold text-xs lg:text-sm">₹{product.pricing?.large || 0}</td>
+                      {product.pricing_type === 'fixed' || product.price ? (
+                        <td colSpan="3" className="py-3 lg:py-4 px-2 lg:px-4 text-center text-gray-900 font-semibold text-xs lg:text-sm">₹{product.price || 0}</td>
+                      ) : (
+                        <>
+                          <td className="py-3 lg:py-4 px-2 lg:px-4 text-center text-gray-900 font-semibold text-xs lg:text-sm">₹{product.pricing?.small || 0}</td>
+                          <td className="py-3 lg:py-4 px-2 lg:px-4 text-center text-gray-900 font-semibold text-xs lg:text-sm">₹{product.pricing?.medium || 0}</td>
+                          <td className="py-3 lg:py-4 px-2 lg:px-4 text-center text-gray-900 font-semibold text-xs lg:text-sm">₹{product.pricing?.large || 0}</td>
+                        </>
+                      )}
                       <td className="py-3 lg:py-4 px-4 lg:px-6">
                         <span className={`px-2 lg:px-3 py-1 lg:py-1.5 rounded-full text-[10px] lg:text-xs font-medium ${product.sameDayDelivery
                             ? "bg-blue-100 text-blue-700 border border-blue-200"

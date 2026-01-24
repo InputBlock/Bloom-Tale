@@ -11,7 +11,8 @@ export default function ProductForm({ images = [], setImages = () => {} }) {
     name: "",
     description: "",
     type: "Birthday",
-    price: "", // Single price for Candles/Combos
+    pricing_type: "sized", // "sized" for size-based, "fixed" for single price
+    price: "", // Single price for Candles/Combos or fixed price flowers
     pricing: {
       small: "",
       medium: "",
@@ -65,13 +66,21 @@ export default function ProductForm({ images = [], setImages = () => {} }) {
       formDataToSend.append("combo", formData.combo)
       formDataToSend.append("is_active", formData.isActive)
       
-      // Send price or pricing based on category
+      // Send price or pricing based on category and pricing_type
       if (isSinglePrice) {
         // For Candles/Combos - send single price
         formDataToSend.append("price", formData.price)
+        formDataToSend.append("pricing_type", "fixed")
       } else {
-        // For other categories - send pricing object
-        formDataToSend.append("pricing", JSON.stringify(formData.pricing))
+        // For other categories - check pricing_type
+        formDataToSend.append("pricing_type", formData.pricing_type)
+        if (formData.pricing_type === "fixed") {
+          // Fixed price for flower
+          formDataToSend.append("price", formData.price)
+        } else {
+          // Size-based pricing
+          formDataToSend.append("pricing", JSON.stringify(formData.pricing))
+        }
       }
       
       // Send discount percentage
@@ -94,6 +103,7 @@ export default function ProductForm({ images = [], setImages = () => {} }) {
         name: "",
         description: "",
         type: "Birthday",
+        pricing_type: "sized",
         price: "",
         pricing: {
           small: "",
@@ -255,68 +265,119 @@ export default function ProductForm({ images = [], setImages = () => {} }) {
             <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500">Set the price for this product</p>
           </>
         ) : (
-          // Three Sizes for other categories
+          // Flower categories - choose between sized or fixed pricing
           <>
-            <label className="block text-gray-900 font-medium mb-2 sm:mb-3 text-sm sm:text-base">Pricing by Size</label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              {/* Small Size */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="block text-xs sm:text-sm font-medium text-gray-700">Small</label>
-                <div className="relative">
-                  <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                  <input
-                    type="number"
-                    value={formData.pricing.small}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      pricing: { ...formData.pricing, small: e.target.value }
-                    })}
-                    placeholder="0.00"
-                    step="0.01"
-                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
-                  />
-                </div>
-              </div>
-
-              {/* Medium Size */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="block text-xs sm:text-sm font-medium text-gray-700">Medium</label>
-                <div className="relative">
-                  <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                  <input
-                    type="number"
-                    value={formData.pricing.medium}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      pricing: { ...formData.pricing, medium: e.target.value }
-                    })}
-                    placeholder="0.00"
-                    step="0.01"
-                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
-                  />
-                </div>
-              </div>
-
-              {/* Large Size */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="block text-xs sm:text-sm font-medium text-gray-700">Large</label>
-                <div className="relative">
-                  <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
-                  <input
-                    type="number"
-                    value={formData.pricing.large}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      pricing: { ...formData.pricing, large: e.target.value }
-                    })}
-                    placeholder="0.00"
-                    step="0.01"
-                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
-                  />
-                </div>
+            {/* Pricing Type Selector */}
+            <div className="mb-4">
+              <label className="block text-gray-900 font-medium mb-2 sm:mb-3 text-sm sm:text-base">Pricing Type</label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, pricing_type: "sized" })}
+                  className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+                    formData.pricing_type === "sized"
+                      ? "bg-black text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Size Based (S/M/L)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, pricing_type: "fixed" })}
+                  className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+                    formData.pricing_type === "fixed"
+                      ? "bg-black text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Fixed Price
+                </button>
               </div>
             </div>
-            <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500">Set different prices for small, medium, and large arrangements</p>
+
+            {formData.pricing_type === "fixed" ? (
+              // Fixed Price for flowers without sizes
+              <>
+                <label className="block text-gray-900 font-medium mb-2 sm:mb-3 text-sm sm:text-base">Price</label>
+                <div className="relative max-w-full sm:max-w-md">
+                  <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                  <input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    placeholder="0.00"
+                    step="0.01"
+                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                  />
+                </div>
+                <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500">Set a single fixed price for this flower</p>
+              </>
+            ) : (
+              // Size-based pricing
+              <>
+                <label className="block text-gray-900 font-medium mb-2 sm:mb-3 text-sm sm:text-base">Pricing by Size</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                  {/* Small Size */}
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700">Small</label>
+                    <div className="relative">
+                      <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                      <input
+                        type="number"
+                        value={formData.pricing.small}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          pricing: { ...formData.pricing, small: e.target.value }
+                        })}
+                        placeholder="0.00"
+                        step="0.01"
+                        className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Medium Size */}
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700">Medium</label>
+                    <div className="relative">
+                      <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                      <input
+                        type="number"
+                        value={formData.pricing.medium}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          pricing: { ...formData.pricing, medium: e.target.value }
+                        })}
+                        placeholder="0.00"
+                        step="0.01"
+                        className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Large Size */}
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700">Large</label>
+                    <div className="relative">
+                      <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                      <input
+                        type="number"
+                        value={formData.pricing.large}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          pricing: { ...formData.pricing, large: e.target.value }
+                    })}
+                    placeholder="0.00"
+                    step="0.01"
+                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500">Set different prices for small, medium, and large arrangements</p>
+              </>
+            )}
           </>
         )}
       </div>
@@ -348,7 +409,7 @@ export default function ProductForm({ images = [], setImages = () => {} }) {
         {formData.discount_percentage > 0 && (
           <div className="mt-2 sm:mt-3 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
             <p className="text-xs sm:text-sm font-medium text-blue-900 mb-1">💡 Preview:</p>
-            {SINGLE_PRICE_CATEGORIES.includes(formData.type) ? (
+            {SINGLE_PRICE_CATEGORIES.includes(formData.type) || formData.pricing_type === "fixed" ? (
               formData.price && (
                 <p className="text-xs sm:text-sm text-blue-800">
                   Customer will see: <span className="line-through text-gray-500">₹{(parseFloat(formData.price) * (1 + parseFloat(formData.discount_percentage) / 100)).toFixed(0)}</span>{" "}
