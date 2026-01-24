@@ -223,7 +223,7 @@ const DeliveryCheck = forwardRef(({
             onChange={handlePincodeChange}
             placeholder="Enter Pincode"
             maxLength="6"
-            className={`flex-1 border px-4 py-3 text-sm focus:outline-none transition-colors ${
+            className={`flex-1 border px-4 py-3 w-50 text-sm focus:outline-none transition-colors ${
               showWarning && globalStatus !== 'available'
                 ? 'border-amber-500 focus:border-amber-600'
                 : 'border-gray-300 focus:border-[#3e4026]'

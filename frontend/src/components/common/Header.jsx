@@ -213,7 +213,7 @@ export default function Header() {
                     {getFirstLetter()}
                   </div>
                 ) : (
-                  <div className={`p-2 hover:bg-white/10 rounded-full transition-all duration-300 ${iconColor}`}>
+                  <div className={`p-2 hover:bg-white/10 mt-2 rounded-full transition-all duration-300 ${iconColor}`}>
                     <User size={20} strokeWidth={1.8} />
                   </div>
                 )}
