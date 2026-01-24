@@ -51,9 +51,15 @@ export default function ListItems() {
     product.id.includes(searchTerm)
   )
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this item?")) {
-      setProducts(products.filter((p) => p.id !== id))
+      try {
+        await productsAPI.delete(id)
+        setProducts(products.filter((p) => p.id !== id))
+      } catch (error) {
+        console.error("Error deleting product:", error)
+        alert("Failed to delete product. Please try again.")
+      }
     }
   }
   const handleUpdateStock = async (id) => {
