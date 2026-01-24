@@ -135,20 +135,28 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
                   
                   {/* Price Display with Discount */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    {item.discount_percentage > 0 ? (
-                      <>
-                        <p className="text-xs sm:text-sm text-gray-400 line-through">
-                          ₹{((item.pricing?.medium || 0) * (1 + item.discount_percentage / 100)).toFixed(0)}
+                    {(() => {
+                      // Get display price - check for fixed price first, then sized pricing
+                      const displayPrice = item.price || item.pricing?.medium || item.pricing?.small || 0
+                      
+                      if (item.discount_percentage > 0 && displayPrice > 0) {
+                        return (
+                          <>
+                            <p className="text-xs sm:text-sm text-gray-400 line-through">
+                              ₹{(displayPrice * (1 + item.discount_percentage / 100)).toFixed(0)}
+                            </p>
+                            <p className="text-sm sm:text-base md:text-lg font-semibold text-[#3e4026]">
+                              ₹{displayPrice?.toLocaleString()}
+                            </p>
+                          </>
+                        )
+                      }
+                      return (
+                        <p className="text-sm sm:text-base md:text-lg font-light text-[#3e4026]">
+                          ₹{displayPrice?.toLocaleString()}
                         </p>
-                        <p className="text-sm sm:text-base md:text-lg font-semibold text-[#3e4026]">
-                          ₹{item.pricing?.medium?.toLocaleString() || 0}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-sm sm:text-base md:text-lg font-light text-[#3e4026]">
-                        ₹{item.pricing?.medium?.toLocaleString() || 0}
-                      </p>
-                    )}
+                      )
+                    })()}
                   </div>
                 </div>
               </div>
