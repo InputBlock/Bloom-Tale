@@ -19,6 +19,11 @@ export default function RazorpayPayment() {
   const { clearCart } = useCart()
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
     // Prevent re-opening Razorpay on back/refresh
     if (paymentInitiated.current) {
       return

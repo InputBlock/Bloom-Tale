@@ -13,6 +13,11 @@ export default function ForgotPassword() {
   const [otpValue, setOtpValue] = useState("")
   const navigate = useNavigate()
 
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0)
+  }, [])
+
   const handleEmailNext = async (email) => {
     try {
       const { response, data } = await authAPI.forgotPassword(email)

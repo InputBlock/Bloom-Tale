@@ -17,6 +17,11 @@ export default function Checkout() {
   const [orderDetails, setOrderDetails] = useState(null)
   const { cartItems, getCartTotal } = useCart()
   
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0)
+  }, [])
+  
   const [formData, setFormData] = useState({
     saveAddress: false,
     title: "Mr.",

@@ -30,6 +30,11 @@ export default function Services() {
   })
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
     // Check URL parameters for tab
     const tabParam = searchParams.get("tab")
     if (tabParam && ["wedding", "social", "corporate"].includes(tabParam)) {

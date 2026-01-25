@@ -19,6 +19,11 @@ export default function ProductCart() {
   const navigate = useNavigate()
   const [expandedCombos, setExpandedCombos] = useState({})
 
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0)
+  }, [])
+
   // Redirect if not logged in
   if (!isLoggedIn()) {
     navigate("/login", { state: { from: "/cart" }, replace: true })
